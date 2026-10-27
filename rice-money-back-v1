@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PandaSplit Pro - foodpanda 雲端外賣夾錢神器</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            panda: {
+              50: '#fff0f6',
+              100: '#ffe0ed',
+              200: '#ffc2dc',
+              300: '#ff94c2',
+              400: '#ff5ca1',
+              500: '#e21b70',
+              600: '#d70f64',
+              700: '#b30b52',
+              800: '#910a43',
+              900: '#780c39',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+HK:wght@400;500;700;900&display=swap');
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans HK', sans-serif;
+      background-color: #fdf6f9;
+      color: #2e3333;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .slide-transition {
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+    }
+
+    .long-press-active {
+      transform: scale(0.97);
+      background-color: #fff0f6 !important;
+      border-color: #d70f64 !important;
+      transition: transform 0.15s ease;
+    }
+
+    @media (orientation: landscape) and (min-width: 768px) {
+      .app-shell {
+        max-width: 1120px;
+        display: grid;
+        grid-template-columns: 375px 1fr;
+        gap: 1rem;
+        padding: 1rem;
+        min-height: 100vh;
+      }
+      .landscape-sticky-pane {
+        position: sticky;
+        top: 1rem;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24 md:pb-8">
+
+  <!-- Main App Container -->
+  <div class="app-shell max-w-md mx-auto bg-[#fdf6f9] min-h-screen shadow-xl relative overflow-hidden md:rounded-3xl md:my-4 md:border md:border-panda-100">
+
+    <!-- LEFT / TOP PANE: Summary Header & Receipt Drawer -->
+    <div class="landscape-sticky-pane flex flex-col bg-white border-b md:border-b-0 md:border-r border-panda-100 md:rounded-2xl md:shadow-sm">
+      <!-- Top App Bar (foodpanda Signature Pink Gradient) -->
+      <header class="bg-gradient-to-br from-[#D70F64] via-[#E21B70] to-[#B00B51] text-white p-4 pb-5 rounded-b-3xl md:rounded-t-2xl shadow-md relative overflow-hidden">
+        <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 pointer-events-none"></div>
+
+        <div class="flex items-center justify-between mb-3 relative z-10">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-white text-panda-600 flex items-center justify-center shadow-md font-extrabold text-lg">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <div>
+              <input id="orderTitleInput" type="text" value="周五 Team Lunch 外賣團" 
+                class="bg-transparent font-extrabold text-base text-white border-b border-transparent focus:border-white/70 focus:outline-none w-40 sm:w-48"
+                onchange="updateOrderTitle(this.value)" />
+              <div class="text-[11px] text-panda-100 flex items-center gap-1.5 mt-0.5">
+                <span class="bg-white/20 px-1.5 py-0.2 rounded text-[10px] font-bold tracking-wide text-white">
+                  <i class="fa-solid fa-crown text-amber-300 mr-0.5"></i>pandapro
+                </span>
+                <!-- Cloud Status Indicator -->
+                <button onclick="openCloudModal()" id="cloudStatusBadge"
+                  class="bg-black/25 hover:bg-black/35 px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 transition">
+                  <span id="cloudStatusDot" class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span>
+                  <span id="cloudStatusText">雲端連線中...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button onclick="openCloudModal()" title="雲端房間與多人同步設定"
+              class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1 transition active:scale-95">
+              <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i>
+              <span class="hidden sm:inline">雲端</span>
+            </button>
+            <button onclick="toggleReceiptDrawer()" id="receiptDrawerBtn"
+              class="px-2.5 py-1.5 rounded-xl bg-white text-panda-600 hover:bg-panda-50 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-receipt"></i>
+              <span>收據</span>
+            </button>
+            <button onclick="openResetModal()" title="重設或載入範例"
+              class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-xs transition active:scale-95">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Calculation Dashboard Cards -->
+        <div class="grid grid-cols-4 gap-2 bg-black/20 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10">
+          <div>
+            <div class="text-[11px] text-panda-100">餐點原價</div>
+            <div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div>
+          </div>
+          <div>
+            <div class="text-[11px] text-amber-200">折扣優惠</div>
+            <div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div>
+          </div>
+          <div>
+            <div class="text-[11px] text-panda-100">運費/平台費</div>
+            <div id="sumFees" class="font-bold text-sm sm:text-base text-white mt-0.5">+$0.0</div>
+          </div>
+          <div class="bg-white text-panda-600 rounded-xl py-1 px-1 shadow-xs">
+            <div class="text-[10px] font-bold uppercase tracking-tight">最終應收</div>
+            <div id="sumFinal" class="font-extrabold text-sm sm:text-base mt-0.5">$0.0</div>
+          </div>
+        </div>
+
+        <!-- Discount & Collection Progress Bar -->
+        <div class="mt-3 flex items-center justify-between text-xs text-white px-1 relative z-10">
+          <div class="flex items-center gap-1.5">
+            <span class="px-2.5 py-0.5 rounded-full bg-white/20 border border-white/30 text-white font-bold text-[11px]" id="effectiveRateBadge">
+              折實率: 100%
+            </span>
+            <span id="roundingModeBadge" class="text-[11px] text-panda-100">精確至 $0.1</span>
+          </div>
+          <div id="collectionStatusText" class="font-bold text-amber-200">
+            已收 0 / 0 人
+          </div>
+        </div>
+      </header>
+
+      <!-- Collapsible Floating Receipt Screenshot Viewer -->
+      <div id="receiptDrawer" class="hidden bg-neutral-900 text-white p-3 border-b border-neutral-800 transition-all">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-xs font-bold flex items-center gap-1.5 text-panda-300">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>foodpanda 收據截圖對照窗</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <label class="px-2.5 py-1 bg-panda-600 hover:bg-panda-500 rounded-lg text-xs font-bold cursor-pointer transition">
+              <i class="fa-solid fa-upload mr-1"></i>上傳截圖
+              <input type="file" accept="image/*" class="hidden" onchange="handleReceiptUpload(event)" />
+            </label>
+            <button onclick="loadMockReceipt()" class="px-2 py-1 bg-neutral-700 hover:bg-neutral-600 rounded-lg text-xs">
+              範例收據
+            </button>
+            <button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Receipt Preview Box -->
+        <div id="receiptPreviewContainer" class="max-h-56 overflow-y-auto rounded-xl bg-neutral-800 border border-neutral-700 p-2.5 text-xs">
+          <div id="mockReceiptContent" class="bg-white text-neutral-800 p-3 rounded-lg font-mono text-[11px] leading-relaxed shadow-inner">
+            <div class="text-center border-b border-dashed border-panda-200 pb-1.5 mb-2">
+              <div class="font-extrabold text-xs text-panda-600 flex items-center justify-center gap-1">
+                <i class="fa-solid fa-bag-shopping"></i> foodpanda 電子收據 (範例)
+              </div>
+              <div class="text-[10px] text-neutral-400">訂單編號 #fp-hk-8842 · 4位成員</div>
+            </div>
+            <div class="space-y-1 border-b border-dashed border-neutral-200 pb-2 mb-2">
+              <div class="flex justify-between"><span>1x 黯然銷魂叉燒煎蛋飯 (Alex)</span><span>$68.0</span></div>
+              <div class="flex justify-between"><span>1x 慢煮牛舌咖哩蛋包飯 (Bella)</span><span>$84.0</span></div>
+              <div class="flex justify-between"><span>1x 招牌花膠濃湯米線 (Chris)</span><span>$76.0</span></div>
+              <div class="flex justify-between"><span>1x 黑松露野菌意粉 (Diana)</span><span>$82.0</span></div>
+              <div class="flex justify-between"><span>1x 脆炸雞軟骨拼盤 (4人Share)</span><span>$48.0</span></div>
+              <div class="flex justify-between"><span>2x 凍檸茶少甜 (Alex, Chris)</span><span>$16.0</span></div>
+            </div>
+            <div class="space-y-0.5 text-[11px]">
+              <div class="flex justify-between text-neutral-600"><span>餐點小計 (Subtotal)</span><span>$374.0</span></div>
+              <div class="flex justify-between text-panda-600 font-bold"><span>pandapro 8折優惠 (上限減$60)</span><span>-$60.0</span></div>
+              <div class="flex justify-between text-panda-600 font-bold"><span>優惠碼立減 (PANDA15)</span><span>-$15.0</span></div>
+              <div class="flex justify-between text-neutral-600"><span>運費 + 平台費 + 包裝費</span><span>+$24.0</span></div>
+              <div class="flex justify-between font-extrabold text-xs text-panda-600 border-t border-neutral-200 pt-1 mt-1">
+                <span>最終實付總額 (Total Paid)</span><span>$323.0</span>
+              </div>
+            </div>
+          </div>
+          <img id="uploadedReceiptImg" class="hidden w-full rounded-lg object-contain" alt="Receipt Screenshot" />
+        </div>
+      </div>
+
+      <!-- Participant Quick Bar -->
+      <div class="p-3 bg-white border-b border-panda-100/60">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-neutral-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-users text-panda-600"></i>
+            參與聚會成員 (<span id="participantCount">0</span>人)
+          </span>
+          <button onclick="openAddParticipantModal()"
+            class="text-xs font-bold text-panda-600 hover:text-panda-700 flex items-center gap-1 bg-panda-50 border border-panda-200 px-2.5 py-1 rounded-xl active:scale-95 transition">
+            <i class="fa-solid fa-user-plus"></i> 新增成員
+          </button>
+        </div>
+        <div id="participantChipsContainer" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Gesture Hint Banner -->
+      <div class="px-3 py-1.5 bg-panda-50 text-[11px] text-panda-700 flex items-center justify-between border-b border-panda-100">
+        <span><i class="fa-solid fa-hand-pointer mr-1 text-panda-600"></i>點人名認領 · <b>左滑</b>刪除 · <b>右滑</b>複製/標記已付 · <b>長按</b>編輯</span>
+      </div>
+    </div>
+
+    <!-- RIGHT / MAIN CONTENT PANE -->
+    <div class="flex-1 flex flex-col">
+
+      <!-- Desktop/Tablet Segmented Navigation -->
+      <div class="hidden md:grid grid-cols-4 gap-1.5 p-1.5 bg-panda-100/70 rounded-2xl mb-3">
+        <button onclick="switchTab('items')" id="deskTab-items" class="py-2 rounded-xl text-xs font-bold transition bg-panda-600 text-white shadow-sm">
+          <i class="fa-solid fa-bowl-food mr-1"></i>1. 餐點認領
+        </button>
+        <button onclick="switchTab('discounts')" id="deskTab-discounts" class="py-2 rounded-xl text-xs font-bold transition text-panda-800 hover:bg-white/60">
+          <i class="fa-solid fa-tags mr-1"></i>2. 折扣與費用
+        </button>
+        <button onclick="switchTab('breakdown')" id="deskTab-breakdown" class="py-2 rounded-xl text-xs font-bold transition text-panda-800 hover:bg-white/60">
+          <i class="fa-solid fa-calculator mr-1"></i>3. 分帳算式
+        </button>
+        <button onclick="switchTab('collect')" id="deskTab-collect" class="py-2 rounded-xl text-xs font-bold transition text-panda-800 hover:bg-white/60">
+          <i class="fa-brands fa-whatsapp mr-1"></i>4. 催收追蹤
+        </button>
+      </div>
+
+      <!-- TAB 1: ITEMS & ASSIGNMENT (餐點與認領) -->
+      <section id="tab-items" class="p-3 space-y-3">
+        <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100">
+          <div class="flex items-center justify-between mb-2.5">
+            <h2 class="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-plus text-panda-600"></i>
+              新增外賣餐點項目
+            </h2>
+            <span class="text-[11px] text-panda-500 font-medium">支援單人或多人 Share</span>
+          </div>
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-6">
+              <input id="newItemName" type="text" placeholder="餐點名稱 (如：叉燒煎蛋飯)"
+                class="w-full px-3 py-2 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600 focus:bg-white" />
+            </div>
+            <div class="col-span-3">
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-xs text-neutral-400">$</span>
+                <input id="newItemPrice" type="number" step="0.1" placeholder="原價"
+                  class="w-full pl-6 pr-2 py-2 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600 focus:bg-white" />
+              </div>
+            </div>
+            <div class="col-span-3">
+              <button onclick="addNewItem()"
+                class="w-full h-full bg-panda-600 hover:bg-panda-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm active:scale-95 transition">
+                <i class="fa-solid fa-plus"></i> 加入
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+            收據餐點清單 (<span id="itemCountBadge">0</span>項)
+          </h3>
+          <button onclick="assignAllUnassignedToAll()" class="text-[11px] text-panda-600 font-bold hover:underline">
+            <i class="fa-solid fa-users-rays mr-0.5"></i>未認領項目設為全體Share
+          </button>
+        </div>
+
+        <div id="itemsListContainer" class="space-y-2.5">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- TAB 2: DISCOUNTS & PLATFORM FEES (折扣與平台費設定) -->
+      <section id="tab-discounts" class="hidden p-3 space-y-3.5">
+        <div class="bg-white p-4 rounded-2xl shadow-xs border border-panda-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-neutral-800 flex items-center gap-2">
+              <i class="fa-solid fa-percent w-6 h-6 rounded-lg bg-panda-100 text-panda-600 flex items-center justify-center text-xs"></i>
+              foodpanda 折扣計算模式
+            </h2>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-panda-50 text-panda-600 border border-panda-200 font-bold">按原價比例分攤</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="setDiscountMode('percent_cap')" id="modeBtn-percent_cap"
+              class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold">百分比折扣 + 上限</span>
+                <i class="fa-solid fa-crown text-xs"></i>
+              </div>
+              <span class="text-[10px] opacity-75 mt-1">例：全單8折，最多減$60</span>
+            </button>
+
+            <button onclick="setDiscountMode('percent')" id="modeBtn-percent"
+              class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold">純百分比折扣 (%)</span>
+                <i class="fa-solid fa-percent text-xs"></i>
+              </div>
+              <span class="text-[10px] opacity-75 mt-1">例：外賣自取全單 85 折</span>
+            </button>
+
+            <button onclick="setDiscountMode('fixed')" id="modeBtn-fixed"
+              class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold">全單減固定金額 ($)</span>
+                <i class="fa-solid fa-ticket text-xs"></i>
+              </div>
+              <span class="text-[10px] opacity-75 mt-1">例：滿 $300 即減 $50 優惠碼</span>
+            </button>
+
+            <button onclick="setDiscountMode('override')" id="modeBtn-override"
+              class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold">收據最終實付反推</span>
+                <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+              </div>
+              <span class="text-[10px] opacity-75 mt-1">直接輸入收據總額自動算差額</span>
+            </button>
+          </div>
+
+          <div id="discountParamsBox" class="p-3 bg-panda-50/50 rounded-xl border border-panda-100 space-y-3 mt-2">
+            <div id="paramRow-percent" class="flex items-center justify-between gap-3">
+              <div>
+                <label class="text-xs font-bold text-neutral-800 block">折扣減免百分比 (% Off)</label>
+                <span class="text-[11px] text-neutral-500">如 8折 輸入 20%；85折 輸入 15%</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <input id="inputDiscountPercent" type="number" min="0" max="100" step="1" value="20"
+                  oninput="updateDiscountParams()"
+                  class="w-20 px-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600 text-panda-600" />
+                <span class="text-xs font-bold text-panda-700">% Off</span>
+              </div>
+            </div>
+
+            <div id="paramRow-presets" class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[11px] text-neutral-400 mr-1">常用折數：</span>
+              <button onclick="setQuickPercent(10)" class="px-2 py-0.5 text-[11px] bg-white border border-panda-200 rounded-lg hover:bg-panda-100 text-panda-700 font-medium">9折 (-10%)</button>
+              <button onclick="setQuickPercent(15)" class="px-2 py-0.5 text-[11px] bg-white border border-panda-200 rounded-lg hover:bg-panda-100 text-panda-700 font-medium">85折 (-15%)</button>
+              <button onclick="setQuickPercent(20)" class="px-2 py-0.5 text-[11px] bg-white border border-panda-200 rounded-lg hover:bg-panda-100 text-panda-700 font-medium">8折 (-20%)</button>
+              <button onclick="setQuickPercent(25)" class="px-2 py-0.5 text-[11px] bg-white border border-panda-200 rounded-lg hover:bg-panda-100 text-panda-700 font-medium">75折 (-25%)</button>
+              <button onclick="setQuickPercent(30)" class="px-2 py-0.5 text-[11px] bg-white border border-panda-200 rounded-lg hover:bg-panda-100 text-panda-700 font-medium">7折 (-30%)</button>
+            </div>
+
+            <div id="paramRow-cap" class="flex items-center justify-between gap-3 pt-2 border-t border-panda-100">
+              <div>
+                <label class="text-xs font-bold text-neutral-800 block">最高折扣金額上限 (Cap $)</label>
+                <span class="text-[11px] text-neutral-500">超出上限時自動以封頂金額按比例分攤</span>
+              </div>
+              <div class="relative">
+                <span class="absolute left-2.5 top-1.5 text-xs text-neutral-400">$</span>
+                <input id="inputDiscountCap" type="number" min="0" step="1" value="60"
+                  oninput="updateDiscountParams()"
+                  class="w-24 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600 text-panda-600" />
+              </div>
+            </div>
+
+            <div id="paramRow-fixed" class="flex items-center justify-between gap-3 pt-2 border-t border-panda-100">
+              <div>
+                <label class="text-xs font-bold text-neutral-800 block">優惠碼 / 額外現金券立減 ($)</label>
+                <span class="text-[11px] text-neutral-500">可單獨使用或與百分比優惠疊加扣減</span>
+              </div>
+              <div class="relative">
+                <span class="absolute left-2.5 top-1.5 text-xs text-neutral-400">$</span>
+                <input id="inputDiscountFixed" type="number" min="0" step="0.5" value="15"
+                  oninput="updateDiscountParams()"
+                  class="w-24 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600 text-panda-600" />
+              </div>
+            </div>
+
+            <div id="paramRow-override" class="hidden flex items-center justify-between gap-3">
+              <div>
+                <label class="text-xs font-bold text-panda-700 block">收據最終信用卡實付總額 ($)</label>
+                <span class="text-[11px] text-neutral-500">連同所有運費及平台費後的最終過數金額</span>
+              </div>
+              <div class="relative">
+                <span class="absolute left-2.5 top-1.5 text-xs text-panda-400">$</span>
+                <input id="inputReceiptOverride" type="number" min="0" step="0.1" value="323"
+                  oninput="updateDiscountParams()"
+                  class="w-28 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border-2 border-panda-500 text-panda-600 rounded-xl focus:outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <div id="discountStatusBanner" class="p-3 rounded-xl bg-panda-50 border border-panda-200 text-xs text-panda-800 flex items-start gap-2">
+            <i class="fa-solid fa-tags mt-0.5 text-panda-600"></i>
+            <div id="discountExplanationText">計算中...</div>
+          </div>
+        </div>
+
+        <!-- Platform & Delivery Fees Card -->
+        <div class="bg-white p-4 rounded-2xl shadow-xs border border-panda-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-neutral-800 flex items-center gap-2">
+              <i class="fa-solid fa-motorcycle w-6 h-6 rounded-lg bg-panda-100 text-panda-600 flex items-center justify-center text-xs"></i>
+              運費、平台費與包裝費
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bg-panda-50/40 p-2.5 rounded-xl border border-panda-100">
+              <label class="text-[11px] text-neutral-500 block mb-1">外賣運費 ($)</label>
+              <input id="inputFeeDelivery" type="number" min="0" step="0.5" value="15" oninput="updateFeeParams()"
+                class="w-full font-bold text-sm bg-white border border-panda-200 rounded-lg px-2 py-1 focus:outline-none focus:border-panda-600" />
+            </div>
+            <div class="bg-panda-50/40 p-2.5 rounded-xl border border-panda-100">
+              <label class="text-[11px] text-neutral-500 block mb-1">平台服務費 ($)</label>
+              <input id="inputFeePlatform" type="number" min="0" step="0.5" value="5" oninput="updateFeeParams()"
+                class="w-full font-bold text-sm bg-white border border-panda-200 rounded-lg px-2 py-1 focus:outline-none focus:border-panda-600" />
+            </div>
+            <div class="bg-panda-50/40 p-2.5 rounded-xl border border-panda-100">
+              <label class="text-[11px] text-neutral-500 block mb-1">包裝/其他費 ($)</label>
+              <input id="inputFeePackaging" type="number" min="0" step="0.5" value="4" oninput="updateFeeParams()"
+                class="w-full font-bold text-sm bg-white border border-panda-200 rounded-lg px-2 py-1 focus:outline-none focus:border-panda-600" />
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-panda-100/80 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-neutral-700">附加費用分攤方式</span>
+              <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
+                <button onclick="setFeeSplitMode('equal')" id="feeSplitBtn-equal"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按人數平分</button>
+                <button onclick="setFeeSplitMode('prorata')" id="feeSplitBtn-prorata"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按餐點比例</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-neutral-700">收款金額湊整設定</span>
+              <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
+                <button onclick="setRoundingMode('exact')" id="roundBtn-exact"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition">精確 $0.1</button>
+                <button onclick="setRoundingMode('half')" id="roundBtn-half"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition">進位 $0.5</button>
+                <button onclick="setRoundingMode('dollar')" id="roundBtn-dollar"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition">湊整 $1</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: BREAKDOWN & FORMULAS (分帳明細與算式) -->
+      <section id="tab-breakdown" class="hidden p-3 space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <div class="text-xs font-bold text-neutral-600">
+            <i class="fa-solid fa-layer-group text-panda-600 mr-1"></i>
+            點擊成員卡片展開完整折扣與平台費算式
+          </div>
+          <button onclick="toggleAllBreakdownCards()" class="text-xs text-panda-600 font-bold hover:underline">
+            全部展開/收起
+          </button>
+        </div>
+
+        <div id="breakdownListContainer" class="space-y-2.5">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- TAB 4: COLLECT & WHATSAPP SHARE (催收追蹤與一鍵分享) -->
+      <section id="tab-collect" class="hidden p-3 space-y-3.5">
+        <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100 space-y-2.5">
+          <h2 class="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-wallet text-panda-600"></i>
+            墊支負責人收款資料 (自動附於催收訊息底部)
+          </h2>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-neutral-400 block">FPS 轉數快 / 電話號碼</label>
+              <input id="inputPaymentFps" type="text" value="9123 4567 (Kel)" oninput="renderAll()"
+                class="w-full px-2.5 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" />
+            </div>
+            <div>
+              <label class="text-[10px] text-neutral-400 block">PayMe 連結或備註</label>
+              <input id="inputPaymentPayme" type="text" value="payme.hsbc/kelsplit" oninput="renderAll()"
+                class="w-full px-2.5 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" />
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <span class="text-xs font-bold text-neutral-600">各人過數進度 (右滑卡片或點擊剔號標記已收)</span>
+            <button onclick="markAllPaid(true)" class="text-[11px] text-panda-600 font-bold hover:underline">全部標記已收</button>
+          </div>
+          <div id="collectionCardsContainer" class="space-y-2">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+              <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
+              WhatsApp 群組催收訊息預覽
+            </h3>
+            <button onclick="copyShareMessage()"
+              class="px-3 py-1.5 bg-panda-600 hover:bg-panda-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm active:scale-95 transition">
+              <i class="fa-regular fa-copy"></i> 複製全文
+            </button>
+          </div>
+          <textarea id="whatsappMessageOutput" rows="10" readonly
+            class="w-full p-3 text-xs font-mono bg-panda-50/40 border border-panda-200 rounded-xl text-neutral-700 focus:outline-none leading-relaxed"></textarea>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-panda-100 px-2 py-1.5 grid grid-cols-4 gap-1 z-30 shadow-lg">
+      <button onclick="switchTab('items')" id="mobTab-items"
+        class="flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold transition">
+        <i class="fa-solid fa-bowl-food text-sm"></i>
+        <span class="text-[11px] mt-0.5">1. 餐點認領</span>
+      </button>
+      <button onclick="switchTab('discounts')" id="mobTab-discounts"
+        class="flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 hover:text-panda-600 font-medium transition">
+        <i class="fa-solid fa-tags text-sm"></i>
+        <span class="text-[11px] mt-0.5">2. 折扣費用</span>
+      </button>
+      <button onclick="switchTab('breakdown')" id="mobTab-breakdown"
+        class="flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 hover:text-panda-600 font-medium transition">
+        <i class="fa-solid fa-calculator text-sm"></i>
+        <span class="text-[11px] mt-0.5">3. 分帳算式</span>
+      </button>
+      <button onclick="switchTab('collect')" id="mobTab-collect"
+        class="flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 hover:text-panda-600 font-medium transition">
+        <i class="fa-brands fa-whatsapp text-sm"></i>
+        <span class="text-[11px] mt-0.5">4. 催收追蹤</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- MODAL 1: Add Participant Modal -->
+  <div id="participantModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl space-y-4 border border-panda-100">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm text-neutral-800 flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-panda-600"></i>
+          新增聚會成員
+        </h3>
+        <button onclick="closeParticipantModal()" class="text-neutral-400 hover:text-neutral-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <input id="modalParticipantName" type="text" placeholder="輸入同事/朋友名稱 (如：Sam)"
+        class="w-full px-3.5 py-2.5 text-sm bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600"
+        onkeydown="if(event.key==='Enter') confirmAddParticipant()" />
+      <div class="flex gap-2">
+        <button onclick="closeParticipantModal()" class="flex-1 py-2 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-600">取消</button>
+        <button onclick="confirmAddParticipant()" class="flex-1 py-2 rounded-xl bg-panda-600 hover:bg-panda-700 text-white text-xs font-bold shadow-sm">確認加入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Long-Press Quick Action Sheet -->
+  <div id="actionSheetModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3 border-t-4 border-panda-600">
+      <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-panda-600">foodpanda 分帳快捷選單</span>
+          <h3 id="actionSheetTitle" class="font-bold text-sm text-neutral-800 mt-0.5">項目設定</h3>
+        </div>
+        <button onclick="closeActionSheet()" class="w-8 h-8 rounded-full bg-panda-50 text-panda-600 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="actionSheetBody" class="space-y-2 text-xs">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Firebase Cloud Sync Room Modal (rice-money-back) -->
+  <div id="cloudModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-panda-100">
+      <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-panda-50 text-panda-600 flex items-center justify-center">
+            <i class="fa-solid fa-cloud"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm text-neutral-800">Firebase 雲端即時同步</h3>
+            <p class="text-[10px] text-neutral-400">Project ID: <span class="font-mono text-panda-600">rice-money-back</span></p>
+          </div>
+        </div>
+        <button onclick="closeCloudModal()" class="text-neutral-400 hover:text-neutral-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded-2xl bg-panda-50/60 border border-panda-100 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-neutral-700">目前連線狀態：</span>
+            <span id="modalCloudStateBadge" class="font-bold text-panda-600">檢測中...</span>
+          </div>
+          <p class="text-[11px] text-neutral-500 leading-relaxed">
+            輸入相同房間代碼的同事可即時同步餐點認領與收款進度。
+          </p>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-neutral-700 block mb-1">雲端房間代碼 (Room ID)</label>
+          <div class="flex gap-2">
+            <input id="cloudRoomIdInput" type="text" value="PANDA-8842"
+              placeholder="例如：TEAM-LUNCH-01"
+              class="flex-1 px-3 py-2 text-xs font-mono font-bold uppercase bg-neutral-50 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" />
+            <button onclick="joinCloudRoom()"
+              class="px-3.5 py-2 rounded-xl bg-panda-600 hover:bg-panda-700 text-white font-bold text-xs shadow-sm transition active:scale-95">
+              切換房間
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="syncToCloudNow()"
+            class="py-2.5 rounded-xl bg-panda-50 hover:bg-panda-100 text-panda-700 border border-panda-200 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>立即推送至雲端</span>
+          </button>
+          <button onclick="copyCloudRoomLink()"
+            class="py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+            <i class="fa-solid fa-link"></i>
+            <span>複製房間連結</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 bg-[#D70F64] text-white px-4 py-2 rounded-full text-xs font-bold shadow-xl z-50 hidden items-center gap-2 border border-white/20">
+    <i class="fa-solid fa-circle-check text-amber-300"></i>
+    <span id="toastText">已複製</span>
+  </div>
+
+  <!-- Firebase v13.1.0 Modular SDK & Application Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+    // --- 1. FIREBASE CONFIGURATION (rice-money-back) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4fH7khR8coPGOc7e8tFXyKR6UHb-k3aI",
+      authDomain: "rice-money-back.firebaseapp.com",
+      projectId: "rice-money-back",
+      storageBucket: "rice-money-back.firebasestorage.app",
+      messagingSenderId: "879838987019",
+      appId: "1:879838987019:web:cea2e429400b703c50580e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- 2. STATE & CLOUD SYNC MANAGEMENT ---
+    const STORAGE_KEY = 'panda_split_pro_v2';
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentRoomId = (urlParams.get('room') || localStorage.getItem('panda_room_id') || 'PANDA-8842').toUpperCase();
+    let unsubscribeRoom = null;
+    let isCloudConnected = false;
+    let isApplyingRemoteUpdate = false;
+    let clientUid = 'client_' + Math.random().toString(36).substring(2, 9);
+
+    const defaultState = {
+      orderTitle: '周五 Team Lunch 外賣團',
+      participants: [
+        { id: 'p1', name: 'Alex', paid: false },
+        { id: 'p2', name: 'Bella', paid: true },
+        { id: 'p3', name: 'Chris', paid: false },
+        { id: 'p4', name: 'Diana', paid: false }
+      ],
+      items: [
+        { id: 'i1', name: '黯然銷魂叉燒煎蛋飯', price: 68, assignedTo: ['p1'] },
+        { id: 'i2', name: '慢煮牛舌咖哩蛋包飯', price: 84, assignedTo: ['p2'] },
+        { id: 'i3', name: '招牌花膠濃湯米線', price: 76, assignedTo: ['p3'] },
+        { id: 'i4', name: '黑松露野菌意粉', price: 82, assignedTo: ['p4'] },
+        { id: 'i5', name: '脆炸雞軟骨拼盤 (Share)', price: 48, assignedTo: ['p1', 'p2', 'p3', 'p4'] },
+        { id: 'i6', name: '凍檸茶少甜 x2', price: 16, assignedTo: ['p1', 'p3'] }
+      ],
+      discount: {
+        mode: 'percent_cap',
+        percentOff: 20,
+        capAmount: 60,
+        fixedAmount: 15,
+        overrideFinalTotal: 323
+      },
+      fees: {
+        delivery: 15,
+        platform: 5,
+        packaging: 4,
+        splitMode: 'equal',
+        rounding: 'exact'
+      },
+      paymentInfo: {
+        fps: '9123 4567 (Kel)',
+        payme: 'payme.hsbc/kelsplit'
+      },
+      expandedBreakdowns: { p1: true }
+    };
+
+    let state = loadState();
+    let activeTab = 'items';
+    let longPressTimer = null;
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn('LocalStorage fallback', e);
+      }
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+      if (!isApplyingRemoteUpdate) {
+        pushStateToFirestore();
+      }
+    }
+
+    function updateCloudIndicator(status, label) {
+      const dot = document.getElementById('cloudStatusDot');
+      const text = document.getElementById('cloudStatusText');
+      const modalBadge = document.getElementById('modalCloudStateBadge');
+      if (!dot || !text) return;
+
+      if (status === 'online') {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+        text.textContent = `雲端 #${currentRoomId}`;
+        if (modalBadge) modalBadge.textContent = `已連線 (${currentRoomId})`;
+      } else if (status === 'syncing') {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse';
+        text.textContent = label || '雲端同步中...';
+        if (modalBadge) modalBadge.textContent = '同步處理中...';
+      } else {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-panda-200';
+        text.textContent = label || '本機儲存模式';
+        if (modalBadge) modalBadge.textContent = '本機儲存模式 (離線/權限保護)';
+      }
+    }
+
+    // Initialize Firebase Auth & Real-time Firestore Room Listener
+    async function initFirebaseSync() {
+      document.getElementById('cloudRoomIdInput').value = currentRoomId;
+      try {
+        await signInAnonymously(auth);
+      } catch (authErr) {
+        // Anonymous auth might not be enabled yet in Console; proceed to try Firestore directly
+        console.info('Anonymous Auth skipped or not enabled in Console:', authErr.code);
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) clientUid = user.uid;
+      });
+
+      subscribeToFirestoreRoom(currentRoomId);
+    }
+
+    function subscribeToFirestoreRoom(roomId) {
+      if (unsubscribeRoom) unsubscribeRoom();
+      currentRoomId = roomId.trim().toUpperCase() || 'PANDA-8842';
+      localStorage.setItem('panda_room_id', currentRoomId);
+      updateCloudIndicator('syncing', `連線 #${currentRoomId}...`);
+
+      try {
+        const roomRef = doc(db, 'orders', currentRoomId);
+        unsubscribeRoom = onSnapshot(roomRef, (snapshot) => {
+          isCloudConnected = true;
+          updateCloudIndicator('online');
+
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            if (data && data.payload && data.updatedBy !== clientUid) {
+              isApplyingRemoteUpdate = true;
+              const currentExpanded = state.expandedBreakdowns || {};
+              state = { ...data.payload, expandedBreakdowns: currentExpanded };
+              renderAll();
+              isApplyingRemoteUpdate = false;
+            }
+          } else {
+            // Seed initial state to this cloud room
+            pushStateToFirestore();
+          }
+        }, (err) => {
+          isCloudConnected = false;
+          console.warn('Firestore snapshot fallback to local mode:', err.message);
+          updateCloudIndicator('local', '本機模式');
+        });
+      } catch (err) {
+        isCloudConnected = false;
+        updateCloudIndicator('local', '本機模式');
+      }
+    }
+
+    let syncDebounceTimer = null;
+    function pushStateToFirestore() {
+      if (!isCloudConnected) return;
+      clearTimeout(syncDebounceTimer);
+      syncDebounceTimer = setTimeout(async () => {
+        try {
+          const roomRef = doc(db, 'orders', currentRoomId);
+          const cleanPayload = JSON.parse(JSON.stringify(state));
+          await setDoc(roomRef, {
+            payload: cleanPayload,
+            updatedAt: Date.now(),
+            updatedBy: clientUid
+          }, { merge: true });
+          updateCloudIndicator('online');
+        } catch (err) {
+          console.warn('Firestore write fallback:', err.message);
+          updateCloudIndicator('local', '本機模式');
+        }
+      }, 350);
+    }
+
+    function openCloudModal() {
+      document.getElementById('cloudRoomIdInput').value = currentRoomId;
+      document.getElementById('cloudModal').classList.remove('hidden');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModal').classList.add('hidden');
+    }
+
+    function joinCloudRoom() {
+      const inputVal = document.getElementById('cloudRoomIdInput').value.trim().toUpperCase();
+      if (!inputVal) {
+        showToast('請輸入有效的雲端房間代碼');
+        return;
+      }
+      subscribeToFirestoreRoom(inputVal);
+      closeCloudModal();
+      showToast(`已切換至雲端房間 #${inputVal}`);
+    }
+
+    async function syncToCloudNow() {
+      isCloudConnected = true;
+      updateCloudIndicator('syncing', '正在推送...');
+      try {
+        const roomRef = doc(db, 'orders', currentRoomId);
+        await setDoc(roomRef, {
+          payload: JSON.parse(JSON.stringify(state)),
+          updatedAt: Date.now(),
+          updatedBy: clientUid
+        }, { merge: true });
+        updateCloudIndicator('online');
+        showToast(`已成功同步至 Firebase (#${currentRoomId})`);
+      } catch (err) {
+        updateCloudIndicator('local', '本機模式');
+        showToast('本機已儲存 (如需跨裝置同步請確認 Firestore 規則已開啟)');
+      }
+    }
+
+    function copyCloudRoomLink() {
+      const baseUrl = window.location.href.split('?')[0];
+      const shareUrl = `${baseUrl}?room=${encodeURIComponent(currentRoomId)}`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast(`已複製雲端房間連結 (#${currentRoomId})！`);
+      });
+    }
+
+    // --- 3. CORE CALCULATION ENGINE ---
+    function calculateBill() {
+      const participants = state.participants;
+      const items = state.items;
+
+      const personSubtotals = {};
+      const personItems = {};
+      participants.forEach(p => {
+        personSubtotals[p.id] = 0;
+        personItems[p.id] = [];
+      });
+
+      let unassignedTotal = 0;
+      let totalOriginal = 0;
+
+      items.forEach(item => {
+        const price = Number(item.price) || 0;
+        totalOriginal += price;
+        const validAssignees = item.assignedTo.filter(pid => personSubtotals.hasOwnProperty(pid));
+        if (validAssignees.length > 0) {
+          const share = price / validAssignees.length;
+          validAssignees.forEach(pid => {
+            personSubtotals[pid] += share;
+            personItems[pid].push({
+              name: item.name,
+              fullPrice: price,
+              shareCount: validAssignees.length,
+              sharePrice: share
+            });
+          });
+        } else {
+          unassignedTotal += price;
+        }
+      });
+
+      const totalFees = (Number(state.fees.delivery) || 0) +
+                        (Number(state.fees.platform) || 0) +
+                        (Number(state.fees.packaging) || 0);
+
+      let totalDiscount = 0;
+      let discountRuleSummary = '';
+      const d = state.discount;
+
+      if (d.mode === 'percent_cap') {
+        const rawPercentDisc = totalOriginal * ((Number(d.percentOff) || 0) / 100);
+        const cap = Number(d.capAmount) || 0;
+        const cappedDisc = cap > 0 ? Math.min(rawPercentDisc, cap) : rawPercentDisc;
+        const extraFixed = Number(d.fixedAmount) || 0;
+        totalDiscount = Math.min(totalOriginal, cappedDisc + extraFixed);
+
+        const isCapped = cap > 0 && rawPercentDisc > cap;
+        discountRuleSummary = `${100 - d.percentOff}折 (-${d.percentOff}%)${isCapped ? ` [已觸發封頂減 $${cap.toFixed(1)}]` : ` (減 $${cappedDisc.toFixed(1)})`}` +
+          (extraFixed > 0 ? ` + 優惠碼減 $${extraFixed.toFixed(1)}` : '');
+      } else if (d.mode === 'percent') {
+        const rawPercentDisc = totalOriginal * ((Number(d.percentOff) || 0) / 100);
+        totalDiscount = Math.min(totalOriginal, rawPercentDisc);
+        discountRuleSummary = `全單 ${100 - d.percentOff}折 (-${d.percentOff}%)，共減 $${totalDiscount.toFixed(1)}`;
+      } else if (d.mode === 'fixed') {
+        const fixed = Number(d.fixedAmount) || 0;
+        totalDiscount = Math.min(totalOriginal, fixed);
+        discountRuleSummary = `全單固定扣減優惠 -$${totalDiscount.toFixed(1)}`;
+      } else if (d.mode === 'override') {
+        const targetFinal = Number(d.overrideFinalTotal) || 0;
+        totalDiscount = Math.max(0, totalOriginal + totalFees - targetFinal);
+        discountRuleSummary = `按收據實付 $${targetFinal.toFixed(1)} 自動反推淨折扣 -$${totalDiscount.toFixed(1)}`;
+      }
+
+      const activeParticipants = participants.filter(p => personSubtotals[p.id] > 0);
+      const activeCount = activeParticipants.length || participants.length || 1;
+
+      const results = {};
+      let sumRoundedCollectible = 0;
+
+      participants.forEach(p => {
+        const sub = personSubtotals[p.id];
+        const ratio = totalOriginal > 0 ? (sub / totalOriginal) : 0;
+        const discShare = totalDiscount * ratio;
+
+        let feeShare = 0;
+        if (sub > 0) {
+          if (state.fees.splitMode === 'equal') {
+            feeShare = totalFees / activeCount;
+          } else {
+            feeShare = totalFees * ratio;
+          }
+        }
+
+        const rawPayable = Math.max(0, sub - discShare + feeShare);
+        let finalPayable = rawPayable;
+
+        if (state.fees.rounding === 'half') {
+          finalPayable = Math.ceil(rawPayable * 2) / 2;
+        } else if (state.fees.rounding === 'dollar') {
+          finalPayable = Math.ceil(rawPayable);
+        } else {
+          finalPayable = Math.round(rawPayable * 10) / 10;
+        }
+
+        sumRoundedCollectible += finalPayable;
+
+        results[p.id] = {
+          id: p.id,
+          name: p.name,
+          paid: p.paid,
+          items: personItems[p.id],
+          subtotal: sub,
+          ratio: ratio,
+          discountShare: discShare,
+          feeShare: feeShare,
+          rawPayable: rawPayable,
+          finalPayable: finalPayable
+        };
+      });
+
+      const effectiveRatio = totalOriginal > 0 ? ((totalOriginal - totalDiscount) / totalOriginal) * 100 : 100;
+
+      return {
+        totalOriginal,
+        totalDiscount,
+        totalFees,
+        netReceiptTotal: Math.max(0, totalOriginal - totalDiscount + totalFees),
+        sumRoundedCollectible,
+        unassignedTotal,
+        effectiveRatio,
+        discountRuleSummary,
+        results
+      };
+    }
+
+    // --- 4. UI RENDER FUNCTIONS ---
+    function renderAll() {
+      saveState();
+      const calc = calculateBill();
+
+      document.getElementById('orderTitleInput').value = state.orderTitle;
+      document.getElementById('sumOriginal').textContent = `$${calc.totalOriginal.toFixed(1)}`;
+      document.getElementById('sumDiscount').textContent = `-$${calc.totalDiscount.toFixed(1)}`;
+      document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`;
+      document.getElementById('sumFinal').textContent = `$${calc.sumRoundedCollectible.toFixed(1)}`;
+
+      document.getElementById('effectiveRateBadge').textContent =
+        `餐飲折實率: ${calc.effectiveRatio.toFixed(1)}%`;
+
+      const roundLabels = { exact: '精確至 $0.1', half: '進位至 $0.5', dollar: '湊整至 $1' };
+      document.getElementById('roundingModeBadge').textContent = roundLabels[state.fees.rounding];
+
+      const activeList = state.participants.filter(p => calc.results[p.id].finalPayable > 0);
+      const paidCount = activeList.filter(p => p.paid).length;
+      document.getElementById('collectionStatusText').textContent =
+        `已收 ${paidCount} / ${activeList.length} 人`;
+
+      renderParticipantChips(calc);
+      renderItemsTab(calc);
+      renderDiscountsTab(calc);
+      renderBreakdownTab(calc);
+      renderCollectTab(calc);
+    }
+
+    function renderParticipantChips(calc) {
+      document.getElementById('participantCount').textContent = state.participants.length;
+      const container = document.getElementById('participantChipsContainer');
+      container.innerHTML = state.participants.map(p => {
+        const r = calc.results[p.id];
+        return `
+          <div oncontextmenu="event.preventDefault(); openParticipantActionSheet('${p.id}')"
+               onclick="openParticipantActionSheet('${p.id}')"
+               class="shrink-0 px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition active:scale-95 ${
+                 p.paid
+                   ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                   : 'bg-panda-50/70 border-panda-200 text-neutral-800 hover:border-panda-500'
+               }">
+            <span class="w-2 h-2 rounded-full ${p.paid ? 'bg-emerald-500' : 'bg-panda-600'}"></span>
+            <span>${escapeHtml(p.name)}</span>
+            <span class="text-[11px] font-extrabold text-panda-600">$${r.finalPayable.toFixed(1)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderItemsTab(calc) {
+      document.getElementById('itemCountBadge').textContent = state.items.length;
+      const container = document.getElementById('itemsListContainer');
+
+      if (state.items.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl p-8 text-center border border-dashed border-panda-200 text-neutral-400 text-xs">
+            <i class="fa-solid fa-bag-shopping text-2xl mb-2 text-panda-300 block"></i>
+            尚未加入餐點，請在上方輸入或對照 foodpanda 收據新增
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.items.map(item => {
+        const assigneeCount = item.assignedTo.length;
+        const perPersonRaw = assigneeCount > 0 ? (item.price / assigneeCount) : item.price;
+
+        const chipsHtml = state.participants.map(p => {
+          const isSelected = item.assignedTo.includes(p.id);
+          return `
+            <button onclick="toggleItemAssignee('${item.id}', '${p.id}')"
+              class="px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95 ${
+                isSelected
+                  ? 'bg-panda-600 text-white shadow-xs'
+                  : 'bg-panda-50/70 text-neutral-600 hover:bg-panda-100 border border-panda-100'
+              }">
+              <i class="fa-solid ${isSelected ? 'fa-check text-[10px]' : 'fa-plus text-[10px] opacity-60'}"></i>
+              <span>${escapeHtml(p.name)}</span>
+            </button>
+          `;
+        }).join('');
+
+        return `
+          <div id="itemCard-${item.id}"
+               ontouchstart="handleTouchStart(event, 'item', '${item.id}')"
+               ontouchend="handleTouchEnd(event, 'item', '${item.id}')"
+               ontouchmove="handleTouchMove(event, 'item', '${item.id}')"
+               oncontextmenu="event.preventDefault(); openItemActionSheet('${item.id}')"
+               class="slide-transition bg-white p-3.5 rounded-2xl shadow-xs border ${
+                 assigneeCount === 0 ? 'border-amber-400 bg-amber-50/20' : 'border-panda-100'
+               }">
+            <div class="flex items-start justify-between gap-2 mb-2.5">
+              <div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-bold text-xs sm:text-sm text-neutral-800">${escapeHtml(item.name)}</span>
+                  ${assigneeCount > 1 ? `<span class="px-2 py-0.5 text-[10px] rounded-full bg-panda-100 text-panda-700 font-extrabold">${assigneeCount}人Share</span>` : ''}
+                  ${assigneeCount === 0 ? `<span class="px-2 py-0.5 text-[10px] rounded-full bg-amber-100 text-amber-800 font-extrabold">待認領</span>` : ''}
+                </div>
+                <div class="text-[11px] text-neutral-400 mt-0.5">
+                  ${assigneeCount > 1 ? `每人原價分攤 $${perPersonRaw.toFixed(1)}` : '點選下方成員認領此餐點'}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-sm text-panda-600">$${Number(item.price).toFixed(1)}</span>
+                <button onclick="openItemActionSheet('${item.id}')" class="w-7 h-7 rounded-xl bg-panda-50 hover:bg-panda-100 text-panda-600 flex items-center justify-center text-xs">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-wrap pt-2 border-t border-panda-50">
+              ${chipsHtml}
+              <button onclick="assignItemEveryone('${item.id}')"
+                class="ml-auto px-2 py-1 rounded-lg text-[11px] font-bold text-panda-600 hover:bg-panda-50">
+                全選
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDiscountsTab(calc) {
+      const mode = state.discount.mode;
+      ['percent_cap', 'percent', 'fixed', 'override'].forEach(m => {
+        const btn = document.getElementById(`modeBtn-${m}`);
+        if (m === mode) {
+          btn.className = 'p-2.5 rounded-xl border-2 border-panda-600 bg-panda-50 text-panda-800 text-left transition flex flex-col justify-between shadow-xs';
+        } else {
+          btn.className = 'p-2.5 rounded-xl border border-panda-100 bg-white text-neutral-700 hover:bg-panda-50/40 text-left transition flex flex-col justify-between';
+        }
+      });
+
+      document.getElementById('paramRow-percent').classList.toggle('hidden', mode === 'fixed' || mode === 'override');
+      document.getElementById('paramRow-presets').classList.toggle('hidden', mode === 'fixed' || mode === 'override');
+      document.getElementById('paramRow-cap').classList.toggle('hidden', mode !== 'percent_cap');
+      document.getElementById('paramRow-fixed').classList.toggle('hidden', mode === 'percent' || mode === 'override');
+      document.getElementById('paramRow-override').classList.toggle('hidden', mode !== 'override');
+
+      document.getElementById('inputDiscountPercent').value = state.discount.percentOff;
+      document.getElementById('inputDiscountCap').value = state.discount.capAmount;
+      document.getElementById('inputDiscountFixed').value = state.discount.fixedAmount;
+      document.getElementById('inputReceiptOverride').value = state.discount.overrideFinalTotal;
+
+      document.getElementById('discountExplanationText').innerHTML = `
+        <b>目前生效優惠：</b>${calc.discountRuleSummary}<br/>
+        <span class="text-[11px] opacity-90">全單餐點原價 $${calc.totalOriginal.toFixed(1)}，共減免 <b>$${calc.totalDiscount.toFixed(1)}</b>（折實率 ${calc.effectiveRatio.toFixed(1)}%）。</span>
+      `;
+
+      ['equal', 'prorata'].forEach(sm => {
+        const btn = document.getElementById(`feeSplitBtn-${sm}`);
+        btn.className = sm === state.fees.splitMode
+          ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-panda-600 text-white shadow-xs transition'
+          : 'px-2.5 py-1 rounded-lg text-xs font-medium text-neutral-600 hover:text-panda-600 transition';
+      });
+
+      ['exact', 'half', 'dollar'].forEach(rm => {
+        const btn = document.getElementById(`roundBtn-${rm}`);
+        btn.className = rm === state.fees.rounding
+          ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-panda-600 text-white shadow-xs transition'
+          : 'px-2.5 py-1 rounded-lg text-xs font-medium text-neutral-600 hover:text-panda-600 transition';
+      });
+    }
+
+    function renderBreakdownTab(calc) {
+      const container = document.getElementById('breakdownListContainer');
+      container.innerHTML = state.participants.map(p => {
+        const r = calc.results[p.id];
+        const isExpanded = !!(state.expandedBreakdowns && state.expandedBreakdowns[p.id]);
+        const pctShare = (r.ratio * 100).toFixed(1);
+
+        const itemsRows = r.items.map(it => `
+          <div class="flex justify-between text-xs py-1 border-b border-panda-50 last:border-0">
+            <span class="text-neutral-700">
+              • ${escapeHtml(it.name)}
+              ${it.shareCount > 1 ? `<span class="text-[10px] text-panda-600 font-bold">(1/${it.shareCount}份)</span>` : ''}
+            </span>
+            <span class="font-semibold text-neutral-800">$${it.sharePrice.toFixed(1)}</span>
+          </div>
+        `).join('') || `<div class="text-xs text-neutral-400 py-1">未認領任何餐點</div>`;
+
+        return `
+          <div class="bg-white rounded-2xl shadow-xs border border-panda-100 overflow-hidden">
+            <div onclick="toggleBreakdownCard('${p.id}')"
+                 class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-panda-50/40 transition">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-panda-600 text-white font-extrabold text-sm flex items-center justify-center shadow-xs">
+                  ${escapeHtml(p.name.charAt(0).toUpperCase())}
+                </div>
+                <div>
+                  <div class="font-bold text-sm text-neutral-800 flex items-center gap-1.5">
+                    <span>${escapeHtml(p.name)}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-panda-50 text-panda-700 border border-panda-200 font-bold">
+                      佔全單 ${pctShare}%
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-neutral-500 mt-0.5">
+                    原價 $${r.subtotal.toFixed(1)} · 減 $${r.discountShare.toFixed(1)} · 費 +$${r.feeShare.toFixed(1)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2.5">
+                <div class="text-right">
+                  <div class="text-[10px] text-neutral-400">應收款項</div>
+                  <div class="font-extrabold text-base text-panda-600">$${r.finalPayable.toFixed(1)}</div>
+                </div>
+                <i class="fa-solid fa-chevron-${isExpanded ? 'up' : 'down'} text-xs text-panda-400"></i>
+              </div>
+            </div>
+
+            <div class="${isExpanded ? 'block' : 'hidden'} px-3.5 pb-3.5 pt-2 bg-panda-50/30 border-t border-panda-100 space-y-2.5">
+              <div>
+                <div class="text-[10px] font-bold uppercase text-panda-700 mb-1">1. 所點餐點原價明細</div>
+                <div class="bg-white p-2.5 rounded-xl border border-panda-100">
+                  ${itemsRows}
+                  <div class="flex justify-between text-xs font-bold text-neutral-800 pt-1.5 mt-1 border-t border-panda-100">
+                    <span>個人餐點原價小計</span>
+                    <span>$${r.subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-panda-50 p-2.5 rounded-xl border border-panda-200">
+                  <div class="text-[10px] text-panda-700 font-bold">2. 按比例分攤折扣</div>
+                  <div class="font-extrabold text-panda-600 text-sm mt-0.5">-$${r.discountShare.toFixed(2)}</div>
+                  <div class="text-[10px] text-panda-700 mt-0.5">
+                    全單減 $${calc.totalDiscount.toFixed(1)} × ${pctShare}%
+                  </div>
+                </div>
+
+                <div class="bg-amber-50/80 p-2.5 rounded-xl border border-amber-200">
+                  <div class="text-[10px] text-amber-800 font-bold">3. 運費與平台費</div>
+                  <div class="font-extrabold text-amber-800 text-sm mt-0.5">+$${r.feeShare.toFixed(2)}</div>
+                  <div class="text-[10px] text-amber-700 mt-0.5">
+                    ${state.fees.splitMode === 'equal' ? '按點餐人數平均分攤' : `按餐點比例 (${pctShare}%) 分攤`}
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gradient-to-r from-[#D70F64] to-[#E21B70] text-white p-2.5 rounded-xl flex items-center justify-between text-xs shadow-xs">
+                <span>算式：$${r.subtotal.toFixed(1)} - $${r.discountShare.toFixed(1)} + $${r.feeShare.toFixed(1)} = $${r.rawPayable.toFixed(2)}</span>
+                <span class="font-extrabold">實收 $${r.finalPayable.toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCollectTab(calc) {
+      const container = document.getElementById('collectionCardsContainer');
+      container.innerHTML = state.participants.map(p => {
+        const r = calc.results[p.id];
+        return `
+          <div id="collectCard-${p.id}"
+               ontouchstart="handleTouchStart(event, 'person', '${p.id}')"
+               ontouchend="handleTouchEnd(event, 'person', '${p.id}')"
+               ontouchmove="handleTouchMove(event, 'person', '${p.id}')"
+               class="slide-transition bg-white p-3 rounded-2xl shadow-xs border flex items-center justify-between ${
+                 p.paid ? 'border-emerald-300 bg-emerald-50/30' : 'border-panda-100'
+               }">
+            <div class="flex items-center gap-2.5">
+              <button onclick="togglePaidStatus('${p.id}')"
+                class="w-8 h-8 rounded-xl flex items-center justify-center transition ${
+                  p.paid ? 'bg-emerald-500 text-white' : 'bg-panda-50 text-panda-600 hover:bg-panda-100'
+                }">
+                <i class="fa-solid fa-check"></i>
+              </button>
+              <div>
+                <div class="font-bold text-xs sm:text-sm text-neutral-800 flex items-center gap-1.5">
+                  <span class="${p.paid ? 'line-through text-neutral-400' : ''}">${escapeHtml(p.name)}</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    p.paid ? 'bg-emerald-100 text-emerald-700' : 'bg-panda-100 text-panda-700'
+                  }">
+                    ${p.paid ? '已收款' : '待過數'}
+                  </span>
+                </div>
+                <div class="text-[11px] text-neutral-500 truncate max-w-[180px] sm:max-w-xs">
+                  ${r.items.map(i => i.name).join('、') || '無餐點'}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-sm ${p.paid ? 'text-emerald-600' : 'text-panda-600'}">
+                $${r.finalPayable.toFixed(1)}
+              </span>
+              <button onclick="copyIndividualReminder('${p.id}')" title="複製個人專屬催收訊息"
+                class="px-2.5 py-1.5 rounded-xl bg-panda-50 hover:bg-panda-100 text-panda-600 border border-panda-200 text-xs font-bold transition active:scale-95">
+                <i class="fa-regular fa-paper-plane mr-0.5"></i>單獨催收
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const fps = document.getElementById('inputPaymentFps')?.value || state.paymentInfo.fps;
+      const payme = document.getElementById('inputPaymentPayme')?.value || state.paymentInfo.payme;
+      state.paymentInfo.fps = fps;
+      state.paymentInfo.payme = payme;
+
+      const lines = [];
+      lines.push(`🐼 *【${state.orderTitle} - foodpanda 夾錢清單】*`);
+      lines.push(`━━━━━━━━━━━━━━━`);
+      lines.push(`🍱 餐點原價總計：$${calc.totalOriginal.toFixed(1)}`);
+      lines.push(`🏷️ 折扣優惠：-$${calc.totalDiscount.toFixed(1)} (${calc.discountRuleSummary})`);
+      lines.push(`🛵 運費及平台費：+$${calc.totalFees.toFixed(1)} (${state.fees.splitMode === 'equal' ? '按人頭平分' : '按比例分攤'})`);
+      lines.push(`💰 *全單應收總額：$${calc.sumRoundedCollectible.toFixed(1)}*`);
+      lines.push(`━━━━━━━━━━━━━━━`);
+
+      state.participants.forEach(p => {
+        const r = calc.results[p.id];
+        if (r.finalPayable <= 0) return;
+        const statusIcon = p.paid ? '✅ [已收]' : '🩷 [待付]';
+        const itemNames = r.items.map(it => `${it.name}${it.shareCount > 1 ? `(Share)` : ''}`).join(' + ');
+        lines.push(`${statusIcon} *${p.name}*：*$${r.finalPayable.toFixed(1)}*`);
+        lines.push(`   └ 餐點：${itemNames}`);
+        lines.push(`   └ 算式：原價$${r.subtotal.toFixed(1)} - 折扣$${r.discountShare.toFixed(1)} + 平台運費$${r.feeShare.toFixed(1)}`);
+      });
+
+      lines.push(`━━━━━━━━━━━━━━━`);
+      if (fps) lines.push(`💳 *FPS 轉數快*：${fps}`);
+      if (payme) lines.push(`📲 *PayMe*：${payme}`);
+
+      document.getElementById('whatsappMessageOutput').value = lines.join('\n');
+    }
+
+    // --- 5. INTERACTION & EVENT HANDLERS ---
+    function switchTab(tabName) {
+      activeTab = tabName;
+      ['items', 'discounts', 'breakdown', 'collect'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+
+        const mobBtn = document.getElementById(`mobTab-${t}`);
+        if (mobBtn) {
+          mobBtn.className = t === tabName
+            ? 'flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold transition'
+            : 'flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 hover:text-panda-600 font-medium transition';
+        }
+
+        const deskBtn = document.getElementById(`deskTab-${t}`);
+        if (deskBtn) {
+          deskBtn.className = t === tabName
+            ? 'py-2 rounded-xl text-xs font-bold transition bg-panda-600 text-white shadow-sm'
+            : 'py-2 rounded-xl text-xs font-bold transition text-panda-800 hover:bg-white/60';
+        }
+      });
+      renderAll();
+    }
+
+    function updateOrderTitle(val) {
+      state.orderTitle = val.trim() || 'foodpanda 外賣分帳';
+      renderAll();
+    }
+
+    function addNewItem() {
+      const nameInput = document.getElementById('newItemName');
+      const priceInput = document.getElementById('newItemPrice');
+      const name = nameInput.value.trim();
+      const price = parseFloat(priceInput.value);
+
+      if (!name || isNaN(price) || price <= 0) {
+        showToast('請輸入有效的餐點名稱及原價金額');
+        return;
+      }
+
+      state.items.unshift({
+        id: 'i_' + Date.now(),
+        name,
+        price,
+        assignedTo: state.participants.length > 0 ? [state.participants[0].id] : []
+      });
+
+      nameInput.value = '';
+      priceInput.value = '';
+      renderAll();
+      showToast(`已加入「${name}」`);
+    }
+
+    function toggleItemAssignee(itemId, participantId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      const idx = item.assignedTo.indexOf(participantId);
+      if (idx >= 0) {
+        item.assignedTo.splice(idx, 1);
+      } else {
+        item.assignedTo.push(participantId);
+      }
+      renderAll();
+    }
+
+    function assignItemEveryone(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      item.assignedTo = state.participants.map(p => p.id);
+      renderAll();
+      showToast('已設為全體成員共同 Share');
+    }
+
+    function assignAllUnassignedToAll() {
+      let count = 0;
+      state.items.forEach(item => {
+        if (item.assignedTo.length === 0) {
+          item.assignedTo = state.participants.map(p => p.id);
+          count++;
+        }
+      });
+      renderAll();
+      showToast(count > 0 ? `已將 ${count} 項未認領餐點設為全體分攤` : '所有餐點均已認領');
+    }
+
+    function setDiscountMode(mode) {
+      state.discount.mode = mode;
+      renderAll();
+    }
+
+    function setQuickPercent(pctOff) {
+      state.discount.percentOff = pctOff;
+      document.getElementById('inputDiscountPercent').value = pctOff;
+      renderAll();
+    }
+
+    function updateDiscountParams() {
+      state.discount.percentOff = parseFloat(document.getElementById('inputDiscountPercent').value) || 0;
+      state.discount.capAmount = parseFloat(document.getElementById('inputDiscountCap').value) || 0;
+      state.discount.fixedAmount = parseFloat(document.getElementById('inputDiscountFixed').value) || 0;
+      state.discount.overrideFinalTotal = parseFloat(document.getElementById('inputReceiptOverride').value) || 0;
+      renderAll();
+    }
+
+    function updateFeeParams() {
+      state.fees.delivery = parseFloat(document.getElementById('inputFeeDelivery').value) || 0;
+      state.fees.platform = parseFloat(document.getElementById('inputFeePlatform').value) || 0;
+      state.fees.packaging = parseFloat(document.getElementById('inputFeePackaging').value) || 0;
+      renderAll();
+    }
+
+    function setFeeSplitMode(mode) {
+      state.fees.splitMode = mode;
+      renderAll();
+    }
+
+    function setRoundingMode(mode) {
+      state.fees.rounding = mode;
+      renderAll();
+    }
+
+    function toggleBreakdownCard(pid) {
+      if (!state.expandedBreakdowns) state.expandedBreakdowns = {};
+      state.expandedBreakdowns[pid] = !state.expandedBreakdowns[pid];
+      renderAll();
+    }
+
+    function toggleAllBreakdownCards() {
+      if (!state.expandedBreakdowns) state.expandedBreakdowns = {};
+      const allOpen = state.participants.every(p => state.expandedBreakdowns[p.id]);
+      state.participants.forEach(p => {
+        state.expandedBreakdowns[p.id] = !allOpen;
+      });
+      renderAll();
+    }
+
+    function togglePaidStatus(pid) {
+      const p = state.participants.find(x => x.id === pid);
+      if (p) {
+        p.paid = !p.paid;
+        renderAll();
+      }
+    }
+
+    function markAllPaid(status) {
+      state.participants.forEach(p => p.paid = status);
+      renderAll();
+      showToast('已更新全體收款狀態');
+    }
+
+    function openAddParticipantModal() {
+      document.getElementById('modalParticipantName').value = '';
+      document.getElementById('participantModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('modalParticipantName').focus(), 80);
+    }
+
+    function closeParticipantModal() {
+      document.getElementById('participantModal').classList.add('hidden');
+    }
+
+    function confirmAddParticipant() {
+      const input = document.getElementById('modalParticipantName');
+      const name = input.value.trim();
+      if (!name) return;
+      state.participants.push({
+        id: 'p_' + Date.now(),
+        name,
+        paid: false
+      });
+      closeParticipantModal();
+      renderAll();
+      showToast(`已新增成員：${name}`);
+    }
+
+    function toggleReceiptDrawer() {
+      const drawer = document.getElementById('receiptDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function handleReceiptUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('uploadedReceiptImg');
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+        document.getElementById('mockReceiptContent').classList.add('hidden');
+        showToast('已載入 foodpanda 收據截圖');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadMockReceipt() {
+      document.getElementById('uploadedReceiptImg').classList.add('hidden');
+      document.getElementById('mockReceiptContent').classList.remove('hidden');
+    }
+
+    // --- TOUCH GESTURES: SWIPE & LONG-HOLD ---
+    let touchData = { startX: 0, startY: 0, type: null, id: null, swiping: false };
+
+    function handleTouchStart(e, type, id) {
+      if (e.touches.length !== 1) return;
+      touchData.startX = e.touches[0].clientX;
+      touchData.startY = e.touches[0].clientY;
+      touchData.type = type;
+      touchData.id = id;
+      touchData.swiping = false;
+
+      const cardEl = document.getElementById(type === 'item' ? `itemCard-${id}` : `collectCard-${id}`);
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(() => {
+        if (!touchData.swiping) {
+          if (cardEl) cardEl.classList.add('long-press-active');
+          setTimeout(() => cardEl && cardEl.classList.remove('long-press-active'), 250);
+          if (type === 'item') openItemActionSheet(id);
+          if (type === 'person') openParticipantActionSheet(id);
+        }
+      }, 520);
+    }
+
+    function handleTouchMove(e, type, id) {
+      if (!touchData.id) return;
+      const dx = e.touches[0].clientX - touchData.startX;
+      const dy = e.touches[0].clientY - touchData.startY;
+
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+        clearTimeout(longPressTimer);
+      }
+
+      if (Math.abs(dx) > 20 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        touchData.swiping = true;
+        const cardEl = document.getElementById(type === 'item' ? `itemCard-${id}` : `collectCard-${id}`);
+        if (cardEl) {
+          const clampedX = Math.max(-90, Math.min(90, dx));
+          cardEl.style.transform = `translateX(${clampedX}px)`;
+        }
+      }
+    }
+
+    function handleTouchEnd(e, type, id) {
+      clearTimeout(longPressTimer);
+      const cardEl = document.getElementById(type === 'item' ? `itemCard-${id}` : `collectCard-${id}`);
+      if (cardEl) cardEl.style.transform = '';
+
+      if (!touchData.swiping) return;
+      const endX = e.changedTouches[0].clientX;
+      const dx = endX - touchData.startX;
+
+      if (type === 'item') {
+        if (dx < -65) {
+          deleteItem(id);
+        } else if (dx > 65) {
+          duplicateItem(id);
+        }
+      } else if (type === 'person') {
+        if (Math.abs(dx) > 60) {
+          togglePaidStatus(id);
+          showToast('已切換收款狀態');
+        }
+      }
+      touchData.id = null;
+    }
+
+    function openItemActionSheet(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      document.getElementById('actionSheetTitle').textContent = `餐點操作：${item.name}`;
+      document.getElementById('actionSheetBody').innerHTML = `
+        <div class="space-y-2.5">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] text-neutral-500">修改餐點名稱</label>
+              <input id="editItemName" type="text" value="${escapeHtml(item.name)}"
+                class="w-full px-3 py-2 text-xs bg-panda-50/40 border border-panda-200 rounded-xl mt-0.5 focus:outline-none focus:border-panda-600" />
+            </div>
+            <div>
+              <label class="text-[11px] text-neutral-500">修改原價 ($)</label>
+              <input id="editItemPrice" type="number" step="0.1" value="${item.price}"
+                class="w-full px-3 py-2 text-xs bg-panda-50/40 border border-panda-200 rounded-xl mt-0.5 focus:outline-none focus:border-panda-600" />
+            </div>
+          </div>
+          <button onclick="saveItemEdit('${item.id}')"
+            class="w-full py-2.5 rounded-xl bg-panda-600 hover:bg-panda-700 text-white font-bold text-xs shadow-sm">
+            <i class="fa-solid fa-floppy-disk mr-1"></i>儲存修改
+          </button>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="duplicateItem('${item.id}'); closeActionSheet();"
+              class="py-2 rounded-xl bg-panda-50 hover:bg-panda-100 text-panda-700 font-bold text-xs">
+              <i class="fa-regular fa-clone mr-1"></i>複製多一份 (+1)
+            </button>
+            <button onclick="deleteItem('${item.id}'); closeActionSheet();"
+              class="py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs">
+              <i class="fa-regular fa-trash-can mr-1"></i>刪除此餐點
+            </button>
+          </div>
+        </div>
+      `;
+      document.getElementById('actionSheetModal').classList.remove('hidden');
+    }
+
+    function openParticipantActionSheet(pid) {
+      const p = state.participants.find(x => x.id === pid);
+      if (!p) return;
+      const calc = calculateBill();
+      const r = calc.results[pid];
+
+      document.getElementById('actionSheetTitle').textContent = `成員管理：${p.name} (應付 $${r.finalPayable.toFixed(1)})`;
+      document.getElementById('actionSheetBody').innerHTML = `
+        <div class="space-y-2">
+          <button onclick="togglePaidStatus('${pid}'); closeActionSheet();"
+            class="w-full py-2.5 rounded-xl ${p.paid ? 'bg-amber-100 text-amber-800' : 'bg-emerald-600 text-white'} font-bold text-xs flex items-center justify-center gap-1.5">
+            <i class="fa-solid ${p.paid ? 'fa-rotate-left' : 'fa-check'}"></i>
+            <span>${p.paid ? '改為「未收款」狀態' : '標記為「已收款」'}</span>
+          </button>
+          <button onclick="copyIndividualReminder('${pid}'); closeActionSheet();"
+            class="w-full py-2.5 rounded-xl bg-panda-50 text-panda-700 border border-panda-200 font-bold text-xs flex items-center justify-center gap-1.5">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            <span>複製 ${escapeHtml(p.name)} 的個人專屬催收明細</span>
+          </button>
+          <button onclick="removeParticipant('${pid}'); closeActionSheet();"
+            class="w-full py-2 rounded-xl bg-rose-50 text-rose-600 font-semibold text-xs">
+            <i class="fa-solid fa-user-minus mr-1"></i>移除此成員
+          </button>
+        </div>
+      `;
+      document.getElementById('actionSheetModal').classList.remove('hidden');
+    }
+
+    function closeActionSheet() {
+      document.getElementById('actionSheetModal').classList.add('hidden');
+    }
+
+    function saveItemEdit(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      const newName = document.getElementById('editItemName').value.trim();
+      const newPrice = parseFloat(document.getElementById('editItemPrice').value);
+      if (newName && !isNaN(newPrice) && newPrice >= 0) {
+        item.name = newName;
+        item.price = newPrice;
+        closeActionSheet();
+        renderAll();
+        showToast('已更新餐點資料');
+      }
+    }
+
+    function duplicateItem(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+      state.items.unshift({
+        id: 'i_' + Date.now(),
+        name: item.name,
+        price: item.price,
+        assignedTo: [...item.assignedTo]
+      });
+      renderAll();
+      showToast(`已複製多一份「${item.name}」`);
+    }
+
+    function deleteItem(itemId) {
+      state.items = state.items.filter(i => i.id !== itemId);
+      renderAll();
+      showToast('已刪除餐點項目');
+    }
+
+    function removeParticipant(pid) {
+      if (state.participants.length <= 1) {
+        showToast('至少需保留一位成員');
+        return;
+      }
+      state.participants = state.participants.filter(p => p.id !== pid);
+      state.items.forEach(item => {
+        item.assignedTo = item.assignedTo.filter(id => id !== pid);
+      });
+      renderAll();
+      showToast('已移除成員');
+    }
+
+    function openResetModal() {
+      document.getElementById('actionSheetTitle').textContent = '重設或清空訂單資料';
+      document.getElementById('actionSheetBody').innerHTML = `
+        <div class="space-y-2">
+          <button onclick="clearCurrentItemsOnly(); closeActionSheet();"
+            class="w-full py-2.5 rounded-xl bg-amber-50 text-amber-800 font-bold text-xs">
+            <i class="fa-solid fa-broom mr-1"></i>保留成員名單，僅清空餐點重新輸入
+          </button>
+          <button onclick="resetToDemoData(); closeActionSheet();"
+            class="w-full py-2.5 rounded-xl bg-panda-50 text-panda-700 font-bold text-xs">
+            <i class="fa-solid fa-rotate mr-1"></i>還原預設範例數據 (4人外賣團)
+          </button>
+        </div>
+      `;
+      document.getElementById('actionSheetModal').classList.remove('hidden');
+    }
+
+    function clearCurrentItemsOnly() {
+      state.items = [];
+      state.participants.forEach(p => p.paid = false);
+      renderAll();
+      showToast('已清空餐點，保留成員名單');
+    }
+
+    function resetToDemoData() {
+      state = JSON.parse(JSON.stringify(defaultState));
+      renderAll();
+      showToast('已還原預設範例數據');
+    }
+
+    function copyShareMessage() {
+      const text = document.getElementById('whatsappMessageOutput').value;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('已複製群組完整催收清單！可直接貼上至 WhatsApp');
+      });
+    }
+
+    function copyIndividualReminder(pid) {
+      const calc = calculateBill();
+      const r = calc.results[pid];
+      if (!r) return;
+      const itemsText = r.items.map(i => `${i.name}($${i.sharePrice.toFixed(1)})`).join(' + ');
+      const msg = `Hi ${r.name} 🐼，今日【${state.orderTitle}】你嘅 foodpanda 外賣折實夾錢金額係 *$${r.finalPayable.toFixed(1)}*：\n` +
+        `• 餐點：${itemsText}\n` +
+        `• 算式：原價 $${r.subtotal.toFixed(1)} - 折扣分攤 $${r.discountShare.toFixed(1)} + 平台運費 $${r.feeShare.toFixed(1)}\n` +
+        `📲 FPS: ${state.paymentInfo.fps} / PayMe: ${state.paymentInfo.payme} 唔該晒！`;
+
+      navigator.clipboard.writeText(msg).then(() => {
+        showToast(`已複製 ${r.name} 的個人催收訊息！`);
+      });
+    }
+
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastText').textContent = msg;
+      banner.classList.remove('hidden');
+      banner.classList.add('flex');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        banner.classList.add('hidden');
+        banner.classList.remove('flex');
+      }, 2400);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // Expose all handlers to global window object for inline HTML event attributes
+    Object.assign(window, {
+      updateOrderTitle,
+      toggleReceiptDrawer,
+      openCloudModal,
+      closeCloudModal,
+      syncToCloudNow,
+      joinCloudRoom,
+      copyCloudRoomLink,
+      openResetModal,
+      handleReceiptUpload,
+      loadMockReceipt,
+      openAddParticipantModal,
+      closeParticipantModal,
+      confirmAddParticipant,
+      switchTab,
+      addNewItem,
+      assignAllUnassignedToAll,
+      toggleItemAssignee,
+      assignItemEveryone,
+      setDiscountMode,
+      setQuickPercent,
+      updateDiscountParams,
+      updateFeeParams,
+      setFeeSplitMode,
+      setRoundingMode,
+      toggleBreakdownCard,
+      toggleAllBreakdownCards,
+      markAllPaid,
+      togglePaidStatus,
+      copyShareMessage,
+      copyIndividualReminder,
+      handleTouchStart,
+      handleTouchMove,
+      handleTouchEnd,
+      openItemActionSheet,
+      openParticipantActionSheet,
+      closeActionSheet,
+      saveItemEdit,
+      duplicateItem,
+      deleteItem,
+      removeParticipant,
+      clearCurrentItemsOnly,
+      resetToDemoData
+    });
+
+    // Initialize UI & Firebase Cloud Sync
+    renderAll();
+    initFirebaseSync();
+  </script>
+</body>
+</html>
