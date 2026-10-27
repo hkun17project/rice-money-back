@@ -170,7 +170,7 @@
       <!-- MULTI-SCREENSHOT UPLOAD & AI OCR DRAWER -->
       <div id="receiptDrawer" class="bg-neutral-900 text-white p-3.5 border-b border-neutral-800 transition-all space-y-3">
         <div class="flex items-center justify-between">
-          <div class="text-xs font-bold flex items-center gap-1.5 text-panda-300"><i class="fa-solid fa-images"></i><span>收據長截圖管理 (支援多張上傳 & AI 去重)</span></div>
+          <div class="text-xs font-bold flex items-center gap-1.5 text-panda-300"><i class="fa-solid fa-images"></i><span>收據長截圖管理 (支援多圖 & AI 去重)</span></div>
           <button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -223,7 +223,7 @@
         </div>
         <div class="flex items-center justify-between px-1">
           <h3 class="text-xs font-bold text-neutral-600">收據餐點清單 (<span id="itemCountBadge">0</span>項)</h3>
-          <span class="text-[11px] text-neutral-400">無需指派成員即可自動計算折實應付價</span>
+          <span class="text-[11px] text-neutral-400">無需指派成員即可自動計算</span>
         </div>
         <div id="itemsListContainer" class="space-y-2.5"></div>
       </section>
@@ -337,7 +337,7 @@
       <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-xl bg-panda-50 text-panda-600 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-          <div><h3 class="font-extrabold text-sm text-neutral-800">AI 收據識圖設定</h3><p class="text-[10px] text-neutral-400">內建自動降級備援機制</p></div>
+          <div><h3 class="font-extrabold text-sm text-neutral-800">AI 收據識圖設定</h3><p class="text-[10px] text-neutral-400">內建舊版 GCP 模型終極備援機制</p></div>
         </div>
         <button onclick="closeApiKeyModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -544,7 +544,7 @@
       return { totalOriginal: totalOrig, totalDiscount: totalDisc, totalFees, sumRoundedCollectible: sumRound, effectiveRatio: totalOrig>0?((totalOrig-totalDisc)/totalOrig)*100:100, discountRuleSummary: dSum, itemBreakdown, personBreakdown };
     }
 
-    // --- 4. MULTI-RECEIPT UPLOAD & AUTOFALLBACK AI ---
+    // --- 4. MULTI-RECEIPT UPLOAD & ULTIMATE AUTOFALLBACK AI ---
     function handleMultiReceiptUpload(event) {
       const files = Array.from(event.target.files || []); if (files.length === 0) return;
       const rec = getActiveRecord(); if(!rec) return; if (!rec.receipts) rec.receipts = [];
@@ -556,15 +556,29 @@
     }
     function removeReceiptImage(id) { const rec = getActiveRecord(); if(!rec) return; rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); }
 
-    // 🏆 CORE FIX: AI Model Auto-Fallback Engine for GCP Keys
+    // 🏆 ULTIMATE FIX: AI Model Auto-Fallback Engine (Including Legacy gemini-pro-vision for GCP)
     async function fetchGeminiWithFallback(apiKey, promptText, imageParts = []) {
-      const modelsToTry = ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro-latest', 'gemini-1.5-pro'];
+      const isVisionTask = imageParts && imageParts.length > 0;
+      
+      const modelsToTry = isVisionTask 
+        ? ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro-latest', 'gemini-1.5-pro', 'gemini-pro-vision']
+        : ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.0-pro'];
+
       let lastErr = null;
       let lastErrMsg = '';
 
       for (const model of modelsToTry) {
         try {
-          const bodyData = { contents: [{ parts: [{ text: promptText }, ...imageParts] }], generationConfig: { responseMimeType: "application/json" } };
+          const bodyData = { 
+            contents: [{ parts: [{ text: promptText }, ...imageParts] }], 
+            generationConfig: { responseMimeType: "application/json" } 
+          };
+
+          if (model === 'gemini-pro-vision' || model === 'gemini-pro') {
+            delete bodyData.generationConfig;
+            bodyData.contents[0].parts[0].text += "\n\n⚠️ IMPORTANT: You MUST return strictly valid JSON ONLY, starting with '{' and ending with '}'. Do not include markdown formatting like ```json or ```.";
+          }
+
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData)
           });
@@ -572,21 +586,21 @@
           if (!res.ok) {
             const errData = await res.json();
             const errMsg = errData.error?.message || `HTTP ${res.status}`;
-            if (errMsg.includes('not found') || errMsg.includes('not supported') || res.status === 404) {
-              lastErr = new Error(`Model ${model} 不支援或找不到`);
+            if (errMsg.includes('not found') || errMsg.includes('not supported') || res.status === 404 || res.status === 400) {
+              lastErr = new Error(`Model ${model} 拒絕或不支援`);
               lastErrMsg = errMsg;
-              continue; // Auto-fallback: try next model in the list
+              continue; 
             }
-            throw new Error(errMsg);
+            throw new Error(errMsg); 
           }
           const data = await res.json();
           return { data, modelUsed: model };
         } catch (e) {
           lastErr = e; lastErrMsg = e.message;
-          if (!e.message.includes('不支援') && !e.message.includes('not found')) throw e; 
+          if (!e.message.includes('拒絕或不支援') && !e.message.includes('not found') && !e.message.includes('not supported') && !e.message.includes('參數錯誤')) throw e; 
         }
       }
-      throw new Error(`所有備援模型皆無法存取: ${lastErrMsg}`);
+      throw new Error(`所有備援模型皆無法存取 (含舊版 gemini-pro-vision): ${lastErrMsg}`);
     }
 
     async function runAiReceiptRecognition() {
@@ -599,7 +613,7 @@
       if (realImages.length === 0) { statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先上傳收據截圖。`; return; }
       if (!apiKey) { statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-300 mr-1"></i>請先在右上角「AI 設定」輸入 API Key。`; return; }
 
-      statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在嘗試連線 AI (支援 GCP 自動備援模型)...`;
+      statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在嘗試連線 AI (支援舊版 GCP 備援)...`;
       try {
         const imageParts = realImages.map(img => {
           const base64Data = img.dataUrl.split(',')[1];
@@ -619,10 +633,10 @@
   "verifiedPromos": [ { "title": "優惠名稱", "badge": "收據實測", "mode": "percent_cap|percent|fixed", "percentOff": 20, "capAmount": 60, "fixedAmount": 0 } ]
 }`;
 
-        // Call the new resilient fallback engine
         const { data, modelUsed } = await fetchGeminiWithFallback(apiKey, promptText, imageParts);
         const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-        const parsed = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+        // Handle markdown JSON wrapping from older models
+        const parsed = JSON.parse(rawText.replace(/```json|```/gi, '').trim());
 
         if (parsed.platform) rec.platform = parsed.platform;
         if (parsed.restaurant) rec.restaurant = parsed.restaurant;
@@ -642,7 +656,7 @@
         if (Array.isArray(parsed.verifiedPromos) && parsed.verifiedPromos.length > 0) rec.verifiedPromos = parsed.verifiedPromos;
 
         saveDatabase(); renderActiveRecordAll();
-        statusText.innerHTML = `<div class="flex items-start gap-1.5 text-emerald-300"><i class="fa-solid fa-circle-check mt-0.5"></i><div><b>AI 識圖完成 (使用模型: ${modelUsed})</b><br/>已辨識餐廳「<b>${escapeHtml(rec.restaurant)}</b>」，匯入 <b>${rec.items.length}</b> 項餐點（剔除 <b>${parsed.duplicatesRemovedCount||0}</b> 項重覆項目）。</div></div>`;
+        statusText.innerHTML = `<div class="flex items-start gap-1.5 text-emerald-300"><i class="fa-solid fa-circle-check mt-0.5"></i><div><b>AI 識圖完成 (模型: ${modelUsed})</b><br/>已辨識餐廳「<b>${escapeHtml(rec.restaurant)}</b>」，匯入 <b>${rec.items.length}</b> 項餐點（剔除 <b>${parsed.duplicatesRemovedCount||0}</b> 項重覆項目）。</div></div>`;
         showToast(`成功匯入 ${rec.items.length} 項餐點！`);
       } catch (err) {
         console.warn('Gemini API Error:', err);
@@ -660,7 +674,7 @@
         try {
           const prompt = `列出香港外賣平台 ${platform} 針對餐廳「${restName}」的 4 個常見折扣快選配置，回傳 JSON Array: [{ "title": "優惠名稱", "badge": "當日優惠", "mode": "percent_cap|percent|fixed", "percentOff": 20, "capAmount": 60, "fixedAmount": 0 }]`;
           const { data } = await fetchGeminiWithFallback(apiKey, prompt);
-          const list = JSON.parse((data.candidates?.[0]?.content?.parts?.[0]?.text || '[]').replace(/```json|```/g, '').trim());
+          const list = JSON.parse((data.candidates?.[0]?.content?.parts?.[0]?.text || '[]').replace(/```json|```/gi, '').trim());
           if (Array.isArray(list) && list.length > 0) {
             rec.verifiedPromos = list; saveDatabase(); renderActiveRecordAll();
             showToast(`已更新「${restName}」當日折扣快選！`);
