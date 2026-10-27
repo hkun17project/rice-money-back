@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PandaSplit Pro v5 - 智慧外賣收據識圖與折實夾錢神器</title>
+  <title>PandaSplit Pro v6 - 智慧外賣收據識圖與折實夾錢神器</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -189,7 +189,7 @@
         <button onclick="pressPinDigit('7')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">7</button>
         <button onclick="pressPinDigit('8')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">8</button>
         <button onclick="pressPinDigit('9')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">9</button>
-        <button onclick="pressPinDigit('.')" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-xl font-extrabold transition">.</button>
+        <button onclick="clearPinDigits()" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold transition">清除</button>
         <button onclick="pressPinDigit('0')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">0</button>
         <button onclick="backspacePinDigit()" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-base font-bold transition"><i class="fa-solid fa-delete-left"></i></button>
       </div>
@@ -294,7 +294,7 @@
             </div>
             <div class="col-span-7 relative">
               <i class="fa-solid fa-store absolute left-2.5 top-2 text-white/75 text-xs"></i>
-              <input id="orderRestaurantInput" type="text" placeholder="餐廳名稱 (可由收據自動提取)" onchange="updateOrderMetadata()" class="w-full pl-7 pr-2.5 py-1.5 bg-white/15 placeholder-white/70 text-white font-bold text-xs rounded-xl border border-white/25 focus:outline-none focus:bg-white/25" />
+              <input id="orderRestaurantInput" type="text" placeholder="餐廳名稱 (識別「訂購於」自動填入)" onchange="updateOrderMetadata()" class="w-full pl-7 pr-2.5 py-1.5 bg-white/15 placeholder-white/70 text-white font-bold text-xs rounded-xl border border-white/25 focus:outline-none focus:bg-white/25" />
             </div>
           </div>
         </div>
@@ -322,7 +322,7 @@
       <div id="receiptDrawer" class="bg-neutral-900 text-white p-3.5 border-b border-neutral-800 transition-all space-y-3">
         <div class="flex items-center justify-between">
           <div class="text-xs font-bold flex items-center gap-1.5 text-amber-300">
-            <i class="fa-solid fa-bolt"></i><span>收據識圖與費用自動匯入工作台</span>
+            <i class="fa-solid fa-bolt"></i><span>收據識圖與餐廳/費用自動匯入工作台</span>
           </div>
           <button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -331,7 +331,7 @@
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-paste text-sm"></i>
             <span>1. 貼上收據文字</span>
-            <span class="text-[9px] opacity-80 font-normal">自動分拆餐點/費用</span>
+            <span class="text-[9px] opacity-80 font-normal">自動匯入餐廳/費用</span>
           </button>
 
           <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95">
@@ -344,7 +344,7 @@
           <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-eye text-sm"></i>
             <span>3. 本機離線識圖</span>
-            <span class="text-[9px] text-white/85 font-normal">認領1x/2x及費用</span>
+            <span class="text-[9px] text-white/85 font-normal">認領Nx餐點及費用</span>
           </button>
         </div>
 
@@ -435,7 +435,7 @@
               <i class="fa-solid fa-receipt w-6 h-6 rounded-lg bg-panda-600 text-white flex items-center justify-center text-xs"></i>
               收據折扣與優惠券欄 (識圖自動匯入)
             </h2>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-panda-50 text-panda-700 font-bold border border-panda-200">點擊用內建鍵盤輸入</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-panda-50 text-panda-700 font-bold border border-panda-200">支援內建鍵盤小數點</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2.5">
@@ -474,7 +474,7 @@
           <div class="pt-2 border-t border-panda-100">
             <h3 class="text-xs font-extrabold text-neutral-700 mb-2 flex items-center gap-1.5">
               <i class="fa-solid fa-motorcycle text-panda-600"></i>
-              收據運費、平台費與其他費用欄 (識圖自動匯入)
+              收據運費、平台服務費與其他費用欄 (識圖自動匯入)
             </h3>
             <div class="grid grid-cols-3 gap-2">
               <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
@@ -487,7 +487,7 @@
               </div>
               <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
                 <label class="text-[11px] font-bold text-neutral-700 block">平台服務費 ($)</label>
-                <span class="text-[9px] text-neutral-400 block mb-1">平台費 HK$ xx</span>
+                <span class="text-[9px] text-neutral-400 block mb-1">平台費 HK $xx</span>
                 <input id="inputFeePlatform" type="text" inputmode="none" readonly
                   onclick="openNumericKeypad('inputFeePlatform', '平台服務費 (HK$)')"
                   value="0"
@@ -664,7 +664,7 @@
         <button onclick="keypadPress('1')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">1</button>
         <button onclick="keypadPress('2')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">2</button>
         <button onclick="keypadPress('3')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">3</button>
-        <button onclick="keypadPress('.')" class="h-12 rounded-2xl bg-amber-400/20 border border-amber-400/50 hover:bg-amber-400/30 active:scale-95 text-2xl font-extrabold text-amber-300">.</button>
+        <button onclick="keypadPress('.')" class="h-12 rounded-2xl bg-amber-400/25 border-2 border-amber-400 hover:bg-amber-400/40 active:scale-95 text-2xl font-extrabold text-amber-300">.</button>
 
         <button onclick="keypadPress('0')" class="col-span-2 h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">0</button>
         <button onclick="keypadPress('00')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-sm font-extrabold">00</button>
@@ -681,14 +681,14 @@
           <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div>
           <div>
             <h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3>
-            <p class="text-[10px] text-neutral-500">自動認領 1x/2x 餐點，並將運費/折扣/平台費/優惠券匯入折扣頁</p>
+            <p class="text-[10px] text-neutral-500">自動認領 1x/3x/5x/10x 等餐點，並自動匯入餐廳名稱、運費、平台費、折扣及優惠券</p>
           </div>
         </div>
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
         <textarea id="smartPasteTextarea" rows="8"
-          placeholder="請貼上收據文字...&#10;系統會自動忽略「訂單#、訂購於、送達到、小計金額、總計、付款方式」，只將 1x/2x 餐點匯入餐點清單，並將「運費、折扣、平台費、優惠券」自動填入折扣快選頁！"
+          placeholder="請貼上收據文字...&#10;• 「訂購於」後方的文字會自動填入頂部「餐廳名稱」&#10;• 「1x / 2x / 3x / 5x / 10x ...」後方的餐點會自動匯入餐點清單&#10;• 「運費、平台費、折扣、優惠券」會自動匯入「2. 折扣快選」對應欄目"
           class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
         <div class="flex gap-2 pt-1">
           <button onclick="closeSmartPasteModal()" class="py-2.5 px-4 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
@@ -765,7 +765,6 @@
     let activeTab = 'items';
     let breakdownViewMode = 'item';
 
-    // Deliveroo removed; Platform-specific promos
     const PLATFORM_PROMOS = {
       'foodpanda': [
         { title: 'pandapro 8折優惠 (封頂減$60)', badge: '熱門餐廳優惠', mode: 'percent_cap', percentOff: 20, capAmount: 60 },
@@ -811,7 +810,6 @@
       return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null;
     }
 
-    // --- DYNAMIC PLATFORM THEME ENGINE ---
     function applyPlatformTheme(platformName) {
       const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台'];
       const theme = validThemes.includes(platformName) ? platformName : 'foodpanda';
@@ -826,7 +824,6 @@
     }
 
     function pressPinDigit(digit) {
-      if (digit === '.') return;
       if (pinBuffer.length >= 6) return;
       pinBuffer += digit;
       updatePasscodeDots();
@@ -869,15 +866,23 @@
       document.getElementById('passcodeScreen').classList.remove('hidden');
     }
 
-    // --- 2. BUILT-IN NUMERIC KEYPAD ENGINE (WITH DECIMAL POINT ".") ---
+    // =========================================================
+    // 2. BUILT-IN NUMERIC KEYPAD ENGINE (FIXED DECIMAL "." INPUT)
+    // =========================================================
     let keypadState = {
       targetId: null,
       isAddItemTrigger: false,
       allowSpaces: false
     };
 
+    // Prevents re-render from overwriting the active input while typing "5." or "0."
+    function setInputValSafe(id, val) {
+      if (keypadState && keypadState.targetId === id) return;
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+
     function openNumericKeypad(inputId, labelText, isAddItemTrigger = false, allowSpaces = false) {
-      // Remove highlight from previous input
       document.querySelectorAll('.keypad-target-active').forEach(el => el.classList.remove('keypad-target-active'));
 
       const inputEl = document.getElementById(inputId);
@@ -889,7 +894,7 @@
       keypadState.allowSpaces = allowSpaces;
 
       document.getElementById('keypadFieldLabel').textContent = labelText || '輸入數值';
-      document.getElementById('keypadLiveValue').textContent = inputEl.value || '0';
+      document.getElementById('keypadLiveValue').textContent = inputEl.value !== '' ? inputEl.value : '0';
       document.getElementById('keypadSpaceBtn').classList.toggle('hidden', !allowSpaces);
       document.getElementById('keypadSubmitBtn').textContent = isAddItemTrigger ? '加入餐點' : '確認';
 
@@ -897,9 +902,14 @@
     }
 
     function closeNumericKeypad() {
+      const prevId = keypadState.targetId;
       document.querySelectorAll('.keypad-target-active').forEach(el => el.classList.remove('keypad-target-active'));
       document.getElementById('numericKeypadSheet').classList.add('hidden');
       keypadState.targetId = null;
+      if (prevId) {
+        syncKeypadTargetChange(prevId);
+        renderActiveRecordAll();
+      }
     }
 
     function keypadPress(char) {
@@ -907,21 +917,26 @@
       const inputEl = document.getElementById(keypadState.targetId);
       if (!inputEl) return;
 
-      let cur = String(inputEl.value || '');
+      let cur = String(inputEl.value ?? '');
 
       if (char === ' ') {
         if (keypadState.allowSpaces && !cur.endsWith(' ')) {
           cur = cur + ' ';
         }
       } else if (char === '.') {
-        // Check last token so each number only has one decimal point
         const parts = cur.split(' ');
         const lastToken = parts[parts.length - 1];
         if (!lastToken.includes('.')) {
-          cur = cur === '' ? '0.' : (cur.endsWith(' ') ? cur + '0.' : cur + '.');
+          if (cur === '' || cur === '0') {
+            cur = '0.';
+          } else if (cur.endsWith(' ')) {
+            cur = cur + '0.';
+          } else {
+            cur = cur + '.';
+          }
         }
       } else {
-        if (cur === '0' && char !== '.') {
+        if (cur === '0') {
           cur = char === '00' ? '0' : char;
         } else {
           cur += char;
@@ -1060,7 +1075,6 @@
       }).join('');
     }
 
-    // Requirement: Clear payment info fields when creating a new record
     function createNewRecord() {
       const ts = new Date().toISOString().split('T')[0];
       const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
@@ -1075,11 +1089,11 @@
         receipts: [],
         verifiedPromos: [...(PLATFORM_PROMOS[defaultPlatform] || PLATFORM_PROMOS['foodpanda'])],
         items: [],
-        paymentInfo: { fps: '', payme: '' }, // Cleared on new record creation!
+        paymentInfo: { fps: '', payme: '' },
         discount: {
           mode: 'receipt_exact',
-          directAmount: 0, // 收據「折扣 HK$」
-          fixedAmount: 0,  // 收據「優惠券 HK$」
+          directAmount: 0,
+          fixedAmount: 0,
           percentOff: 20,
           capAmount: 60,
           overrideFinalTotal: 0
@@ -1087,7 +1101,6 @@
         fees: { delivery: 0, platform: 0, packaging: 0, splitMode: 'equal', rounding: 'exact' }
       };
 
-      // Also clear global paymentInfo fallback
       dbState.paymentInfo = { fps: '', payme: '' };
       dbState.records.unshift(newRec);
       dbState.activeRecordId = newRec.id;
@@ -1208,7 +1221,7 @@
     }
 
     // =========================================================
-    // 5. STRICT 1x/2x RECEIPT PARSER & FEE/DISCOUNT AUTO-IMPORTER
+    // 5. ENHANCED RECEIPT PARSER (ANY Nx QUANTITY, PLATFORM FEE & RESTAURANT)
     // =========================================================
     function openSmartPasteModal() {
       closeNumericKeypad();
@@ -1218,6 +1231,51 @@
     }
     function closeSmartPasteModal() {
       document.getElementById('smartPasteModal').classList.add('hidden');
+    }
+
+    // Helper: Extract trailing currency amount from a line (handles "HK$ 52.0", "HK $5.0", "HKS 5.0", "$5", "5.0")
+    function extractTrailingAmount(str, allowPlainInteger = false) {
+      if (!str) return null;
+      const cleaned = str.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2').trim();
+      // 1. With currency prefix (HK$, HK $, HKS, HK5, $, ￥, 元)
+      const curMatch = cleaned.match(/[-－]?\s*(?:HK\s*[\$S5s]|[\$￥元])\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
+      if (curMatch) return parseFloat(curMatch[1]);
+      // 2. Decimal number at end of line
+      const decMatch = cleaned.match(/[-－]?\s*\b([0-9]+\.[0-9]{1,2})\s*$/);
+      if (decMatch) return parseFloat(decMatch[1]);
+      // 3. Optional plain integer at end of known fee line
+      if (allowPlainInteger) {
+        const intMatch = cleaned.match(/[-－]?\s*\b([0-9]{1,4})\s*$/);
+        if (intMatch) return parseFloat(intMatch[1]);
+      }
+      return null;
+    }
+
+    // Helper: Extract fee amount from current line OR the next line if split across lines by OCR
+    function extractFeeFromLineOrNext(lines, idx) {
+      const valSameLine = extractTrailingAmount(lines[idx], true);
+      if (valSameLine !== null) return { val: valSameLine, nextIdx: idx };
+      if (idx + 1 < lines.length) {
+        const nextLine = lines[idx + 1].replace(/(\d)\s*\.\s*(\d)/g, '$1.$2').trim();
+        if (/^[-－]?\s*(?:HK\s*[\$S5s]|[\$￥元])?\s*[0-9]+(?:\.[0-9]{1,2})?\s*$/i.test(nextLine)) {
+          const valNext = extractTrailingAmount(nextLine, true);
+          if (valNext !== null) return { val: valNext, nextIdx: idx + 1 };
+        }
+      }
+      return { val: null, nextIdx: idx };
+    }
+
+    // Helper: Parse quantity prefix like "1x", "2x", "3x", "5x", "10x", "12x" (plus OCR character fixes)
+    function matchQuantityPrefix(line) {
+      const m = line.match(/^\s*([0-9IilL|OoS]{1,3})\s*[xX×*✕]\s*(.*)$/);
+      if (!m) return null;
+      const normalizedDigits = m[1]
+        .replace(/[IilL|]/g, '1')
+        .replace(/[Oo]/g, '0')
+        .replace(/[S]/g, '5');
+      const qty = parseInt(normalizedDigits, 10);
+      if (isNaN(qty) || qty <= 0 || qty > 500) return null;
+      return { qty, rest: m[2].trim() };
     }
 
     function parseReceiptRawText(rawText) {
@@ -1234,118 +1292,159 @@
       let detectedVoucher = null;
       let detectedFinalTotal = null;
 
-      // Strict blacklist of non-meal lines (tolerates spaces injected by OCR between Chinese chars)
-      const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*#|訂\s*購\s*於|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*台\s*費|平\s*台\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費)/i;
+      // Strict blacklist of non-meal lines (tolerates spaces injected by OCR)
+      const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*#|訂\s*購\s*[於放菸自]|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費)/i;
 
-      // Quantity prefix regex: matches "1x", "2x", "1 x", "1×", "1*", or OCR variants "Ix", "lx" at start of line
-      const qtyMarkerRegex = /^(?:(\d+)|[IilL|])\s*[xX×*]\s*(.+)$/;
-
-      // Check if the text contains any 1x/2x quantity markers
-      const hasAnyQtyMarkers = lines.some(l => qtyMarkerRegex.test(l));
+      const hasAnyQtyMarkers = lines.some(l => matchQuantityPrefix(l) !== null);
 
       let pendingItemName = null;
       let pendingQty = 1;
+      let pendingLockedByQty = false; // Locks the dish name after Nx so sub-options don't overwrite it
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].replace(/\s+/g, ' ').trim();
 
-        // Extract trailing price on the line (handles "HK$ 52.0", "HK $52.0", "- HK$ 15.0", "$52")
-        const priceMatch = line.match(/[-－]?\s*(?:HK\s*\$|\$|￥|元)\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i) ||
-                           line.match(/[-－]?\s*\b([0-9]+\.[0-9]{1,2})\s*$/);
-        const amountVal = priceMatch ? parseFloat(priceMatch[1]) : null;
-
-        // 1. Check "訂購於 xxx" to auto-extract restaurant name
-        const restMatch = line.match(/訂\s*購\s*於\s*[:：]?\s*(.+)$/i);
-        if (restMatch) {
-          detectedRestaurant = restMatch[1].replace(/\s*(?:HK\s*\$|\$).*$/i, '').trim();
-          pendingItemName = null;
+        // 1. Check "訂購於" (Same-line OR Next-line restaurant name extraction)
+        const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
+        if (restHeaderMatch) {
+          let candidate = restHeaderMatch[1].replace(/\s*(?:HK\s*[\$S5s]|\$).*$/i, '').trim();
+          if (candidate.length >= 2) {
+            detectedRestaurant = candidate;
+          } else if (i + 1 < lines.length) {
+            // Restaurant name is on the next line!
+            const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
+            if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) {
+              detectedRestaurant = nextLine;
+              i++; // Consume next line
+            }
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
-        // 2. Check & extract "運費 HK$ xx"
-        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee)/i.test(line)) {
-          if (amountVal !== null) detectedDelivery = amountVal;
-          else if (/免\s*運\s*費|free/i.test(line)) detectedDelivery = 0;
-          pendingItemName = null;
+        // 2. Check & extract "平台服務費" / "平台費 HK $xx" (Supports台/臺/合 OCR variants & next-line amount)
+        if (/(平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i);
+          if (res.val !== null) {
+            detectedPlatformFee = res.val;
+            i = res.nextIdx;
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
-        // 3. Check & extract "平台費 HK $xx"
-        if (/(平\s*台\s*費|平\s*台\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) {
-          if (amountVal !== null) detectedPlatformFee = amountVal;
-          pendingItemName = null;
+        // 3. Check & extract "運費 HK$ xx"
+        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line)) {
+          if (/免\s*運\s*費|free/i.test(line)) {
+            detectedDelivery = 0;
+          } else {
+            const res = extractFeeFromLineOrNext(lines, i);
+            if (res.val !== null) {
+              detectedDelivery = res.val;
+              i = res.nextIdx;
+            }
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
         // 4. Check & extract "包裝費 / 餐盒費 HK$ xx"
-        if (/(包\s*裝\s*費|餐\s*盒\s*費|container|packaging)/i.test(line)) {
-          if (amountVal !== null) detectedPackagingFee = amountVal;
-          pendingItemName = null;
+        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i);
+          if (res.val !== null) {
+            detectedPackagingFee = res.val;
+            i = res.nextIdx;
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
         // 5. Check & extract "優惠券xxx HK$ xx"
         if (/(優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|promo\s*code)/i.test(line)) {
-          if (amountVal !== null) detectedVoucher = (detectedVoucher || 0) + amountVal;
-          pendingItemName = null;
+          const res = extractFeeFromLineOrNext(lines, i);
+          if (res.val !== null) {
+            detectedVoucher = (detectedVoucher || 0) + res.val;
+            i = res.nextIdx;
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
         // 6. Check & extract "折扣 HK$ xx"
         if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line)) {
-          if (amountVal !== null) detectedDirectDiscount = (detectedDirectDiscount || 0) + amountVal;
-          pendingItemName = null;
+          const res = extractFeeFromLineOrNext(lines, i);
+          if (res.val !== null) {
+            detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val;
+            i = res.nextIdx;
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
         // 7. Check & extract "總計 HK$ xxx"
         if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) {
-          if (amountVal !== null) detectedFinalTotal = amountVal;
-          pendingItemName = null;
+          const res = extractFeeFromLineOrNext(lines, i);
+          if (res.val !== null) {
+            detectedFinalTotal = res.val;
+            i = res.nextIdx;
+          }
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
         // 8. Strictly block all other blacklisted phrases (訂單#, 送達到, 小計金額, 付款方式, etc.)
         if (nonItemBlacklistRegex.test(line)) {
-          pendingItemName = null;
+          pendingItemName = null; pendingLockedByQty = false;
           continue;
         }
 
-        // 9. Match Meal Items starting with "1x" / "2x"
-        const qtyMatch = line.match(qtyMarkerRegex);
-        if (qtyMatch) {
-          const parsedQty = qtyMatch[1] ? parseInt(qtyMatch[1], 10) : 1;
-          let restOfLine = qtyMatch[2].trim();
+        // 9. Match Meal Items starting with ANY quantity "1x", "2x", "3x", "5x", "10x", etc.
+        const qtyInfo = matchQuantityPrefix(line);
+        if (qtyInfo) {
+          const parsedQty = qtyInfo.qty;
+          let restOfLine = qtyInfo.rest;
 
-          // Check if price is on the same line as "1x ..."
-          const inlinePriceMatch = restOfLine.match(/^(.+?)\s+[-－]?\s*(?:HK\s*\$|\$|￥)?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
+          // If "3x" is on its own line and the item name is on the next line
+          if (!restOfLine && i + 1 < lines.length) {
+            const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
+            if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) {
+              restOfLine = nextLine;
+              i++;
+            }
+          }
+
+          // Check if price is on the same line as "Nx ..."
+          const cleanedRest = restOfLine.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2');
+          const inlinePriceMatch = cleanedRest.match(/^(.+?)\s+[-－]?\s*(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
           if (inlinePriceMatch) {
             let itemName = inlinePriceMatch[1].replace(/^[*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim();
             const itemPrice = parseFloat(inlinePriceMatch[2]);
-            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 5000) {
-              const fp = `${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
+            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 10000) {
+              const fp = `${parsedQty}x_${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
               if (seenFingerprints.has(fp)) duplicatesSkipped++;
               else {
                 seenFingerprints.add(fp);
                 pushItemWithQty(extractedItems, itemName, itemPrice, parsedQty);
               }
             }
-            pendingItemName = null;
+            pendingItemName = null; pendingLockedByQty = false;
             continue;
           } else {
-            // Price is on a following line (e.g., after drink options like "少冰")
+            // Price is on a subsequent line (e.g., after drink options like "少冰")
             pendingQty = parsedQty;
             pendingItemName = restOfLine.replace(/^[*\-•·\s]+/, '').trim();
+            pendingLockedByQty = true;
             continue;
           }
         }
 
-        // 10. If waiting for the price of a "1x" item on a subsequent line
-        const standalonePrice = line.match(/^(?:HK\s*\$|\$)?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
+        // 10. If waiting for the price of a "Nx" item on a subsequent line
+        const cleanedLine = line.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2');
+        const standalonePrice = cleanedLine.match(/^(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
         if (standalonePrice && pendingItemName) {
           const itemPrice = parseFloat(standalonePrice[1]);
-          if (itemPrice > 0 && itemPrice < 5000 && !nonItemBlacklistRegex.test(pendingItemName)) {
-            const fp = `${pendingItemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
+          if (itemPrice > 0 && itemPrice < 10000 && !nonItemBlacklistRegex.test(pendingItemName)) {
+            const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
             if (seenFingerprints.has(fp)) duplicatesSkipped++;
             else {
               seenFingerprints.add(fp);
@@ -1354,17 +1453,35 @@
           }
           pendingItemName = null;
           pendingQty = 1;
+          pendingLockedByQty = false;
           continue;
         }
 
-        // 11. Fallback ONLY if the user pasted a custom list without any "1x"/"2x" markers
-        if (!hasAnyQtyMarkers && amountVal !== null) {
-          const fallbackMatch = line.match(/^(.+?)\s+(?:HK\s*\$|\$|￥)?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
+        // If pendingLockedByQty is true, ignore intermediate option lines (e.g. "少冰, 半糖") unless the line itself has a trailing price
+        if (pendingLockedByQty && pendingItemName) {
+          const lineTrailingPrice = extractTrailingAmount(line, false);
+          if (lineTrailingPrice !== null && lineTrailingPrice > 0 && lineTrailingPrice < 10000) {
+            const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${lineTrailingPrice.toFixed(1)}`;
+            if (seenFingerprints.has(fp)) duplicatesSkipped++;
+            else {
+              seenFingerprints.add(fp);
+              pushItemWithQty(extractedItems, pendingItemName, lineTrailingPrice, pendingQty);
+            }
+            pendingItemName = null;
+            pendingQty = 1;
+            pendingLockedByQty = false;
+          }
+          continue;
+        }
+
+        // 11. Fallback ONLY if the user pasted a custom list without any "Nx" markers
+        if (!hasAnyQtyMarkers) {
+          const fallbackMatch = cleanedLine.match(/^(.+?)\s+(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
           if (fallbackMatch) {
             let itemName = fallbackMatch[1].replace(/^[*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim();
             const itemPrice = parseFloat(fallbackMatch[2]);
-            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 5000) {
-              const fp = `${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
+            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 10000) {
+              const fp = `1x_${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
               if (!seenFingerprints.has(fp)) {
                 seenFingerprints.add(fp);
                 extractedItems.push({ name: itemName, price: itemPrice });
@@ -1389,16 +1506,15 @@
 
     function pushItemWithQty(list, name, totalLinePrice, qty) {
       if (qty > 1) {
-        const unitPrice = Math.round((totalLinePrice / qty) * 10) / 10;
+        const unitPrice = Math.round((totalLinePrice / qty) * 100) / 100;
         for (let k = 1; k <= qty; k++) {
-          list.push({ name: `${name} (#${k})`, price: unitPrice });
+          list.push({ name: `${name} (${k}/${qty})`, price: unitPrice });
         }
       } else {
         list.push({ name, price: totalLinePrice });
       }
     }
 
-    // Apply extracted items, fees, and discounts into the active record
     function applyParsedReceiptToRecord(rec, res, replaceExisting = true) {
       if (res.extractedItems.length > 0) {
         if (replaceExisting) rec.items = [];
@@ -1407,38 +1523,43 @@
         });
       }
 
-      if (res.detectedRestaurant && !rec.restaurant) {
+      let importedMetaLabels = [];
+
+      // Always update restaurant name when detected after "訂購於"
+      if (res.detectedRestaurant) {
         rec.restaurant = res.detectedRestaurant;
+        const restInput = document.getElementById('orderRestaurantInput');
+        if (restInput) restInput.value = res.detectedRestaurant;
+        importedMetaLabels.push(`餐廳「${res.detectedRestaurant}」`);
       }
 
-      let importedFeeLabels = [];
       if (res.detectedDelivery !== null) {
         rec.fees.delivery = res.detectedDelivery;
-        importedFeeLabels.push(`運費 $${res.detectedDelivery}`);
+        importedMetaLabels.push(`運費 $${res.detectedDelivery}`);
       }
       if (res.detectedPlatformFee !== null) {
         rec.fees.platform = res.detectedPlatformFee;
-        importedFeeLabels.push(`平台費 $${res.detectedPlatformFee}`);
+        importedMetaLabels.push(`平台服務費 $${res.detectedPlatformFee}`);
       }
       if (res.detectedPackagingFee !== null) {
         rec.fees.packaging = res.detectedPackagingFee;
-        importedFeeLabels.push(`包裝費 $${res.detectedPackagingFee}`);
+        importedMetaLabels.push(`包裝費 $${res.detectedPackagingFee}`);
       }
       if (res.detectedDirectDiscount !== null) {
         rec.discount.directAmount = res.detectedDirectDiscount;
         rec.discount.mode = 'receipt_exact';
-        importedFeeLabels.push(`折扣 -$${res.detectedDirectDiscount}`);
+        importedMetaLabels.push(`折扣 -$${res.detectedDirectDiscount}`);
       }
       if (res.detectedVoucher !== null) {
         rec.discount.fixedAmount = res.detectedVoucher;
         rec.discount.mode = 'receipt_exact';
-        importedFeeLabels.push(`優惠券 -$${res.detectedVoucher}`);
+        importedMetaLabels.push(`優惠券 -$${res.detectedVoucher}`);
       }
       if (res.detectedFinalTotal !== null) {
         rec.discount.overrideFinalTotal = res.detectedFinalTotal;
       }
 
-      return importedFeeLabels;
+      return importedMetaLabels;
     }
 
     function parseSmartTextAndImport(replaceExisting) {
@@ -1447,12 +1568,12 @@
 
       const res = parseReceiptRawText(raw);
       const rec = getActiveRecord();
-      const feeSummary = applyParsedReceiptToRecord(rec, res, replaceExisting);
+      const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting);
 
       closeSmartPasteModal();
       saveDatabase();
       renderActiveRecordAll();
-      showToast(`已匯入 ${res.extractedItems.length} 項餐點${feeSummary.length ? ` 及 ${feeSummary.join('、')}` : ''}！`);
+      showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`);
     }
 
     // Local Browser Offline OCR using Tesseract.js
@@ -1477,14 +1598,14 @@
       try {
         let combinedText = '';
         for (let i = 0; i < images.length; i++) {
-          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在使用本機離線 OCR 掃描第 ${i + 1}/${images.length} 張截圖 (自動過濾非餐點並提取運費/折扣)...`;
+          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在使用本機離線 OCR 掃描第 ${i + 1}/${images.length} 張截圖 (識別「訂購於」餐廳、Nx 餐點、平台服務費及折扣)...`;
           const result = await Tesseract.recognize(images[i].dataUrl, 'chi_tra+eng');
           combinedText += '\n' + (result?.data?.text || '');
         }
 
         window._lastOcrRawText = combinedText;
         const parsed = parseReceiptRawText(combinedText);
-        const feeSummary = applyParsedReceiptToRecord(rec, parsed, true);
+        const metaSummary = applyParsedReceiptToRecord(rec, parsed, true);
 
         saveDatabase();
         renderActiveRecordAll();
@@ -1492,8 +1613,8 @@
         statusText.innerHTML = `
           <div class="text-emerald-300 space-y-1">
             <div><i class="fa-solid fa-circle-check mr-1"></i><b>本機離線識圖完成！</b></div>
-            <div>• 匯入餐點：<b>${parsed.extractedItems.length}</b> 項 (已過濾訂單#/小計/總計/付款方式等非餐點字詞)</div>
-            <div>• 自動匯入「2. 折扣快選」：<b>${feeSummary.length ? feeSummary.join('、') : '未偵測到額外費用'}</b></div>
+            <div>• 匯入餐點：<b>${parsed.extractedItems.length}</b> 項 (支援 1x/2x/3x/5x/10x 等任意數量)</div>
+            <div>• 自動匯入餐廳與費用：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>
             <div><button onclick="openSmartPasteWithText()" class="underline text-amber-300">檢視或微調 OCR 識別文字</button></div>
           </div>
         `;
@@ -1644,15 +1765,16 @@
       document.getElementById('paramRow-cap').classList.toggle('hidden', m !== 'percent_cap');
       document.getElementById('paramRow-override').classList.toggle('hidden', m !== 'override');
 
-      document.getElementById('inputDiscountDirect').value = rec.discount.directAmount || 0;
-      document.getElementById('inputDiscountFixed').value = rec.discount.fixedAmount || 0;
-      document.getElementById('inputDiscountPercent').value = rec.discount.percentOff || 0;
-      document.getElementById('inputDiscountCap').value = rec.discount.capAmount || 0;
-      document.getElementById('inputReceiptOverride').value = rec.discount.overrideFinalTotal || 0;
+      // Use setInputValSafe so active keypad input with trailing "." is NEVER overwritten!
+      setInputValSafe('inputDiscountDirect', rec.discount.directAmount || 0);
+      setInputValSafe('inputDiscountFixed', rec.discount.fixedAmount || 0);
+      setInputValSafe('inputDiscountPercent', rec.discount.percentOff || 0);
+      setInputValSafe('inputDiscountCap', rec.discount.capAmount || 0);
+      setInputValSafe('inputReceiptOverride', rec.discount.overrideFinalTotal || 0);
 
-      document.getElementById('inputFeeDelivery').value = rec.fees.delivery || 0;
-      document.getElementById('inputFeePlatform').value = rec.fees.platform || 0;
-      document.getElementById('inputFeePackaging').value = rec.fees.packaging || 0;
+      setInputValSafe('inputFeeDelivery', rec.fees.delivery || 0);
+      setInputValSafe('inputFeePlatform', rec.fees.platform || 0);
+      setInputValSafe('inputFeePackaging', rec.fees.packaging || 0);
 
       document.getElementById('discountExplanationText').innerHTML = `<b>目前生效折扣：</b>${calc.discountRuleSummary}<br/><span class="text-[11px]">餐點原價 $${calc.totalOriginal.toFixed(1)}，共減免 <b>$${calc.totalDiscount.toFixed(1)}</b>，另加運費/平台費 <b>+$${calc.totalFees.toFixed(1)}</b>。</span>`;
 
