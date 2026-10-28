@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PandaSplit Pro v6 - 智慧外賣收據識圖與折實夾錢神器</title>
+  <title>Split That Rice - 智慧外賣收據識圖與折實夾錢神器</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -34,7 +34,6 @@
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+HK:wght@400;500;700;900&display=swap');
-
     /* Dynamic Platform Color Themes */
     :root, [data-theme="foodpanda"] {
       --c-50: #fff0f6;
@@ -52,7 +51,6 @@
       --hdr-via: #E21B70;
       --hdr-to: #9E0B49;
     }
-
     [data-theme="Keeta"] {
       --c-50: #fefce8;
       --c-100: #fef08a;
@@ -69,7 +67,6 @@
       --hdr-via: #27272A;
       --hdr-to: #B45309;
     }
-
     [data-theme="Uber Eats"] {
       --c-50: #ecfdf5;
       --c-100: #d1fae5;
@@ -86,7 +83,6 @@
       --hdr-via: #047857;
       --hdr-to: #0F172A;
     }
-
     [data-theme="其他平台"] {
       --c-50: #eef2ff;
       --c-100: #e0e7ff;
@@ -103,7 +99,6 @@
       --hdr-via: #4338CA;
       --hdr-to: #1E1B4B;
     }
-
     body {
       font-family: 'Plus Jakarta Sans', 'Noto Sans HK', sans-serif;
       background-color: var(--bg-page);
@@ -112,32 +107,26 @@
       user-select: none;
       transition: background-color 0.25s ease;
     }
-
     .theme-header-gradient {
       background: linear-gradient(135deg, var(--hdr-from) 0%, var(--hdr-via) 55%, var(--hdr-to) 100%);
       transition: background 0.3s ease;
     }
-
     .theme-bar-gradient {
       background: linear-gradient(90deg, var(--hdr-from) 0%, var(--hdr-via) 100%);
     }
-
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20%, 60% { transform: translateX(-8px); }
       40%, 80% { transform: translateX(8px); }
     }
     .animate-shake { animation: shake 0.35s ease-in-out; }
-
     /* Highlight active input using built-in keypad */
     .keypad-target-active {
       outline: 2px solid var(--c-600) !important;
       background-color: var(--c-50) !important;
     }
-
     @media (orientation: landscape) and (min-width: 768px) {
       .app-shell {
         max-width: 1140px;
@@ -157,17 +146,16 @@
   </style>
 </head>
 <body data-theme="foodpanda" class="min-h-screen pb-28 md:pb-10">
-
   <!-- ========================================================= -->
   <!-- 1. PASSCODE LOCK SCREEN (初次使用密碼: 246135)              -->
   <!-- ========================================================= -->
   <div id="passcodeScreen" class="fixed inset-0 z-50 theme-header-gradient flex flex-col items-center justify-center p-6 text-white">
     <div class="w-full max-w-xs text-center space-y-5">
       <div class="mx-auto w-20 h-20 rounded-3xl bg-white text-panda-600 flex items-center justify-center shadow-2xl text-4xl">
-        <i class="fa-solid fa-bag-shopping"></i>
+        <i class="fa-solid fa-bowl-rice"></i>
       </div>
       <div>
-        <h1 class="text-2xl font-extrabold tracking-tight">TakeawaySplit Pro</h1>
+        <h1 class="text-3xl font-extrabold tracking-tight">Split That Rice</h1>
         <p class="text-xs text-white/80 mt-1">外賣收據智慧識圖與折實夾錢系統</p>
       </div>
       <div id="passcodeDots" class="flex items-center justify-center gap-3.5 py-2">
@@ -195,7 +183,6 @@
       </div>
     </div>
   </div>
-
   <!-- ========================================================= -->
   <!-- 2. RECORDS LIST VIEW (分賬紀錄列表首頁)                     -->
   <!-- ========================================================= -->
@@ -205,7 +192,7 @@
       <div class="flex items-center justify-between relative z-10">
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-white text-panda-600 flex items-center justify-center shadow-md font-extrabold text-xl">
-            <i class="fa-solid fa-bag-shopping"></i>
+            <i class="fa-solid fa-bowl-rice"></i>
           </div>
           <div>
             <h1 class="font-extrabold text-lg leading-tight">外賣分賬紀錄庫</h1>
@@ -224,15 +211,12 @@
           </button>
         </div>
       </div>
-
       <div class="mt-4 space-y-2.5 relative z-10">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-panda-600 text-xs"></i>
           <input id="recordSearchInput" type="text" placeholder="即時搜尋分賬標題、餐廳名稱、餐點..." oninput="renderRecordsList()" class="w-full pl-9 pr-9 py-2.5 text-xs font-medium bg-white text-neutral-800 rounded-2xl shadow-inner focus:outline-none focus:ring-2 focus:ring-amber-300" />
           <button onclick="clearRecordSearch()" id="clearSearchBtn" class="hidden absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600 text-xs"><i class="fa-solid fa-circle-xmark"></i></button>
         </div>
-
-        <!-- Platform Filter Pills (Deliveroo Removed) -->
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
             <button onclick="setPlatformFilter('ALL')" id="filterBtn-ALL" class="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white text-panda-600 shadow-xs shrink-0">全部平台</button>
@@ -247,7 +231,6 @@
         </div>
       </div>
     </header>
-
     <div class="p-4 space-y-3">
       <button onclick="createNewRecord()" class="w-full py-3.5 px-4 rounded-2xl theme-bar-gradient hover:opacity-95 text-white font-extrabold text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-98">
         <i class="fa-solid fa-plus-circle text-base"></i><span>新增外賣分賬紀錄</span>
@@ -255,7 +238,6 @@
       <div id="recordsListContainer" class="space-y-3 pt-1"></div>
     </div>
   </div>
-
   <!-- ========================================================= -->
   <!-- 3. RECORD DETAIL EDITOR VIEW                              -->
   <!-- ========================================================= -->
@@ -264,26 +246,31 @@
       <header class="theme-header-gradient text-white p-4 pb-5 rounded-b-3xl md:rounded-t-2xl shadow-md relative overflow-hidden">
         <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 pointer-events-none"></div>
         <div class="flex items-center justify-between mb-3 relative z-10">
-          <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95">
+          <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0">
             <i class="fa-solid fa-chevron-left"></i><span>列表</span>
           </button>
-          <div class="flex items-center gap-1.5">
-            <button onclick="openSmartPasteModal()" class="px-2.5 py-1.5 rounded-xl bg-amber-300 text-neutral-900 hover:bg-amber-200 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95">
-              <i class="fa-solid fa-paste"></i><span>貼上收據文字</span>
+
+          <!-- 債主 / 債仔 Mode Toggle Switch -->
+          <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
+             <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition">債主 Mode</button>
+             <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition">債仔 Mode</button>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0" id="headerActionBtns">
+            <button onclick="openSmartPasteModal()" class="px-2 py-1.5 rounded-xl bg-amber-300 text-neutral-900 hover:bg-amber-200 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-paste"></i>
             </button>
-            <button onclick="toggleReceiptDrawer()" id="receiptDrawerBtn" class="px-2.5 py-1.5 rounded-xl bg-white text-panda-600 hover:bg-panda-50 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95">
-              <i class="fa-solid fa-images"></i><span>收據識圖 (<span id="receiptCountBadge">0</span>)</span>
+            <button onclick="toggleReceiptDrawer()" class="px-2.5 py-1.5 rounded-xl bg-white text-panda-600 hover:bg-panda-50 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-images"></i><span>識圖 (<span id="receiptCountBadge">0</span>)</span>
             </button>
           </div>
         </div>
-
         <div class="space-y-2 mb-3 relative z-10">
           <div class="flex items-center justify-between gap-2">
             <input id="orderTitleInput" type="text" placeholder="輸入分賬標題..." class="bg-transparent font-extrabold text-base sm:text-lg text-white border-b border-white/30 focus:border-white focus:outline-none flex-1" onchange="updateOrderMetadata()" />
             <input id="orderDateInput" type="date" class="bg-black/25 text-white text-[11px] font-bold px-2 py-1 rounded-lg border border-white/20 focus:outline-none" onchange="updateOrderMetadata()" />
           </div>
           <div class="grid grid-cols-12 gap-2">
-            <!-- Platform Select (Deliveroo Removed, Triggers Dynamic Theme) -->
             <div class="col-span-5">
               <select id="orderPlatformSelect" onchange="handlePlatformChange(this.value)" class="w-full bg-white text-panda-700 font-extrabold text-xs px-2.5 py-1.5 rounded-xl shadow-xs focus:outline-none">
                 <option value="foodpanda">🐼 foodpanda</option>
@@ -294,11 +281,10 @@
             </div>
             <div class="col-span-7 relative">
               <i class="fa-solid fa-store absolute left-2.5 top-2 text-white/75 text-xs"></i>
-              <input id="orderRestaurantInput" type="text" placeholder="餐廳名稱 (識別「訂購於」自動填入)" onchange="updateOrderMetadata()" class="w-full pl-7 pr-2.5 py-1.5 bg-white/15 placeholder-white/70 text-white font-bold text-xs rounded-xl border border-white/25 focus:outline-none focus:bg-white/25" />
+              <input id="orderRestaurantInput" type="text" placeholder="餐廳名稱 (自動匯入)" onchange="updateOrderMetadata()" class="w-full pl-7 pr-2.5 py-1.5 bg-white/15 placeholder-white/70 text-white font-bold text-xs rounded-xl border border-white/25 focus:outline-none focus:bg-white/25" />
             </div>
           </div>
         </div>
-
         <!-- Live Calculation Summary -->
         <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10">
           <div><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
@@ -306,7 +292,6 @@
           <div><div class="text-[11px] text-white/80">運費/平台費</div><div id="sumFees" class="font-bold text-sm sm:text-base text-white mt-0.5">+$0.0</div></div>
           <div class="bg-white text-panda-600 rounded-xl py-1 px-1 shadow-xs"><div class="text-[10px] font-bold uppercase tracking-tight">最終實付</div><div id="sumFinal" class="font-extrabold text-sm sm:text-base mt-0.5">$0.0</div></div>
         </div>
-
         <div class="mt-2.5 flex items-center justify-between text-xs text-white px-1 relative z-10">
           <div class="flex items-center gap-1.5">
             <span class="px-2.5 py-0.5 rounded-full bg-white/20 border border-white/30 text-white font-bold text-[11px]" id="effectiveRateBadge">折實率: 100%</span>
@@ -315,7 +300,6 @@
           <div id="collectionStatusText" class="font-bold text-amber-200">已收 0 / 0 項</div>
         </div>
       </header>
-
       <!-- ========================================================= -->
       <!-- RECEIPT OCR & MULTI-SCREENSHOT WORKBENCH                  -->
       <!-- ========================================================= -->
@@ -326,30 +310,25 @@
           </div>
           <button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <div class="grid grid-cols-3 gap-1.5">
+        <div class="grid grid-cols-3 gap-1.5" id="receiptToolsActionGrid">
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-paste text-sm"></i>
-            <span>1. 貼上收據文字</span>
-            <span class="text-[9px] opacity-80 font-normal">自動匯入餐廳/費用</span>
+            <span>1. 貼上收據</span>
+            <span class="text-[9px] opacity-80 font-normal">自動匯入資訊</span>
           </button>
-
           <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95">
             <i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i>
-            <span>2. 上傳收據截圖</span>
-            <span class="text-[9px] text-neutral-400 font-normal">支援多張長截圖</span>
+            <span>2. 上傳截圖</span>
+            <span class="text-[9px] text-neutral-400 font-normal">支援多張長圖</span>
             <input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" />
           </label>
-
           <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-eye text-sm"></i>
-            <span>3. 本機離線識圖</span>
-            <span class="text-[9px] text-white/85 font-normal">認領Nx餐點及費用</span>
+            <span>3. 離線識圖</span>
+            <span class="text-[9px] text-white/85 font-normal">Y-Axis空間重組</span>
           </button>
         </div>
-
         <div id="receiptGalleryStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
-
         <div id="zoomReceiptBox" class="hidden bg-black/60 p-2 rounded-xl border border-neutral-700 max-h-64 overflow-y-auto">
           <div class="flex justify-between items-center mb-1 px-1">
             <span class="text-[10px] text-amber-300 font-bold">收據原圖對照 (可上下滾動檢視)</span>
@@ -357,25 +336,22 @@
           </div>
           <img id="zoomReceiptImg" class="w-full rounded-lg object-contain" />
         </div>
-
         <div id="aiScanStatusBox" class="hidden p-2.5 rounded-xl bg-neutral-800 border border-panda-400/50 text-[11px] space-y-1">
           <div id="aiScanStatusText" class="text-panda-100 font-semibold">準備就緒</div>
         </div>
       </div>
-
       <!-- Optional Participant Bar -->
       <div class="p-3 bg-white border-b border-panda-100/60">
         <div class="flex items-center justify-between mb-1.5">
           <span class="text-xs font-bold text-neutral-700 flex items-center gap-1.5"><i class="fa-solid fa-user-tag text-panda-600"></i>選填點餐人標籤 (<span id="participantCount">0</span>人 — 可留空)</span>
           <div class="flex items-center gap-1">
             <button onclick="clearAllParticipants()" id="clearAllMembersBtn" class="text-[11px] font-bold text-rose-600 hover:bg-rose-50 px-2 py-1 rounded-lg transition hidden"><i class="fa-solid fa-user-slash mr-0.5"></i>清空全部</button>
-            <button onclick="openAddParticipantModal()" class="text-[11px] font-bold text-panda-600 bg-panda-50 border border-panda-200 px-2 py-1 rounded-lg active:scale-95 transition"><i class="fa-solid fa-plus"></i> 加人名</button>
+            <button onclick="openAddParticipantModal()" id="addMemberBtn" class="text-[11px] font-bold text-panda-600 bg-panda-50 border border-panda-200 px-2 py-1 rounded-lg active:scale-95 transition"><i class="fa-solid fa-plus"></i> 加人名</button>
           </div>
         </div>
         <div id="participantChipsContainer" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5"></div>
       </div>
     </div>
-
     <!-- RIGHT / MAIN CONTENT PANE -->
     <div class="flex-1 flex flex-col">
       <div class="hidden md:grid grid-cols-4 gap-1.5 p-1.5 bg-panda-100/70 rounded-2xl mb-3">
@@ -384,10 +360,9 @@
         <button onclick="switchTab('breakdown')" id="deskTab-breakdown" class="py-2 rounded-xl text-xs font-bold transition text-panda-800 hover:bg-white/60"><i class="fa-solid fa-calculator mr-1"></i>3. 分賬算式</button>
         <button onclick="switchTab('collect')" id="deskTab-collect" class="py-2 rounded-xl text-xs font-bold transition text-panda-800 hover:bg-white/60"><i class="fa-brands fa-whatsapp mr-1"></i>4. 催收追蹤</button>
       </div>
-
       <!-- TAB 1: RECEIPT ITEMS LIST & NUMERIC KEYPAD ENTRY -->
       <section id="tab-items" class="p-3 space-y-3">
-        <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100 space-y-2.5">
+        <div id="addItemBlock" class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100 space-y-2.5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
               <i class="fa-solid fa-keyboard text-panda-600"></i>新增餐點 (點擊銀碼欄自動彈出內建小數點鍵盤)
@@ -407,7 +382,6 @@
               <button onclick="addNewItem()" class="w-full h-full bg-panda-600 hover:bg-panda-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm active:scale-95 transition"><i class="fa-solid fa-plus"></i> 加入</button>
             </div>
           </div>
-
           <!-- Rapid Multi-Price Batch Bar -->
           <div class="pt-2 border-t border-panda-50 flex items-center gap-2">
             <span class="text-[11px] font-bold text-neutral-500 shrink-0">連打多個銀碼：</span>
@@ -415,193 +389,147 @@
             <button onclick="addRapidBatchPrices()" class="px-3 py-1.5 bg-neutral-800 text-white rounded-xl text-xs font-bold shrink-0 active:scale-95 transition">一次加入</button>
           </div>
         </div>
-
         <div class="flex items-center justify-between px-1">
           <h3 class="text-xs font-bold text-neutral-600">收據餐點清單 (<span id="itemCountBadge">0</span>項)</h3>
-          <button onclick="clearAllItems()" class="text-[11px] text-rose-500 font-bold hover:underline">清空餐點</button>
+          <button id="clearItemsBtn" onclick="clearAllItems()" class="text-[11px] text-rose-500 font-bold hover:underline">清空餐點</button>
         </div>
         <div id="itemsListContainer" class="space-y-2.5"></div>
       </section>
-
       <!-- ========================================================= -->
-      <!-- TAB 2: DISCOUNTS & FEES (對應收據識圖匯入之專屬欄目)        -->
+      <!-- TAB 2: DISCOUNTS & FEES                                   -->
       <!-- ========================================================= -->
       <section id="tab-discounts" class="hidden p-3 space-y-3.5">
-
-        <!-- Direct Receipt Discount & Voucher Imported Fields -->
-        <div class="bg-white p-4 rounded-2xl shadow-xs border-2 border-panda-200 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-neutral-800 flex items-center gap-2">
-              <i class="fa-solid fa-receipt w-6 h-6 rounded-lg bg-panda-600 text-white flex items-center justify-center text-xs"></i>
-              收據折扣與優惠券欄 (識圖自動匯入)
-            </h2>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-panda-50 text-panda-700 font-bold border border-panda-200">支援內建鍵盤小數點</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2.5">
-            <!-- “折扣”欄 -->
-            <div class="bg-panda-50/50 p-3 rounded-xl border border-panda-200">
-              <label class="text-xs font-extrabold text-panda-800 block mb-1">
-                <i class="fa-solid fa-tag mr-1 text-panda-600"></i>折扣欄 (HK$)
-              </label>
-              <span class="text-[10px] text-neutral-500 block mb-1.5">對應收據「折扣 HK$ xx」</span>
-              <div class="relative">
-                <span class="absolute left-2.5 top-2 text-xs font-bold text-panda-600">-$</span>
-                <input id="inputDiscountDirect" type="text" inputmode="none" readonly
-                  onclick="openNumericKeypad('inputDiscountDirect', '收據「折扣」金額 (HK$)')"
-                  value="0"
-                  class="w-full pl-8 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-300 text-panda-700 rounded-xl cursor-pointer focus:outline-none" />
-              </div>
-            </div>
-
-            <!-- “優惠券”欄 -->
-            <div class="bg-panda-50/50 p-3 rounded-xl border border-panda-200">
-              <label class="text-xs font-extrabold text-panda-800 block mb-1">
-                <i class="fa-solid fa-ticket mr-1 text-panda-600"></i>優惠券欄 (HK$)
-              </label>
-              <span class="text-[10px] text-neutral-500 block mb-1.5">對應「優惠券xxx HK$ xx」</span>
-              <div class="relative">
-                <span class="absolute left-2.5 top-2 text-xs font-bold text-panda-600">-$</span>
-                <input id="inputDiscountFixed" type="text" inputmode="none" readonly
-                  onclick="openNumericKeypad('inputDiscountFixed', '收據「優惠券」扣減金額 (HK$)')"
-                  value="0"
-                  class="w-full pl-8 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-300 text-panda-700 rounded-xl cursor-pointer focus:outline-none" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Platform & Delivery Fees Imported Fields -->
-          <div class="pt-2 border-t border-panda-100">
-            <h3 class="text-xs font-extrabold text-neutral-700 mb-2 flex items-center gap-1.5">
-              <i class="fa-solid fa-motorcycle text-panda-600"></i>
-              收據運費、平台服務費與其他費用欄 (識圖自動匯入)
-            </h3>
-            <div class="grid grid-cols-3 gap-2">
-              <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
-                <label class="text-[11px] font-bold text-neutral-700 block">外賣運費 ($)</label>
-                <span class="text-[9px] text-neutral-400 block mb-1">運費 HK$ xx</span>
-                <input id="inputFeeDelivery" type="text" inputmode="none" readonly
-                  onclick="openNumericKeypad('inputFeeDelivery', '外賣運費 (HK$)')"
-                  value="0"
-                  class="w-full font-extrabold text-sm text-right bg-white border border-panda-200 rounded-lg px-2 py-1 cursor-pointer focus:outline-none" />
-              </div>
-              <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
-                <label class="text-[11px] font-bold text-neutral-700 block">平台服務費 ($)</label>
-                <span class="text-[9px] text-neutral-400 block mb-1">平台費 HK $xx</span>
-                <input id="inputFeePlatform" type="text" inputmode="none" readonly
-                  onclick="openNumericKeypad('inputFeePlatform', '平台服務費 (HK$)')"
-                  value="0"
-                  class="w-full font-extrabold text-sm text-right bg-white border border-panda-200 rounded-lg px-2 py-1 cursor-pointer focus:outline-none" />
-              </div>
-              <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
-                <label class="text-[11px] font-bold text-neutral-700 block">包裝/其他費 ($)</label>
-                <span class="text-[9px] text-neutral-400 block mb-1">餐盒/其他費</span>
-                <input id="inputFeePackaging" type="text" inputmode="none" readonly
-                  onclick="openNumericKeypad('inputFeePackaging', '包裝/其他費用 (HK$)')"
-                  value="0"
-                  class="w-full font-extrabold text-sm text-right bg-white border border-panda-200 rounded-lg px-2 py-1 cursor-pointer focus:outline-none" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Advanced Percentage / Cap & Quick Promo Presets -->
-        <div class="bg-white p-4 rounded-2xl shadow-xs border border-panda-100 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xs font-extrabold text-neutral-800 flex items-center gap-1.5">
-              <i class="fa-solid fa-percent text-panda-600"></i>
-              折數計算模式與平台優惠快選
-            </h2>
-            <span class="text-[10px] text-neutral-400">可與上方收據折扣/優惠券靈活切換</span>
-          </div>
-
-          <div id="verifiedPromosContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="setDiscountMode('receipt_exact')" id="modeBtn-receipt_exact" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
-              <div class="flex items-center justify-between"><span class="text-xs font-bold">按收據「折扣+優惠券」</span><i class="fa-solid fa-receipt text-xs"></i></div>
-              <span class="text-[10px] opacity-75 mt-1">直接扣減上方折扣欄及優惠券欄</span>
-            </button>
-            <button onclick="setDiscountMode('percent_cap')" id="modeBtn-percent_cap" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
-              <div class="flex items-center justify-between"><span class="text-xs font-bold">百分比折數 + 上限</span><i class="fa-solid fa-crown text-xs"></i></div>
-              <span class="text-[10px] opacity-75 mt-1">例：全單8折，最多減$60</span>
-            </button>
-            <button onclick="setDiscountMode('percent')" id="modeBtn-percent" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
-              <div class="flex items-center justify-between"><span class="text-xs font-bold">純百分比折扣 (%)</span><i class="fa-solid fa-percent text-xs"></i></div>
-              <span class="text-[10px] opacity-75 mt-1">例：外賣自取全單 85 折</span>
-            </button>
-            <button onclick="setDiscountMode('override')" id="modeBtn-override" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
-              <div class="flex items-center justify-between"><span class="text-xs font-bold">按「總計 HK$」反推</span><i class="fa-solid fa-wand-magic-sparkles text-xs"></i></div>
-              <span class="text-[10px] opacity-75 mt-1">輸入收據最終總計自動算差額</span>
-            </button>
-          </div>
-
-          <div id="discountParamsBox" class="p-3 bg-panda-50/40 rounded-xl border border-panda-100 space-y-3">
-            <div id="paramRow-percent" class="flex items-center justify-between gap-3">
-              <div><label class="text-xs font-bold text-neutral-800 block">折扣減免百分比 (% Off)</label><span class="text-[10px] text-neutral-500">8折=20% Off；85折=15% Off</span></div>
-              <div class="flex items-center gap-1.5">
-                <input id="inputDiscountPercent" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputDiscountPercent', '折扣減免百分比 (% Off)')" value="20" class="w-20 px-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl cursor-pointer text-panda-600" />
-                <span class="text-xs font-bold text-panda-700">%</span>
-              </div>
-            </div>
-            <div id="paramRow-cap" class="flex items-center justify-between gap-3 pt-2 border-t border-panda-100">
-              <div><label class="text-xs font-bold text-neutral-800 block">最高折扣金額上限 (Cap $)</label></div>
-              <div class="relative">
-                <span class="absolute left-2.5 top-1.5 text-xs text-neutral-400">$</span>
-                <input id="inputDiscountCap" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputDiscountCap', '最高折扣上限 (Cap $)')" value="60" class="w-24 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl cursor-pointer text-panda-600" />
-              </div>
-            </div>
-            <div id="paramRow-override" class="hidden flex items-center justify-between gap-3">
-              <div><label class="text-xs font-bold text-panda-700 block">收據「總計 HK$」實付總額 ($)</label></div>
-              <div class="relative">
-                <span class="absolute left-2.5 top-1.5 text-xs text-panda-400">$</span>
-                <input id="inputReceiptOverride" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputReceiptOverride', '收據「總計 HK$」最終實付金額')" value="0" class="w-28 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border-2 border-panda-500 text-panda-600 rounded-xl cursor-pointer" />
-              </div>
-            </div>
-          </div>
-
-          <div id="discountStatusBanner" class="p-3 rounded-xl bg-panda-50 border border-panda-200 text-xs text-panda-800 flex items-start gap-2">
-            <i class="fa-solid fa-circle-info mt-0.5 text-panda-600"></i><div id="discountExplanationText">計算中...</div>
-          </div>
-
-          <div class="pt-2 border-t border-panda-100/80 space-y-2.5">
+        <div id="discountsWrap" class="space-y-3.5">
+          <div class="bg-white p-4 rounded-2xl shadow-xs border-2 border-panda-200 space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-neutral-700">運費與平台費分攤方式</span>
-              <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
-                <button onclick="setFeeSplitMode('equal')" id="feeSplitBtn-equal" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按餐點平分</button>
-                <button onclick="setFeeSplitMode('prorata')" id="feeSplitBtn-prorata" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按原價比例</button>
+              <h2 class="text-sm font-extrabold text-neutral-800 flex items-center gap-2">
+                <i class="fa-solid fa-receipt w-6 h-6 rounded-lg bg-panda-600 text-white flex items-center justify-center text-xs"></i>
+                收據折扣與優惠券欄 (識圖自動匯入)
+              </h2>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-panda-50 text-panda-700 font-bold border border-panda-200">支援內建鍵盤小數點</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="bg-panda-50/50 p-3 rounded-xl border border-panda-200">
+                <label class="text-xs font-extrabold text-panda-800 block mb-1"><i class="fa-solid fa-tag mr-1 text-panda-600"></i>折扣欄 (HK$)</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-xs font-bold text-panda-600">-$</span>
+                  <input id="inputDiscountDirect" type="text" inputmode="none" readonly
+                    onclick="openNumericKeypad('inputDiscountDirect', '收據「折扣」金額 (HK$)')"
+                    value="0"
+                    class="w-full pl-8 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-300 text-panda-700 rounded-xl cursor-pointer focus:outline-none" />
+                </div>
+              </div>
+              <div class="bg-panda-50/50 p-3 rounded-xl border border-panda-200">
+                <label class="text-xs font-extrabold text-panda-800 block mb-1"><i class="fa-solid fa-ticket mr-1 text-panda-600"></i>優惠券欄 (HK$)</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-xs font-bold text-panda-600">-$</span>
+                  <input id="inputDiscountFixed" type="text" inputmode="none" readonly
+                    onclick="openNumericKeypad('inputDiscountFixed', '收據「優惠券」扣減金額 (HK$)')"
+                    value="0"
+                    class="w-full pl-8 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-300 text-panda-700 rounded-xl cursor-pointer focus:outline-none" />
+                </div>
               </div>
             </div>
+            <div class="pt-2 border-t border-panda-100">
+              <h3 class="text-xs font-extrabold text-neutral-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-motorcycle text-panda-600"></i>收據運費、平台服務費與其他費用欄</h3>
+              <div class="grid grid-cols-3 gap-2">
+                <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
+                  <label class="text-[11px] font-bold text-neutral-700 block">外賣運費 ($)</label>
+                  <input id="inputFeeDelivery" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputFeeDelivery', '外賣運費 (HK$)')" value="0" class="w-full font-extrabold text-sm text-right bg-white border border-panda-200 rounded-lg px-2 py-1 mt-1 cursor-pointer focus:outline-none" />
+                </div>
+                <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
+                  <label class="text-[11px] font-bold text-neutral-700 block">平台服務費 ($)</label>
+                  <input id="inputFeePlatform" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputFeePlatform', '平台服務費 (HK$)')" value="0" class="w-full font-extrabold text-sm text-right bg-white border border-panda-200 rounded-lg px-2 py-1 mt-1 cursor-pointer focus:outline-none" />
+                </div>
+                <div class="bg-neutral-50 p-2.5 rounded-xl border border-panda-100">
+                  <label class="text-[11px] font-bold text-neutral-700 block">包裝/其他費 ($)</label>
+                  <input id="inputFeePackaging" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputFeePackaging', '包裝/其他費用 (HK$)')" value="0" class="w-full font-extrabold text-sm text-right bg-white border border-panda-200 rounded-lg px-2 py-1 mt-1 cursor-pointer focus:outline-none" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl shadow-xs border border-panda-100 space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-neutral-700">收款金額湊整設定</span>
-              <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
-                <button onclick="setRoundingMode('exact')" id="roundBtn-exact" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">精確 $0.1</button>
-                <button onclick="setRoundingMode('half')" id="roundBtn-half" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">進位 $0.5</button>
-                <button onclick="setRoundingMode('dollar')" id="roundBtn-dollar" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">湊整 $1</button>
+              <h2 class="text-xs font-extrabold text-neutral-800 flex items-center gap-1.5"><i class="fa-solid fa-percent text-panda-600"></i>折數計算模式與平台優惠快選</h2>
+            </div>
+            <div id="verifiedPromosContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="setDiscountMode('receipt_exact')" id="modeBtn-receipt_exact" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+                <div class="flex items-center justify-between"><span class="text-xs font-bold">按收據「折扣+優惠券」</span><i class="fa-solid fa-receipt text-xs"></i></div>
+              </button>
+              <button onclick="setDiscountMode('percent_cap')" id="modeBtn-percent_cap" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+                <div class="flex items-center justify-between"><span class="text-xs font-bold">百分比折數 + 上限</span><i class="fa-solid fa-crown text-xs"></i></div>
+              </button>
+              <button onclick="setDiscountMode('percent')" id="modeBtn-percent" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+                <div class="flex items-center justify-between"><span class="text-xs font-bold">純百分比折扣 (%)</span><i class="fa-solid fa-percent text-xs"></i></div>
+              </button>
+              <button onclick="setDiscountMode('override')" id="modeBtn-override" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between">
+                <div class="flex items-center justify-between"><span class="text-xs font-bold">按「總計 HK$」反推</span><i class="fa-solid fa-wand-magic-sparkles text-xs"></i></div>
+              </button>
+            </div>
+            <div id="discountParamsBox" class="p-3 bg-panda-50/40 rounded-xl border border-panda-100 space-y-3">
+              <div id="paramRow-percent" class="flex items-center justify-between gap-3">
+                <div><label class="text-xs font-bold text-neutral-800 block">折扣減免百分比 (% Off)</label></div>
+                <div class="flex items-center gap-1.5">
+                  <input id="inputDiscountPercent" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputDiscountPercent', '折扣減免百分比 (% Off)')" value="20" class="w-20 px-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl cursor-pointer text-panda-600" />
+                  <span class="text-xs font-bold text-panda-700">%</span>
+                </div>
+              </div>
+              <div id="paramRow-cap" class="flex items-center justify-between gap-3 pt-2 border-t border-panda-100">
+                <div><label class="text-xs font-bold text-neutral-800 block">最高折扣金額上限 (Cap $)</label></div>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-1.5 text-xs text-neutral-400">$</span>
+                  <input id="inputDiscountCap" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputDiscountCap', '最高折扣上限 (Cap $)')" value="60" class="w-24 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl cursor-pointer text-panda-600" />
+                </div>
+              </div>
+              <div id="paramRow-override" class="hidden flex items-center justify-between gap-3">
+                <div><label class="text-xs font-bold text-panda-700 block">收據「總計 HK$」實付總額 ($)</label></div>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-1.5 text-xs text-panda-400">$</span>
+                  <input id="inputReceiptOverride" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputReceiptOverride', '收據「總計 HK$」最終實付金額')" value="0" class="w-28 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border-2 border-panda-500 text-panda-600 rounded-xl cursor-pointer" />
+                </div>
+              </div>
+            </div>
+            <div id="discountStatusBanner" class="p-3 rounded-xl bg-panda-50 border border-panda-200 text-xs text-panda-800 flex items-start gap-2">
+              <i class="fa-solid fa-circle-info mt-0.5 text-panda-600"></i><div id="discountExplanationText">計算中...</div>
+            </div>
+            <div class="pt-2 border-t border-panda-100/80 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-neutral-700">運費與平台費分攤方式</span>
+                <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
+                  <button onclick="setFeeSplitMode('equal')" id="feeSplitBtn-equal" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按餐點平分</button>
+                  <button onclick="setFeeSplitMode('prorata')" id="feeSplitBtn-prorata" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按原價比例</button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-neutral-700">收款金額湊整設定</span>
+                <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
+                  <button onclick="setRoundingMode('exact')" id="roundBtn-exact" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">精確 $0.1</button>
+                  <button onclick="setRoundingMode('half')" id="roundBtn-half" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">進位 $0.5</button>
+                  <button onclick="setRoundingMode('dollar')" id="roundBtn-dollar" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">湊整 $1</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-
       <!-- TAB 3: BREAKDOWN & FORMULAS -->
       <section id="tab-breakdown" class="hidden p-3 space-y-3">
         <div class="flex items-center justify-between bg-white p-2.5 rounded-2xl border border-panda-100 shadow-2xs">
           <span class="text-xs font-bold text-neutral-700 pl-1"><i class="fa-solid fa-calculator text-panda-600 mr-1"></i>分賬算式檢視模式</span>
-          <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100">
+          <div class="inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100" id="breakdownViewControls">
             <button onclick="setBreakdownViewMode('item')" id="bdViewBtn-item" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">逐項餐點應付價</button>
             <button onclick="setBreakdownViewMode('person')" id="bdViewBtn-person" class="px-2.5 py-1 rounded-lg text-xs font-bold transition">按成員歸納</button>
           </div>
         </div>
         <div id="breakdownListContainer" class="space-y-2.5"></div>
       </section>
-
       <!-- TAB 4: COLLECT & WHATSAPP SHARE -->
       <section id="tab-collect" class="hidden p-3 space-y-3.5">
         <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100 space-y-2.5">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-bold text-neutral-800 flex items-center gap-1.5"><i class="fa-solid fa-wallet text-panda-600"></i>墊支負責人收款資料 (建立新紀錄時自動清空)</h2>
-            <button onclick="clearPaymentInfoFields()" class="text-[11px] text-rose-500 font-bold hover:underline">清空欄目</button>
+            <button id="clearPaymentBtn" onclick="clearPaymentInfoFields()" class="text-[11px] text-rose-500 font-bold hover:underline">清空欄目</button>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div><label class="text-[10px] text-neutral-400 block">FPS 轉數快 / 電話號碼</label><input id="inputPaymentFps" type="text" placeholder="未填寫" oninput="updatePaymentInfo()" class="w-full px-2.5 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" /></div>
@@ -609,7 +537,7 @@
           </div>
         </div>
         <div class="space-y-2">
-          <div class="flex items-center justify-between px-1"><span class="text-xs font-bold text-neutral-600">應收款項清單 (點擊標記已收)</span><button onclick="markAllPaid(true)" class="text-[11px] text-panda-600 font-bold hover:underline">全部標記已收</button></div>
+          <div class="flex items-center justify-between px-1"><span class="text-xs font-bold text-neutral-600">應收款項清單 (點擊標記已收)</span><button id="markAllPaidBtn" onclick="markAllPaid(true)" class="text-[11px] text-panda-600 font-bold hover:underline">全部標記已收</button></div>
           <div id="collectionCardsContainer" class="space-y-2"></div>
         </div>
         <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100 space-y-2.5">
@@ -618,7 +546,6 @@
         </div>
       </section>
     </div>
-
     <!-- Mobile Nav -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-panda-100 px-2 py-1.5 grid grid-cols-4 gap-1 z-30 shadow-lg">
       <button onclick="switchTab('items')" id="mobTab-items" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold transition"><i class="fa-solid fa-bowl-food text-sm"></i><span class="text-[11px] mt-0.5">1. 收據餐點</span></button>
@@ -627,7 +554,6 @@
       <button onclick="switchTab('collect')" id="mobTab-collect" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 hover:text-panda-600 font-medium transition"><i class="fa-brands fa-whatsapp text-sm"></i><span class="text-[11px] mt-0.5">4. 催收追蹤</span></button>
     </nav>
   </div>
-
   <!-- ========================================================= -->
   <!-- BUILT-IN NUMERIC KEYPAD WITH DECIMAL POINT "."            -->
   <!-- ========================================================= -->
@@ -648,31 +574,26 @@
           </button>
         </div>
       </div>
-
       <!-- Keypad Buttons Grid (Includes "." Decimal Point) -->
       <div class="grid grid-cols-4 gap-2 text-center">
         <button onclick="keypadPress('7')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">7</button>
         <button onclick="keypadPress('8')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">8</button>
         <button onclick="keypadPress('9')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">9</button>
         <button onclick="keypadBackspace()" class="h-12 rounded-2xl bg-neutral-700 hover:bg-neutral-600 active:scale-95 text-base font-bold text-amber-300"><i class="fa-solid fa-delete-left"></i></button>
-
         <button onclick="keypadPress('4')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">4</button>
         <button onclick="keypadPress('5')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">5</button>
         <button onclick="keypadPress('6')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">6</button>
         <button onclick="keypadClear()" class="h-12 rounded-2xl bg-rose-900/60 hover:bg-rose-800 active:scale-95 text-xs font-extrabold text-rose-200">清空</button>
-
         <button onclick="keypadPress('1')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">1</button>
         <button onclick="keypadPress('2')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">2</button>
         <button onclick="keypadPress('3')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">3</button>
         <button onclick="keypadPress('.')" class="h-12 rounded-2xl bg-amber-400/25 border-2 border-amber-400 hover:bg-amber-400/40 active:scale-95 text-2xl font-extrabold text-amber-300">.</button>
-
         <button onclick="keypadPress('0')" class="col-span-2 h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">0</button>
         <button onclick="keypadPress('00')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-sm font-extrabold">00</button>
         <button id="keypadSubmitBtn" onclick="keypadConfirmAction()" class="h-12 rounded-2xl theme-bar-gradient active:scale-95 text-xs font-extrabold text-white shadow-md">確認</button>
       </div>
     </div>
   </div>
-
   <!-- MODAL: SMART TEXT PASTE PARSER -->
   <div id="smartPasteModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3.5 border border-panda-100">
@@ -681,14 +602,14 @@
           <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div>
           <div>
             <h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3>
-            <p class="text-[10px] text-neutral-500">自動認領 1x/3x/5x/10x 等餐點，並自動匯入餐廳名稱、運費、平台費、折扣及優惠券</p>
+            <p class="text-[10px] text-neutral-500">自動認領 1x/3x/5x 等餐點，自動匯入餐廳名稱及費用</p>
           </div>
         </div>
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
         <textarea id="smartPasteTextarea" rows="8"
-          placeholder="請貼上收據文字...&#10;• 「訂購於」後方的文字會自動填入頂部「餐廳名稱」&#10;• 「1x / 2x / 3x / 5x / 10x ...」後方的餐點會自動匯入餐點清單&#10;• 「運費、平台費、折扣、優惠券」會自動匯入「2. 折扣快選」對應欄目"
+          placeholder="請貼上收據文字...&#10;• 支援「訂購於」或收據頂部自動提取餐廳名稱&#10;• 自動支援 1x/2x 等所有項目&#10;• 全面淨化所有特殊符號"
           class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
         <div class="flex gap-2 pt-1">
           <button onclick="closeSmartPasteModal()" class="py-2.5 px-4 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
@@ -698,7 +619,6 @@
       </div>
     </div>
   </div>
-
   <!-- MODAL: Add Participant -->
   <div id="participantModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl space-y-4 border border-panda-100">
@@ -713,7 +633,6 @@
       </div>
     </div>
   </div>
-
   <!-- MODAL: Item Edit -->
   <div id="actionSheetModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3 border-t-4 border-panda-600">
@@ -724,7 +643,6 @@
       <div id="actionSheetBody" class="space-y-2 text-xs"></div>
     </div>
   </div>
-
   <!-- MODAL: Cloud Sync -->
   <div id="cloudModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-panda-100">
@@ -746,7 +664,6 @@
       </div>
     </div>
   </div>
-
   <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 theme-bar-gradient text-white px-4 py-2 rounded-full text-xs font-bold shadow-xl z-50 hidden items-center gap-2 border border-white/20">
     <i class="fa-solid fa-circle-check text-amber-300"></i><span id="toastText">已完成</span>
   </div>
@@ -756,14 +673,14 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v5';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v5';
-
+    const STORAGE_KEY_DB = 'panda_split_records_db_v6';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v6';
     let pinBuffer = '';
     let currentFilterPlatform = 'ALL';
     let sortNewestFirst = true;
     let activeTab = 'items';
     let breakdownViewMode = 'item';
+    let appMode = 'creditor'; // 'creditor' or 'debtor'
 
     const PLATFORM_PROMOS = {
       'foodpanda': [
@@ -783,16 +700,15 @@
         { title: '全單 9折優惠', badge: '通用', mode: 'percent', percentOff: 10, capAmount: 0 }
       ]
     };
-
     const defaultDatabase = { activeRecordId: null, paymentInfo: { fps: '', payme: '' }, records: [] };
     let dbState = loadDatabase();
     let currentRoomId = (localStorage.getItem('panda_room_id') || 'PANDA-8842').toUpperCase();
     let isApplyingRemoteUpdate = false;
     window._firebaseBridge = { pushState: () => {}, subscribeRoom: () => {} };
-
+    
     function loadDatabase() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v3');
+        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v5');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && Array.isArray(parsed.records)) return parsed;
@@ -800,29 +716,31 @@
       } catch (e) {}
       return JSON.parse(JSON.stringify(defaultDatabase));
     }
-
     function saveDatabase() {
       try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); } catch (e) {}
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
     }
-
     function getActiveRecord() {
       return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null;
     }
-
     function applyPlatformTheme(platformName) {
       const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台'];
       const theme = validThemes.includes(platformName) ? platformName : 'foodpanda';
       document.body.setAttribute('data-theme', theme);
     }
+    
+    // 全面過濾特殊符號的淨化器
+    function sanitizeCleanName(str) {
+      if (!str) return '';
+      return str.replace(/["'×=_<>!@#%&*:;?]/g, '').trim();
+    }
 
-    // --- 1. PASSCODE AUTH ---
+    // --- 1. PASSCODE AUTH & DEBTOR MODE ---
     function initAuthLock() {
       const unlocked = sessionStorage.getItem(STORAGE_KEY_AUTH) === 'true' || localStorage.getItem(STORAGE_KEY_AUTH) === 'true';
       if (unlocked) unlockAppSuccess(false);
       else document.getElementById('passcodeScreen').classList.remove('hidden');
     }
-
     function pressPinDigit(digit) {
       if (pinBuffer.length >= 6) return;
       pinBuffer += digit;
@@ -866,88 +784,76 @@
       document.getElementById('passcodeScreen').classList.remove('hidden');
     }
 
-    // =========================================================
-    // 2. BUILT-IN NUMERIC KEYPAD ENGINE (FIXED DECIMAL "." INPUT)
-    // =========================================================
-    let keypadState = {
-      targetId: null,
-      isAddItemTrigger: false,
-      allowSpaces: false
-    };
+    // 債主 / 債仔 Mode 切換
+    function setAppMode(mode) {
+      appMode = mode;
+      const isDebtor = mode === 'debtor';
+      document.getElementById('modeCreditorBtn').className = !isDebtor
+        ? 'px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition'
+        : 'px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer';
+      document.getElementById('modeDebtorBtn').className = isDebtor
+        ? 'px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition'
+        : 'px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer';
+      
+      document.getElementById('headerActionBtns').style.display = isDebtor ? 'none' : 'flex';
+      renderActiveRecordAll();
+      showToast(isDebtor ? '已切換為「債仔唯讀瀏覽模式」' : '已恢復為「債主管理模式」');
+    }
 
-    // Prevents re-render from overwriting the active input while typing "5." or "0."
+    // =========================================================
+    // 2. BUILT-IN NUMERIC KEYPAD ENGINE
+    // =========================================================
+    let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
     function setInputValSafe(id, val) {
       if (keypadState && keypadState.targetId === id) return;
       const el = document.getElementById(id);
       if (el) el.value = val;
     }
-
     function openNumericKeypad(inputId, labelText, isAddItemTrigger = false, allowSpaces = false) {
+      if (appMode === 'debtor') return; // 防護機制
       document.querySelectorAll('.keypad-target-active').forEach(el => el.classList.remove('keypad-target-active'));
-
       const inputEl = document.getElementById(inputId);
       if (!inputEl) return;
       inputEl.classList.add('keypad-target-active');
-
       keypadState.targetId = inputId;
       keypadState.isAddItemTrigger = isAddItemTrigger;
       keypadState.allowSpaces = allowSpaces;
-
       document.getElementById('keypadFieldLabel').textContent = labelText || '輸入數值';
       document.getElementById('keypadLiveValue').textContent = inputEl.value !== '' ? inputEl.value : '0';
       document.getElementById('keypadSpaceBtn').classList.toggle('hidden', !allowSpaces);
       document.getElementById('keypadSubmitBtn').textContent = isAddItemTrigger ? '加入餐點' : '確認';
-
       document.getElementById('numericKeypadSheet').classList.remove('hidden');
     }
-
     function closeNumericKeypad() {
       const prevId = keypadState.targetId;
       document.querySelectorAll('.keypad-target-active').forEach(el => el.classList.remove('keypad-target-active'));
       document.getElementById('numericKeypadSheet').classList.add('hidden');
       keypadState.targetId = null;
-      if (prevId) {
-        syncKeypadTargetChange(prevId);
-        renderActiveRecordAll();
-      }
+      if (prevId) { syncKeypadTargetChange(prevId); renderActiveRecordAll(); }
     }
-
     function keypadPress(char) {
       if (!keypadState.targetId) return;
       const inputEl = document.getElementById(keypadState.targetId);
       if (!inputEl) return;
-
       let cur = String(inputEl.value ?? '');
-
       if (char === ' ') {
-        if (keypadState.allowSpaces && !cur.endsWith(' ')) {
-          cur = cur + ' ';
-        }
+        if (keypadState.allowSpaces && !cur.endsWith(' ')) cur = cur + ' ';
       } else if (char === '.') {
         const parts = cur.split(' ');
         const lastToken = parts[parts.length - 1];
         if (!lastToken.includes('.')) {
-          if (cur === '' || cur === '0') {
-            cur = '0.';
-          } else if (cur.endsWith(' ')) {
-            cur = cur + '0.';
-          } else {
-            cur = cur + '.';
-          }
+          if (cur === '' || cur === '0') cur = '0.';
+          else if (cur.endsWith(' ')) cur = cur + '0.';
+          else cur = cur + '.';
         }
       } else {
-        if (cur === '0') {
-          cur = char === '00' ? '0' : char;
-        } else {
-          cur += char;
-        }
+        if (cur === '0') cur = char === '00' ? '0' : char;
+        else cur += char;
       }
-
       inputEl.value = cur;
       document.getElementById('keypadLiveValue').textContent = cur || '0';
       syncKeypadTargetChange(keypadState.targetId);
     }
-
     function keypadBackspace() {
       if (!keypadState.targetId) return;
       const inputEl = document.getElementById(keypadState.targetId);
@@ -956,7 +862,6 @@
       document.getElementById('keypadLiveValue').textContent = inputEl.value || '0';
       syncKeypadTargetChange(keypadState.targetId);
     }
-
     function keypadClear() {
       if (!keypadState.targetId) return;
       const inputEl = document.getElementById(keypadState.targetId);
@@ -965,25 +870,14 @@
       document.getElementById('keypadLiveValue').textContent = '0';
       syncKeypadTargetChange(keypadState.targetId);
     }
-
     function keypadConfirmAction() {
-      if (keypadState.isAddItemTrigger) {
-        addNewItem();
-        document.getElementById('keypadLiveValue').textContent = '0';
-      } else if (keypadState.targetId === 'rapidBatchPricesInput') {
-        addRapidBatchPrices();
-        closeNumericKeypad();
-      } else {
-        closeNumericKeypad();
-      }
+      if (keypadState.isAddItemTrigger) { addNewItem(); document.getElementById('keypadLiveValue').textContent = '0'; }
+      else if (keypadState.targetId === 'rapidBatchPricesInput') { addRapidBatchPrices(); closeNumericKeypad(); }
+      else closeNumericKeypad();
     }
-
     function syncKeypadTargetChange(targetId) {
-      if (['inputDiscountDirect', 'inputDiscountFixed', 'inputDiscountPercent', 'inputDiscountCap', 'inputReceiptOverride'].includes(targetId)) {
-        updateDiscountParams();
-      } else if (['inputFeeDelivery', 'inputFeePlatform', 'inputFeePackaging'].includes(targetId)) {
-        updateFeeParams();
-      }
+      if (['inputDiscountDirect', 'inputDiscountFixed', 'inputDiscountPercent', 'inputDiscountCap', 'inputReceiptOverride'].includes(targetId)) updateDiscountParams();
+      else if (['inputFeeDelivery', 'inputFeePlatform', 'inputFeePackaging'].includes(targetId)) updateFeeParams();
     }
 
     // --- 3. RECORDS LIST ---
@@ -994,12 +888,9 @@
       renderRecordsList();
     }
     function backToRecordsList() { saveDatabase(); showRecordsListView(); }
-
     function setPlatformFilter(p) {
       currentFilterPlatform = p;
-      if (p !== 'ALL') applyPlatformTheme(p);
-      else applyPlatformTheme('foodpanda');
-
+      if (p !== 'ALL') applyPlatformTheme(p); else applyPlatformTheme('foodpanda');
       ['ALL', 'foodpanda', 'Keeta', 'Uber Eats', '其他平台'].forEach(x => {
         const btn = document.getElementById(`filterBtn-${x}`);
         if (btn) btn.className = x === p
@@ -1008,46 +899,28 @@
       });
       renderRecordsList();
     }
-
-    function toggleSortOrder() {
-      sortNewestFirst = !sortNewestFirst;
-      document.getElementById('sortOrderLabel').textContent = sortNewestFirst ? '最新優先' : '最舊優先';
-      renderRecordsList();
-    }
+    function toggleSortOrder() { sortNewestFirst = !sortNewestFirst; document.getElementById('sortOrderLabel').textContent = sortNewestFirst ? '最新優先' : '最舊優先'; renderRecordsList(); }
     function clearRecordSearch() { document.getElementById('recordSearchInput').value = ''; renderRecordsList(); }
-
     function renderRecordsList() {
       const query = (document.getElementById('recordSearchInput')?.value || '').trim().toLowerCase();
       document.getElementById('clearSearchBtn').classList.toggle('hidden', !query);
       document.getElementById('totalRecordsCountBadge').textContent = `${dbState.records.length} 筆紀錄`;
-
       let filtered = dbState.records.filter(rec => {
         if (currentFilterPlatform !== 'ALL' && rec.platform !== currentFilterPlatform) return false;
         if (!query) return true;
-        return (rec.title||'').toLowerCase().includes(query) ||
-               (rec.restaurant||'').toLowerCase().includes(query) ||
-               (rec.date||'').toLowerCase().includes(query) ||
-               (rec.platform||'').toLowerCase().includes(query) ||
-               (rec.items||[]).some(i => (i.name||'').toLowerCase().includes(query));
+        return (rec.title||'').toLowerCase().includes(query) || (rec.restaurant||'').toLowerCase().includes(query) || (rec.date||'').toLowerCase().includes(query) || (rec.platform||'').toLowerCase().includes(query) || (rec.items||[]).some(i => (i.name||'').toLowerCase().includes(query));
       });
       filtered.sort((a, b) => {
         const dA = new Date(a.date || 0).getTime() || a.createdAt || 0;
         const dB = new Date(b.date || 0).getTime() || b.createdAt || 0;
         return sortNewestFirst ? (dB - dA) : (dA - dB);
       });
-
       const container = document.getElementById('recordsListContainer');
       if (filtered.length === 0) {
         container.innerHTML = `<div class="bg-white rounded-3xl p-10 text-center border border-dashed border-panda-200 text-neutral-400 space-y-2"><i class="fa-solid fa-folder-open text-3xl text-panda-300 block"></i><div class="text-xs font-bold text-neutral-600">尚無分賬紀錄，請點擊上方按鈕新增</div></div>`;
         return;
       }
-
-      const badges = {
-        'foodpanda': 'bg-[#fff0f6] text-[#d70f64] border-[#ffc2dc]',
-        'Keeta': 'bg-amber-100 text-neutral-900 border-amber-300',
-        'Uber Eats': 'bg-emerald-100 text-emerald-800 border-emerald-200'
-      };
-
+      const badges = { 'foodpanda': 'bg-[#fff0f6] text-[#d70f64] border-[#ffc2dc]', 'Keeta': 'bg-amber-100 text-neutral-900 border-amber-300', 'Uber Eats': 'bg-emerald-100 text-emerald-800 border-emerald-200' };
       container.innerHTML = filtered.map(rec => {
         const calc = calculateRecordBill(rec);
         const t = rec.items.length;
@@ -1074,49 +947,31 @@
         `;
       }).join('');
     }
-
     function createNewRecord() {
       const ts = new Date().toISOString().split('T')[0];
       const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
       const newRec = {
-        id: 'rec_' + Date.now(),
-        title: `外賣聚會分賬 (${ts})`,
-        date: ts,
-        createdAt: Date.now(),
-        platform: defaultPlatform,
-        restaurant: '',
-        participants: [],
-        receipts: [],
+        id: 'rec_' + Date.now(), title: `外賣聚會分賬 (${ts})`, date: ts, createdAt: Date.now(),
+        platform: defaultPlatform, restaurant: '', participants: [], receipts: [],
         verifiedPromos: [...(PLATFORM_PROMOS[defaultPlatform] || PLATFORM_PROMOS['foodpanda'])],
-        items: [],
-        paymentInfo: { fps: '', payme: '' },
-        discount: {
-          mode: 'receipt_exact',
-          directAmount: 0,
-          fixedAmount: 0,
-          percentOff: 20,
-          capAmount: 60,
-          overrideFinalTotal: 0
-        },
+        items: [], paymentInfo: { fps: '', payme: '' },
+        discount: { mode: 'receipt_exact', directAmount: 0, fixedAmount: 0, percentOff: 20, capAmount: 60, overrideFinalTotal: 0 },
         fees: { delivery: 0, platform: 0, packaging: 0, splitMode: 'equal', rounding: 'exact' }
       };
-
       dbState.paymentInfo = { fps: '', payme: '' };
       dbState.records.unshift(newRec);
       dbState.activeRecordId = newRec.id;
-      saveDatabase();
-      openRecordDetail(newRec.id);
+      saveDatabase(); openRecordDetail(newRec.id);
       showToast('已建立新分賬紀錄 (收款資料已清空)！');
     }
-
     function deleteRecord(id) {
+      if (appMode === 'debtor') return;
       const t = dbState.records.find(r => r.id === id);
       if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return;
       dbState.records = dbState.records.filter(r => r.id !== id);
       if (dbState.activeRecordId === id) dbState.activeRecordId = null;
       saveDatabase(); renderRecordsList(); showToast('已刪除紀錄');
     }
-
     function openRecordDetail(id) {
       dbState.activeRecordId = id;
       const rec = getActiveRecord();
@@ -1132,17 +987,9 @@
       if (!rec) return null;
       let totalOrig = 0;
       (rec.items || []).forEach(i => totalOrig += Number(i.price) || 0);
-
-      const totalFees = (Number(rec.fees.delivery) || 0) +
-                        (Number(rec.fees.platform) || 0) +
-                        (Number(rec.fees.packaging) || 0);
-
-      let totalDisc = 0;
-      let dSum = '';
-      const d = rec.discount || {};
-      const directDisc = Number(d.directAmount) || 0;
-      const voucherDisc = Number(d.fixedAmount) || 0;
-
+      const totalFees = (Number(rec.fees.delivery) || 0) + (Number(rec.fees.platform) || 0) + (Number(rec.fees.packaging) || 0);
+      let totalDisc = 0; let dSum = ''; const d = rec.discount || {};
+      const directDisc = Number(d.directAmount) || 0; const voucherDisc = Number(d.fixedAmount) || 0;
       if (d.mode === 'receipt_exact' || d.mode === 'fixed') {
         totalDisc = Math.min(totalOrig, directDisc + voucherDisc);
         const parts = [];
@@ -1154,43 +1001,27 @@
         const cap = Number(d.capAmount) || 0;
         const capped = cap > 0 ? Math.min(raw, cap) : raw;
         totalDisc = Math.min(totalOrig, capped + directDisc + voucherDisc);
-        dSum = `${100 - (d.percentOff||0)}折${cap > 0 && raw > cap ? ` [上限減$${cap.toFixed(1)}]` : ` (-$${capped.toFixed(1)})`}` +
-               (directDisc + voucherDisc > 0 ? ` + 額外減$${(directDisc + voucherDisc).toFixed(1)}` : '');
+        dSum = `${100 - (d.percentOff||0)}折${cap > 0 && raw > cap ? ` [上限減$${cap.toFixed(1)}]` : ` (-$${capped.toFixed(1)})`}` + (directDisc + voucherDisc > 0 ? ` + 額外減$${(directDisc + voucherDisc).toFixed(1)}` : '');
       } else if (d.mode === 'percent') {
         const raw = totalOrig * ((Number(d.percentOff) || 0) / 100);
         totalDisc = Math.min(totalOrig, raw + directDisc + voucherDisc);
-        dSum = `${100 - (d.percentOff||0)}折 (-$${raw.toFixed(1)})` +
-               (directDisc + voucherDisc > 0 ? ` + 額外減$${(directDisc + voucherDisc).toFixed(1)}` : '');
+        dSum = `${100 - (d.percentOff||0)}折 (-$${raw.toFixed(1)})` + (directDisc + voucherDisc > 0 ? ` + 額外減$${(directDisc + voucherDisc).toFixed(1)}` : '');
       } else if (d.mode === 'override') {
         const tg = Number(d.overrideFinalTotal) || 0;
         totalDisc = tg > 0 ? Math.max(0, totalOrig + totalFees - tg) : 0;
         dSum = `按總計實付 $${tg.toFixed(1)} 反推淨折扣 -$${totalDisc.toFixed(1)}`;
       }
-
-      const itemBreakdown = [];
-      let sumRound = 0;
-      const cCount = rec.items.length || 1;
-
+      const itemBreakdown = []; let sumRound = 0; const cCount = rec.items.length || 1;
       (rec.items || []).forEach(it => {
-        const p = Number(it.price) || 0;
-        const ratio = totalOrig > 0 ? (p / totalOrig) : 0;
-        const iD = totalDisc * ratio;
-        const iF = rec.fees.splitMode === 'equal' ? (totalFees / cCount) : (totalFees * ratio);
-        const rawF = Math.max(0, p - iD + iF);
-        let rF = rawF;
+        const p = Number(it.price) || 0; const ratio = totalOrig > 0 ? (p / totalOrig) : 0;
+        const iD = totalDisc * ratio; const iF = rec.fees.splitMode === 'equal' ? (totalFees / cCount) : (totalFees * ratio);
+        const rawF = Math.max(0, p - iD + iF); let rF = rawF;
         if (rec.fees.rounding === 'half') rF = Math.ceil(rawF * 2) / 2;
         else if (rec.fees.rounding === 'dollar') rF = Math.ceil(rawF);
         else rF = Math.round(rawF * 10) / 10;
-
         sumRound += rF;
-        itemBreakdown.push({
-          id: it.id, name: it.name, originalPrice: p, ratio,
-          discountShare: iD, feeShare: iF, rawFinal: rawF, finalPayable: rF,
-          paid: !!it.paid, assignedTo: it.assignedTo || [],
-          assignedNames: (it.assignedTo || []).map(pid => (rec.participants || []).find(x => x.id === pid)?.name).filter(Boolean)
-        });
+        itemBreakdown.push({ id: it.id, name: it.name, originalPrice: p, ratio, discountShare: iD, feeShare: iF, rawFinal: rawF, finalPayable: rF, paid: !!it.paid, assignedTo: it.assignedTo || [], assignedNames: (it.assignedTo || []).map(pid => (rec.participants || []).find(x => x.id === pid)?.name).filter(Boolean) });
       });
-
       const personBreakdown = {};
       (rec.participants || []).forEach(p => personBreakdown[p.id] = { id: p.id, name: p.name, items: [], subtotal: 0, discountShare: 0, feeShare: 0, finalPayable: 0 });
       itemBreakdown.forEach(ib => {
@@ -1200,58 +1031,31 @@
           vPids.forEach(pid => {
             const pb = personBreakdown[pid];
             pb.items.push({ name: ib.name, shareCount: c, finalShare: ib.finalPayable / c });
-            pb.subtotal += ib.originalPrice / c;
-            pb.discountShare += ib.discountShare / c;
-            pb.feeShare += ib.feeShare / c;
-            pb.finalPayable += ib.finalPayable / c;
+            pb.subtotal += ib.originalPrice / c; pb.discountShare += ib.discountShare / c; pb.feeShare += ib.feeShare / c; pb.finalPayable += ib.finalPayable / c;
           });
         }
       });
-
-      return {
-        totalOriginal: totalOrig,
-        totalDiscount: totalDisc,
-        totalFees,
-        sumRoundedCollectible: sumRound,
-        effectiveRatio: totalOrig > 0 ? ((totalOrig - totalDisc) / totalOrig) * 100 : 100,
-        discountRuleSummary: dSum,
-        itemBreakdown,
-        personBreakdown
-      };
+      return { totalOriginal: totalOrig, totalDiscount: totalDisc, totalFees, sumRoundedCollectible: sumRound, effectiveRatio: totalOrig > 0 ? ((totalOrig - totalDisc) / totalOrig) * 100 : 100, discountRuleSummary: dSum, itemBreakdown, personBreakdown };
     }
 
     // =========================================================
-    // 5. ENHANCED RECEIPT PARSER (ANY Nx QUANTITY, PLATFORM FEE & RESTAURANT)
+    // 5. ENHANCED RECEIPT PARSER (Y-Axis Spatial Reconstruction & Name Extraction)
     // =========================================================
-    function openSmartPasteModal() {
-      closeNumericKeypad();
-      document.getElementById('smartPasteTextarea').value = '';
-      document.getElementById('smartPasteModal').classList.remove('hidden');
-      setTimeout(() => document.getElementById('smartPasteTextarea').focus(), 80);
-    }
-    function closeSmartPasteModal() {
-      document.getElementById('smartPasteModal').classList.add('hidden');
-    }
-
-    // Helper: Extract trailing currency amount from a line (handles "HK$ 52.0", "HK $5.0", "HKS 5.0", "$5", "5.0")
+    function openSmartPasteModal() { if (appMode === 'debtor') return; closeNumericKeypad(); document.getElementById('smartPasteTextarea').value = ''; document.getElementById('smartPasteModal').classList.remove('hidden'); setTimeout(() => document.getElementById('smartPasteTextarea').focus(), 80); }
+    function closeSmartPasteModal() { document.getElementById('smartPasteModal').classList.add('hidden'); }
     function extractTrailingAmount(str, allowPlainInteger = false) {
       if (!str) return null;
       const cleaned = str.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2').trim();
-      // 1. With currency prefix (HK$, HK $, HKS, HK5, $, ￥, 元)
       const curMatch = cleaned.match(/[-－]?\s*(?:HK\s*[\$S5s]|[\$￥元])\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
       if (curMatch) return parseFloat(curMatch[1]);
-      // 2. Decimal number at end of line
       const decMatch = cleaned.match(/[-－]?\s*\b([0-9]+\.[0-9]{1,2})\s*$/);
       if (decMatch) return parseFloat(decMatch[1]);
-      // 3. Optional plain integer at end of known fee line
       if (allowPlainInteger) {
         const intMatch = cleaned.match(/[-－]?\s*\b([0-9]{1,4})\s*$/);
         if (intMatch) return parseFloat(intMatch[1]);
       }
       return null;
     }
-
-    // Helper: Extract fee amount from current line OR the next line if split across lines by OCR
     function extractFeeFromLineOrNext(lines, idx) {
       const valSameLine = extractTrailingAmount(lines[idx], true);
       if (valSameLine !== null) return { val: valSameLine, nextIdx: idx };
@@ -1264,181 +1068,98 @@
       }
       return { val: null, nextIdx: idx };
     }
-
-    // Helper: Parse quantity prefix like "1x", "2x", "3x", "5x", "10x", "12x" (plus OCR character fixes)
     function matchQuantityPrefix(line) {
       const m = line.match(/^\s*([0-9IilL|OoS]{1,3})\s*[xX×*✕]\s*(.*)$/);
       if (!m) return null;
-      const normalizedDigits = m[1]
-        .replace(/[IilL|]/g, '1')
-        .replace(/[Oo]/g, '0')
-        .replace(/[S]/g, '5');
+      const normalizedDigits = m[1].replace(/[IilL|]/g, '1').replace(/[Oo]/g, '0').replace(/[S]/g, '5');
       const qty = parseInt(normalizedDigits, 10);
       if (isNaN(qty) || qty <= 0 || qty > 500) return null;
       return { qty, rest: m[2].trim() };
     }
-
     function parseReceiptRawText(rawText) {
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-      const extractedItems = [];
-      const seenFingerprints = new Set();
-      let duplicatesSkipped = 0;
-
-      let detectedRestaurant = null;
-      let detectedDelivery = null;
-      let detectedPlatformFee = null;
-      let detectedPackagingFee = null;
-      let detectedDirectDiscount = null;
-      let detectedVoucher = null;
-      let detectedFinalTotal = null;
-
-      // Strict blacklist of non-meal lines (tolerates spaces injected by OCR)
-      const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*#|訂\s*購\s*[於放菸自]|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費)/i;
-
+      const extractedItems = []; const seenFingerprints = new Set();
+      let duplicatesSkipped = 0; let detectedRestaurant = null; let detectedDelivery = null; let detectedPlatformFee = null; let detectedPackagingFee = null; let detectedDirectDiscount = null; let detectedVoucher = null; let detectedFinalTotal = null;
+      const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*\#|訂\s*購\s*[於放菸自]|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費)/i;
       const hasAnyQtyMarkers = lines.some(l => matchQuantityPrefix(l) !== null);
-
-      let pendingItemName = null;
-      let pendingQty = 1;
-      let pendingLockedByQty = false; // Locks the dish name after Nx so sub-options don't overwrite it
+      let pendingItemName = null; let pendingQty = 1; let pendingLockedByQty = false;
+      let possibleHeaderLines = [];
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].replace(/\s+/g, ' ').trim();
 
-        // 1. Check "訂購於" (Same-line OR Next-line restaurant name extraction)
+        // 收集頂部文字，以便後續「多維度提取餐廳名稱」 fallback
+        if (i < 5 && !matchQuantityPrefix(line) && !/(foodpanda|keeta|uber eats|order|delivery|total|小計|平台|HK\$|\d{2}:\d{2})/i.test(line)) {
+          possibleHeaderLines.push(line);
+        }
+
+        // 1. 識別「訂購於」餐廳名稱 (同行或下一行提取)
         const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
         if (restHeaderMatch) {
           let candidate = restHeaderMatch[1].replace(/\s*(?:HK\s*[\$S5s]|\$).*$/i, '').trim();
           if (candidate.length >= 2) {
-            detectedRestaurant = candidate;
+            detectedRestaurant = sanitizeCleanName(candidate);
           } else if (i + 1 < lines.length) {
-            // Restaurant name is on the next line!
             const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
             if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) {
-              detectedRestaurant = nextLine;
-              i++; // Consume next line
-            }
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 2. Check & extract "平台服務費" / "平台費 HK $xx" (Supports台/臺/合 OCR variants & next-line amount)
-        if (/(平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) {
-          const res = extractFeeFromLineOrNext(lines, i);
-          if (res.val !== null) {
-            detectedPlatformFee = res.val;
-            i = res.nextIdx;
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 3. Check & extract "運費 HK$ xx"
-        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line)) {
-          if (/免\s*運\s*費|free/i.test(line)) {
-            detectedDelivery = 0;
-          } else {
-            const res = extractFeeFromLineOrNext(lines, i);
-            if (res.val !== null) {
-              detectedDelivery = res.val;
-              i = res.nextIdx;
-            }
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 4. Check & extract "包裝費 / 餐盒費 HK$ xx"
-        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line)) {
-          const res = extractFeeFromLineOrNext(lines, i);
-          if (res.val !== null) {
-            detectedPackagingFee = res.val;
-            i = res.nextIdx;
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 5. Check & extract "優惠券xxx HK$ xx"
-        if (/(優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|promo\s*code)/i.test(line)) {
-          const res = extractFeeFromLineOrNext(lines, i);
-          if (res.val !== null) {
-            detectedVoucher = (detectedVoucher || 0) + res.val;
-            i = res.nextIdx;
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 6. Check & extract "折扣 HK$ xx"
-        if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line)) {
-          const res = extractFeeFromLineOrNext(lines, i);
-          if (res.val !== null) {
-            detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val;
-            i = res.nextIdx;
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 7. Check & extract "總計 HK$ xxx"
-        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) {
-          const res = extractFeeFromLineOrNext(lines, i);
-          if (res.val !== null) {
-            detectedFinalTotal = res.val;
-            i = res.nextIdx;
-          }
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 8. Strictly block all other blacklisted phrases (訂單#, 送達到, 小計金額, 付款方式, etc.)
-        if (nonItemBlacklistRegex.test(line)) {
-          pendingItemName = null; pendingLockedByQty = false;
-          continue;
-        }
-
-        // 9. Match Meal Items starting with ANY quantity "1x", "2x", "3x", "5x", "10x", etc.
-        const qtyInfo = matchQuantityPrefix(line);
-        if (qtyInfo) {
-          const parsedQty = qtyInfo.qty;
-          let restOfLine = qtyInfo.rest;
-
-          // If "3x" is on its own line and the item name is on the next line
-          if (!restOfLine && i + 1 < lines.length) {
-            const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
-            if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) {
-              restOfLine = nextLine;
+              detectedRestaurant = sanitizeCleanName(nextLine);
               i++;
             }
           }
+          pendingItemName = null; pendingLockedByQty = false;
+          continue;
+        }
+        
+        if (/(平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i);
+          if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; }
+          pendingItemName = null; pendingLockedByQty = false; continue;
+        }
+        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line)) {
+          if (/免\s*運\s*費|free/i.test(line)) detectedDelivery = 0;
+          else { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } }
+          pendingItemName = null; pendingLockedByQty = false; continue;
+        }
+        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; }
+          pendingItemName = null; pendingLockedByQty = false; continue;
+        }
+        if (/(優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|promo\s*code)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; }
+          pendingItemName = null; pendingLockedByQty = false; continue;
+        }
+        if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; }
+          pendingItemName = null; pendingLockedByQty = false; continue;
+        }
+        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) {
+          const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; }
+          pendingItemName = null; pendingLockedByQty = false; continue;
+        }
+        if (nonItemBlacklistRegex.test(line)) { pendingItemName = null; pendingLockedByQty = false; continue; }
 
-          // Check if price is on the same line as "Nx ..."
+        const qtyInfo = matchQuantityPrefix(line);
+        if (qtyInfo) {
+          const parsedQty = qtyInfo.qty; let restOfLine = qtyInfo.rest;
+          if (!restOfLine && i + 1 < lines.length) {
+            const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
+            if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { restOfLine = nextLine; i++; }
+          }
           const cleanedRest = restOfLine.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2');
           const inlinePriceMatch = cleanedRest.match(/^(.+?)\s+[-－]?\s*(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
           if (inlinePriceMatch) {
-            let itemName = inlinePriceMatch[1].replace(/^[*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim();
+            let itemName = sanitizeCleanName(inlinePriceMatch[1].replace(/^[\*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim());
             const itemPrice = parseFloat(inlinePriceMatch[2]);
             if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 10000) {
               const fp = `${parsedQty}x_${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
               if (seenFingerprints.has(fp)) duplicatesSkipped++;
-              else {
-                seenFingerprints.add(fp);
-                pushItemWithQty(extractedItems, itemName, itemPrice, parsedQty);
-              }
+              else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, itemName, itemPrice, parsedQty); }
             }
-            pendingItemName = null; pendingLockedByQty = false;
-            continue;
+            pendingItemName = null; pendingLockedByQty = false; continue;
           } else {
-            // Price is on a subsequent line (e.g., after drink options like "少冰")
-            pendingQty = parsedQty;
-            pendingItemName = restOfLine.replace(/^[*\-•·\s]+/, '').trim();
-            pendingLockedByQty = true;
-            continue;
+            pendingQty = parsedQty; pendingItemName = sanitizeCleanName(restOfLine.replace(/^[\*\-•·\s]+/, '').trim()); pendingLockedByQty = true; continue;
           }
         }
-
-        // 10. If waiting for the price of a "Nx" item on a subsequent line
         const cleanedLine = line.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2');
         const standalonePrice = cleanedLine.match(/^(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
         if (standalonePrice && pendingItemName) {
@@ -1446,191 +1167,132 @@
           if (itemPrice > 0 && itemPrice < 10000 && !nonItemBlacklistRegex.test(pendingItemName)) {
             const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
             if (seenFingerprints.has(fp)) duplicatesSkipped++;
-            else {
-              seenFingerprints.add(fp);
-              pushItemWithQty(extractedItems, pendingItemName, itemPrice, pendingQty);
-            }
+            else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, pendingItemName, itemPrice, pendingQty); }
           }
-          pendingItemName = null;
-          pendingQty = 1;
-          pendingLockedByQty = false;
-          continue;
+          pendingItemName = null; pendingQty = 1; pendingLockedByQty = false; continue;
         }
-
-        // If pendingLockedByQty is true, ignore intermediate option lines (e.g. "少冰, 半糖") unless the line itself has a trailing price
         if (pendingLockedByQty && pendingItemName) {
           const lineTrailingPrice = extractTrailingAmount(line, false);
           if (lineTrailingPrice !== null && lineTrailingPrice > 0 && lineTrailingPrice < 10000) {
             const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${lineTrailingPrice.toFixed(1)}`;
             if (seenFingerprints.has(fp)) duplicatesSkipped++;
-            else {
-              seenFingerprints.add(fp);
-              pushItemWithQty(extractedItems, pendingItemName, lineTrailingPrice, pendingQty);
-            }
-            pendingItemName = null;
-            pendingQty = 1;
-            pendingLockedByQty = false;
+            else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, pendingItemName, lineTrailingPrice, pendingQty); }
+            pendingItemName = null; pendingQty = 1; pendingLockedByQty = false;
           }
           continue;
         }
-
-        // 11. Fallback ONLY if the user pasted a custom list without any "Nx" markers
         if (!hasAnyQtyMarkers) {
           const fallbackMatch = cleanedLine.match(/^(.+?)\s+(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
           if (fallbackMatch) {
-            let itemName = fallbackMatch[1].replace(/^[*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim();
+            let itemName = sanitizeCleanName(fallbackMatch[1].replace(/^[\*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim());
             const itemPrice = parseFloat(fallbackMatch[2]);
             if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 10000) {
               const fp = `1x_${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
-              if (!seenFingerprints.has(fp)) {
-                seenFingerprints.add(fp);
-                extractedItems.push({ name: itemName, price: itemPrice });
-              }
+              if (!seenFingerprints.has(fp)) { seenFingerprints.add(fp); extractedItems.push({ name: itemName, price: itemPrice }); }
             }
           }
         }
       }
 
-      return {
-        extractedItems,
-        duplicatesSkipped,
-        detectedRestaurant,
-        detectedDelivery,
-        detectedPlatformFee,
-        detectedPackagingFee,
-        detectedDirectDiscount,
-        detectedVoucher,
-        detectedFinalTotal
-      };
-    }
+      // 如果未偵測到「訂購於」，多維度提取收據頂部的商店標題
+      if (!detectedRestaurant && possibleHeaderLines.length > 0) {
+        const validH = possibleHeaderLines.filter(h => h.length >= 2 && h.length < 30);
+        if (validH.length > 0) detectedRestaurant = sanitizeCleanName(validH[0]);
+      }
 
+      return { extractedItems, duplicatesSkipped, detectedRestaurant, detectedDelivery, detectedPlatformFee, detectedPackagingFee, detectedDirectDiscount, detectedVoucher, detectedFinalTotal };
+    }
     function pushItemWithQty(list, name, totalLinePrice, qty) {
       if (qty > 1) {
         const unitPrice = Math.round((totalLinePrice / qty) * 100) / 100;
-        for (let k = 1; k <= qty; k++) {
-          list.push({ name: `${name} (${k}/${qty})`, price: unitPrice });
-        }
-      } else {
-        list.push({ name, price: totalLinePrice });
-      }
+        for (let k = 1; k <= qty; k++) list.push({ name: `${name} (${k}/${qty})`, price: unitPrice });
+      } else list.push({ name, price: totalLinePrice });
     }
-
     function applyParsedReceiptToRecord(rec, res, replaceExisting = true) {
       if (res.extractedItems.length > 0) {
         if (replaceExisting) rec.items = [];
-        res.extractedItems.forEach((it, idx) => {
-          rec.items.push({ id: 'sp_' + Date.now() + '_' + idx, name: it.name, price: it.price, assignedTo: [], paid: false });
-        });
+        res.extractedItems.forEach((it, idx) => { rec.items.push({ id: 'sp_' + Date.now() + '_' + idx, name: it.name, price: it.price, assignedTo: [], paid: false }); });
       }
-
       let importedMetaLabels = [];
-
-      // Always update restaurant name when detected after "訂購於"
       if (res.detectedRestaurant) {
         rec.restaurant = res.detectedRestaurant;
         const restInput = document.getElementById('orderRestaurantInput');
         if (restInput) restInput.value = res.detectedRestaurant;
         importedMetaLabels.push(`餐廳「${res.detectedRestaurant}」`);
       }
-
-      if (res.detectedDelivery !== null) {
-        rec.fees.delivery = res.detectedDelivery;
-        importedMetaLabels.push(`運費 $${res.detectedDelivery}`);
-      }
-      if (res.detectedPlatformFee !== null) {
-        rec.fees.platform = res.detectedPlatformFee;
-        importedMetaLabels.push(`平台服務費 $${res.detectedPlatformFee}`);
-      }
-      if (res.detectedPackagingFee !== null) {
-        rec.fees.packaging = res.detectedPackagingFee;
-        importedMetaLabels.push(`包裝費 $${res.detectedPackagingFee}`);
-      }
-      if (res.detectedDirectDiscount !== null) {
-        rec.discount.directAmount = res.detectedDirectDiscount;
-        rec.discount.mode = 'receipt_exact';
-        importedMetaLabels.push(`折扣 -$${res.detectedDirectDiscount}`);
-      }
-      if (res.detectedVoucher !== null) {
-        rec.discount.fixedAmount = res.detectedVoucher;
-        rec.discount.mode = 'receipt_exact';
-        importedMetaLabels.push(`優惠券 -$${res.detectedVoucher}`);
-      }
-      if (res.detectedFinalTotal !== null) {
-        rec.discount.overrideFinalTotal = res.detectedFinalTotal;
-      }
-
+      if (res.detectedDelivery !== null) { rec.fees.delivery = res.detectedDelivery; importedMetaLabels.push(`運費 $${res.detectedDelivery}`); }
+      if (res.detectedPlatformFee !== null) { rec.fees.platform = res.detectedPlatformFee; importedMetaLabels.push(`平台服務費 $${res.detectedPlatformFee}`); }
+      if (res.detectedPackagingFee !== null) { rec.fees.packaging = res.detectedPackagingFee; importedMetaLabels.push(`包裝費 $${res.detectedPackagingFee}`); }
+      if (res.detectedDirectDiscount !== null) { rec.discount.directAmount = res.detectedDirectDiscount; rec.discount.mode = 'receipt_exact'; importedMetaLabels.push(`折扣 -$${res.detectedDirectDiscount}`); }
+      if (res.detectedVoucher !== null) { rec.discount.fixedAmount = res.detectedVoucher; rec.discount.mode = 'receipt_exact'; importedMetaLabels.push(`優惠券 -$${res.detectedVoucher}`); }
+      if (res.detectedFinalTotal !== null) { rec.discount.overrideFinalTotal = res.detectedFinalTotal; }
       return importedMetaLabels;
     }
-
     function parseSmartTextAndImport(replaceExisting) {
       const raw = document.getElementById('smartPasteTextarea').value;
       if (!raw.trim()) { showToast('請先貼上收據文字'); return; }
-
-      const res = parseReceiptRawText(raw);
-      const rec = getActiveRecord();
+      const res = parseReceiptRawText(raw); const rec = getActiveRecord();
       const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting);
-
-      closeSmartPasteModal();
-      saveDatabase();
-      renderActiveRecordAll();
+      closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll();
       showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`);
     }
 
-    // Local Browser Offline OCR using Tesseract.js
+    // Y-Axis 空間座標同行重組技術的本機離線 OCR
     async function runLocalOfflineOcr() {
-      const rec = getActiveRecord();
-      if (!rec) return;
+      if (appMode === 'debtor') return;
+      const rec = getActiveRecord(); if (!rec) return;
       const images = (rec.receipts || []).filter(r => r.dataUrl);
-      const statusBox = document.getElementById('aiScanStatusBox');
-      const statusText = document.getElementById('aiScanStatusText');
+      const statusBox = document.getElementById('aiScanStatusBox'); const statusText = document.getElementById('aiScanStatusText');
       statusBox.classList.remove('hidden');
-
-      if (images.length === 0) {
-        statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「2. 上傳收據截圖」選取相片，或使用「1. 貼上收據文字」。`;
-        return;
-      }
-
-      if (typeof Tesseract === 'undefined') {
-        statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>本機 OCR 引擎載入中，請稍候重試。`;
-        return;
-      }
-
+      if (images.length === 0) { statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「2. 上傳收據截圖」。`; return; }
+      if (typeof Tesseract === 'undefined') { statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>本機 OCR 引擎載入中，請稍候重試。`; return; }
       try {
         let combinedText = '';
         for (let i = 0; i < images.length; i++) {
-          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在使用本機離線 OCR 掃描第 ${i + 1}/${images.length} 張截圖 (識別「訂購於」餐廳、Nx 餐點、平台服務費及折扣)...`;
+          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在掃描第 ${i + 1}/${images.length} 張截圖 (應用 Y-Axis 空間座標重組)...`;
           const result = await Tesseract.recognize(images[i].dataUrl, 'chi_tra+eng');
-          combinedText += '\n' + (result?.data?.text || '');
+          
+          // Y-Axis Spatial Line Reconstruction Logic
+          const words = result.data.words || [];
+          let currentY = -1; let currentLine = []; let linesArr = [];
+          
+          words.sort((a, b) => a.bbox.y0 - b.bbox.y0).forEach(w => {
+            const yCenter = (w.bbox.y0 + w.bbox.y1) / 2;
+            if (currentY === -1 || Math.abs(yCenter - currentY) > 12) { // 12px 垂直容差
+              if (currentLine.length > 0) {
+                currentLine.sort((a, b) => a.bbox.x0 - b.bbox.x0);
+                linesArr.push(currentLine.map(x => x.text).join(' '));
+              }
+              currentLine = [w]; currentY = yCenter;
+            } else {
+              currentLine.push(w);
+              currentY = (currentY * (currentLine.length - 1) + yCenter) / currentLine.length; // 滾動平均以應對輕微傾斜
+            }
+          });
+          if (currentLine.length > 0) {
+            currentLine.sort((a, b) => a.bbox.x0 - b.bbox.x0);
+            linesArr.push(currentLine.map(x => x.text).join(' '));
+          }
+          combinedText += '\n' + linesArr.join('\n');
         }
-
         window._lastOcrRawText = combinedText;
         const parsed = parseReceiptRawText(combinedText);
         const metaSummary = applyParsedReceiptToRecord(rec, parsed, true);
-
-        saveDatabase();
-        renderActiveRecordAll();
-
+        saveDatabase(); renderActiveRecordAll();
         statusText.innerHTML = `
           <div class="text-emerald-300 space-y-1">
             <div><i class="fa-solid fa-circle-check mr-1"></i><b>本機離線識圖完成！</b></div>
-            <div>• 匯入餐點：<b>${parsed.extractedItems.length}</b> 項 (支援 1x/2x/3x/5x/10x 等任意數量)</div>
-            <div>• 自動匯入餐廳與費用：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>
-            <div><button onclick="openSmartPasteWithText()" class="underline text-amber-300">檢視或微調 OCR 識別文字</button></div>
+            <div>• 匯入餐點：<b>${parsed.extractedItems.length}</b> 項</div>
+            <div>• 自動匯入資訊：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>
+            <div><button onclick="openSmartPasteWithText()" class="underline text-amber-300">檢視或微調空間重組後的 OCR 文字</button></div>
           </div>
         `;
         showToast(`識圖成功！匯入 ${parsed.extractedItems.length} 項餐點`);
-      } catch (err) {
-        statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>離線掃描發生錯誤 (${escapeHtml(err.message)})。`;
-      }
+      } catch (err) { statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>離線掃描發生錯誤 (${escapeHtml(err.message)})。`; }
     }
-
-    function openSmartPasteWithText() {
-      document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || '';
-      document.getElementById('smartPasteModal').classList.remove('hidden');
-    }
-
-    // --- MULTI-RECEIPT UPLOAD ---
+    function openSmartPasteWithText() { document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || ''; document.getElementById('smartPasteModal').classList.remove('hidden'); }
     function handleMultiReceiptUpload(event) {
+      if (appMode === 'debtor') return;
       const files = Array.from(event.target.files || []); if (files.length === 0) return;
       const rec = getActiveRecord(); if (!rec) return; if (!rec.receipts) rec.receipts = [];
       let loaded = 0;
@@ -1639,39 +1301,34 @@
         reader.onload = (e) => {
           rec.receipts.push({ id: 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6), name: file.name, dataUrl: e.target.result });
           loaded++;
-          if (loaded === files.length) {
-            saveDatabase(); renderActiveRecordAll();
-            showToast(`已載入 ${files.length} 張截圖！可按「3. 本機離線識圖」自動匯入`);
-          }
+          if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已載入 ${files.length} 張截圖！可點擊本機識圖`); }
         };
         reader.readAsDataURL(file);
       });
       event.target.value = '';
     }
-
-    function zoomReceiptImage(dataUrl) {
-      document.getElementById('zoomReceiptImg').src = dataUrl;
-      document.getElementById('zoomReceiptBox').classList.remove('hidden');
-    }
-
-    function removeReceiptImage(id) {
-      const rec = getActiveRecord(); if (!rec) return;
-      rec.receipts = (rec.receipts || []).filter(r => r.id !== id);
-      saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖');
-    }
+    function zoomReceiptImage(dataUrl) { document.getElementById('zoomReceiptImg').src = dataUrl; document.getElementById('zoomReceiptBox').classList.remove('hidden'); }
+    function removeReceiptImage(id) { if(appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); }
 
     // --- 6. UI RENDER LOGIC ---
     function renderActiveRecordAll() {
       const rec = getActiveRecord(); if (!rec) return;
       applyPlatformTheme(rec.platform || 'foodpanda');
       const calc = calculateRecordBill(rec);
-
+      const isDebtor = (appMode === 'debtor');
+      
+      // Top Inputs
       document.getElementById('orderTitleInput').value = rec.title || '';
+      document.getElementById('orderTitleInput').readOnly = isDebtor;
       document.getElementById('orderDateInput').value = rec.date || '';
+      document.getElementById('orderDateInput').readOnly = isDebtor;
       document.getElementById('orderPlatformSelect').value = rec.platform || 'foodpanda';
+      document.getElementById('orderPlatformSelect').disabled = isDebtor;
       document.getElementById('orderRestaurantInput').value = rec.restaurant || '';
+      document.getElementById('orderRestaurantInput').readOnly = isDebtor;
       document.getElementById('receiptCountBadge').textContent = (rec.receipts || []).length;
-
+      
+      // Summaries
       document.getElementById('sumOriginal').textContent = `$${calc.totalOriginal.toFixed(1)}`;
       document.getElementById('sumDiscount').textContent = `-$${calc.totalDiscount.toFixed(1)}`;
       document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`;
@@ -1679,50 +1336,53 @@
       document.getElementById('effectiveRateBadge').textContent = `折實率: ${calc.effectiveRatio.toFixed(1)}%`;
       document.getElementById('roundingModeBadge').textContent = { exact: '精確 $0.1', half: '進位 $0.5', dollar: '湊整 $1' }[rec.fees.rounding];
       document.getElementById('collectionStatusText').textContent = `已收 ${rec.items.filter(i=>i.paid).length} / ${rec.items.length} 項`;
-
-      renderReceiptGallery(rec);
-      renderParticipantChips(rec, calc);
-      renderItemsTab(rec, calc);
-      renderDiscountsTab(rec, calc);
-      renderBreakdownTab(rec, calc);
-      renderCollectTab(rec, calc);
+      
+      renderReceiptGallery(rec, isDebtor);
+      renderParticipantChips(rec, calc, isDebtor);
+      renderItemsTab(rec, calc, isDebtor);
+      renderDiscountsTab(rec, calc, isDebtor);
+      renderBreakdownTab(rec, calc, isDebtor);
+      renderCollectTab(rec, calc, isDebtor);
     }
-
-    function renderReceiptGallery(rec) {
+    
+    function renderReceiptGallery(rec, isDebtor) {
       const strip = document.getElementById('receiptGalleryStrip');
       const r = rec.receipts || [];
       if (r.length === 0) {
-        strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。可上傳多張長截圖後點擊「3. 本機離線識圖」。</div>`;
+        strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`;
         return;
       }
       strip.innerHTML = r.map((rc, i) => `
         <div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-1">
             <span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>
-            <button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>
+            ${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}
           </div>
           <img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" />
         </div>
       `).join('');
     }
-
-    function renderParticipantChips(rec, calc) {
+    function renderParticipantChips(rec, calc, isDebtor) {
       const p = rec.participants || [];
       document.getElementById('participantCount').textContent = p.length;
-      document.getElementById('clearAllMembersBtn').classList.toggle('hidden', p.length === 0);
+      document.getElementById('clearAllMembersBtn').style.display = (isDebtor || p.length === 0) ? 'none' : 'flex';
+      document.getElementById('addMemberBtn').style.display = isDebtor ? 'none' : 'flex';
       const c = document.getElementById('participantChipsContainer');
       if (p.length === 0) {
-        c.innerHTML = `<div class="text-[11px] text-emerald-700 bg-emerald-50 px-3 py-1 rounded-xl font-medium"><i class="fa-solid fa-circle-check mr-1"></i>免認領模式：於「分賬算式」與「催收追蹤」直出每項餐點折實價</div>`;
+        c.innerHTML = `<div class="text-[11px] text-emerald-700 bg-emerald-50 px-3 py-1 rounded-xl font-medium"><i class="fa-solid fa-circle-check mr-1"></i>免認領模式：直出每項餐點折實價</div>`;
         return;
       }
-      c.innerHTML = p.map(x => `<div onclick="removeParticipant('${x.id}')" class="shrink-0 px-3 py-1 rounded-xl border border-panda-200 bg-panda-50/70 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-rose-50"><span>${escapeHtml(x.name)}</span><span class="text-[11px] text-panda-600">$${(calc.personBreakdown[x.id]?.finalPayable||0).toFixed(1)}</span><i class="fa-solid fa-xmark text-neutral-400"></i></div>`).join('');
+      c.innerHTML = p.map(x => `<div ${isDebtor ? '' : `onclick="removeParticipant('${x.id}')"`} class="shrink-0 px-3 py-1 rounded-xl border border-panda-200 bg-panda-50/70 text-xs font-bold flex items-center gap-1.5 ${isDebtor ? '' : 'cursor-pointer hover:bg-rose-50'}"><span>${escapeHtml(x.name)}</span><span class="text-[11px] text-panda-600">$${(calc.personBreakdown[x.id]?.finalPayable||0).toFixed(1)}</span>${isDebtor ? '' : '<i class="fa-solid fa-xmark text-neutral-400"></i>'}</div>`).join('');
     }
-
-    function renderItemsTab(rec, calc) {
+    function renderItemsTab(rec, calc, isDebtor) {
       document.getElementById('itemCountBadge').textContent = rec.items.length;
+      document.getElementById('addItemBlock').style.display = isDebtor ? 'none' : 'block';
+      const clearBtn = document.getElementById('clearItemsBtn');
+      if(clearBtn) clearBtn.style.display = isDebtor ? 'none' : 'block';
+      
       const c = document.getElementById('itemsListContainer');
       if (rec.items.length === 0) {
-        c.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border border-dashed border-panda-200 text-neutral-400 text-xs">請使用上方「貼上收據文字」、「本機離線識圖」或點擊原價欄以內建鍵盤加入餐點</div>`;
+        c.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border border-dashed border-panda-200 text-neutral-400 text-xs">目前尚未添加任何餐點。</div>`;
         return;
       }
       const hm = (rec.participants || []).length > 0;
@@ -1735,15 +1395,15 @@
             </div>
             <div class="flex items-center gap-2">
               <div class="text-right"><div class="text-[10px] text-neutral-400">折實應付</div><div class="font-extrabold text-sm sm:text-base text-panda-600">$${ib.finalPayable.toFixed(1)}</div></div>
-              <button onclick="openItemActionSheet('${ib.id}')" class="w-7 h-7 rounded-xl bg-panda-50 text-panda-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+              ${isDebtor ? '' : `<button onclick="openItemActionSheet('${ib.id}')" class="w-7 h-7 rounded-xl bg-panda-50 text-panda-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>`}
             </div>
           </div>
-          ${hm ? `<div class="flex flex-wrap gap-1 mt-2 pt-2 border-t border-panda-50"><span class="text-[10px] text-neutral-400">點餐人：</span>${rec.participants.map(p=>`<button onclick="toggleItemAssignee('${ib.id}','${p.id}')" class="px-2 py-0.5 rounded-lg text-[11px] font-bold ${ib.assignedTo.includes(p.id)?'bg-panda-600 text-white':'bg-panda-50 text-neutral-600'}">${escapeHtml(p.name)}</button>`).join('')}</div>` : ''}
+          ${hm ? `<div class="flex flex-wrap gap-1 mt-2 pt-2 border-t border-panda-50"><span class="text-[10px] text-neutral-400">點餐人：</span>${rec.participants.map(p=>`<button ${isDebtor ? 'disabled' : `onclick="toggleItemAssignee('${ib.id}','${p.id}')"`} class="px-2 py-0.5 rounded-lg text-[11px] font-bold ${ib.assignedTo.includes(p.id)?'bg-panda-600 text-white':'bg-panda-50 text-neutral-600'}">${escapeHtml(p.name)}</button>`).join('')}</div>` : ''}
         </div>
       `).join('');
     }
-
-    function renderDiscountsTab(rec, calc) {
+    function renderDiscountsTab(rec, calc, isDebtor) {
+      document.getElementById('discountsWrap').className = isDebtor ? 'space-y-3.5 pointer-events-none opacity-80' : 'space-y-3.5';
       const p = (rec.verifiedPromos && rec.verifiedPromos.length > 0) ? rec.verifiedPromos : (PLATFORM_PROMOS[rec.platform] || PLATFORM_PROMOS['foodpanda']);
       document.getElementById('verifiedPromosContainer').innerHTML = p.map((x, i) => `
         <button onclick="applyVerifiedPromo(${i})" class="p-2.5 rounded-xl bg-panda-50/50 hover:bg-panda-50 border border-panda-200 text-left flex flex-col justify-between shadow-2xs active:scale-98">
@@ -1751,7 +1411,6 @@
           <div class="font-bold text-xs text-neutral-800 mt-1.5">${escapeHtml(x.title)}</div>
         </button>
       `).join('');
-
       const m = rec.discount.mode || 'receipt_exact';
       ['receipt_exact', 'percent_cap', 'percent', 'override'].forEach(x => {
         const el = document.getElementById(`modeBtn-${x}`);
@@ -1759,30 +1418,26 @@
           ? 'p-2.5 rounded-xl border-2 border-panda-600 bg-panda-50 text-panda-800 text-left flex flex-col justify-between shadow-xs'
           : 'p-2.5 rounded-xl border border-panda-100 bg-white text-neutral-700 text-left flex flex-col justify-between';
       });
-
       document.getElementById('discountParamsBox').classList.toggle('hidden', m === 'receipt_exact');
       document.getElementById('paramRow-percent').classList.toggle('hidden', m === 'override');
       document.getElementById('paramRow-cap').classList.toggle('hidden', m !== 'percent_cap');
       document.getElementById('paramRow-override').classList.toggle('hidden', m !== 'override');
-
-      // Use setInputValSafe so active keypad input with trailing "." is NEVER overwritten!
+      
       setInputValSafe('inputDiscountDirect', rec.discount.directAmount || 0);
       setInputValSafe('inputDiscountFixed', rec.discount.fixedAmount || 0);
       setInputValSafe('inputDiscountPercent', rec.discount.percentOff || 0);
       setInputValSafe('inputDiscountCap', rec.discount.capAmount || 0);
       setInputValSafe('inputReceiptOverride', rec.discount.overrideFinalTotal || 0);
-
       setInputValSafe('inputFeeDelivery', rec.fees.delivery || 0);
       setInputValSafe('inputFeePlatform', rec.fees.platform || 0);
       setInputValSafe('inputFeePackaging', rec.fees.packaging || 0);
-
-      document.getElementById('discountExplanationText').innerHTML = `<b>目前生效折扣：</b>${calc.discountRuleSummary}<br/><span class="text-[11px]">餐點原價 $${calc.totalOriginal.toFixed(1)}，共減免 <b>$${calc.totalDiscount.toFixed(1)}</b>，另加運費/平台費 <b>+$${calc.totalFees.toFixed(1)}</b>。</span>`;
-
+      
+      document.getElementById('discountExplanationText').innerHTML = `<b>目前生效折扣：</b>${calc.discountRuleSummary}<br/><span class="text-[11px]">餐點原價 $${calc.totalOriginal.toFixed(1)}，共減免 <b>-$${calc.totalDiscount.toFixed(1)}</b>，另加運費/平台費 <b>+$${calc.totalFees.toFixed(1)}</b>。</span>`;
       ['equal','prorata'].forEach(x => document.getElementById(`feeSplitBtn-${x}`).className = x === rec.fees.splitMode ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-panda-600 text-white' : 'px-2.5 py-1 rounded-lg text-xs font-medium text-neutral-600');
       ['exact','half','dollar'].forEach(x => document.getElementById(`roundBtn-${x}`).className = x === rec.fees.rounding ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-panda-600 text-white' : 'px-2.5 py-1 rounded-lg text-xs font-medium text-neutral-600');
     }
-
-    function renderBreakdownTab(rec, calc) {
+    function renderBreakdownTab(rec, calc, isDebtor) {
+      document.getElementById('breakdownViewControls').className = isDebtor ? 'inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100 pointer-events-none opacity-80' : 'inline-flex rounded-xl bg-panda-50 p-1 border border-panda-100';
       ['item','person'].forEach(x => document.getElementById(`bdViewBtn-${x}`).className = x === breakdownViewMode ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-panda-600 text-white' : 'px-2.5 py-1 rounded-lg text-xs font-medium text-neutral-600');
       const c = document.getElementById('breakdownListContainer');
       if (breakdownViewMode === 'item' || (rec.participants || []).length === 0) {
@@ -1811,16 +1466,20 @@
         }).join('');
       }
     }
-
-    function renderCollectTab(rec, calc) {
+    function renderCollectTab(rec, calc, isDebtor) {
       if (!rec.paymentInfo) rec.paymentInfo = { fps: '', payme: '' };
       document.getElementById('inputPaymentFps').value = rec.paymentInfo.fps || '';
+      document.getElementById('inputPaymentFps').readOnly = isDebtor;
       document.getElementById('inputPaymentPayme').value = rec.paymentInfo.payme || '';
+      document.getElementById('inputPaymentPayme').readOnly = isDebtor;
+      
+      document.getElementById('clearPaymentBtn').style.display = isDebtor ? 'none' : 'block';
+      document.getElementById('markAllPaidBtn').style.display = isDebtor ? 'none' : 'block';
 
       document.getElementById('collectionCardsContainer').innerHTML = calc.itemBreakdown.map((ib,i) => `
         <div class="bg-white p-3 rounded-2xl shadow-xs border flex items-center justify-between ${ib.paid?'border-emerald-300 bg-emerald-50/30':'border-panda-100'}">
           <div class="flex items-center gap-2.5">
-            <button onclick="toggleItemPaid('${ib.id}')" class="w-8 h-8 rounded-xl flex items-center justify-center ${ib.paid?'bg-emerald-500 text-white':'bg-panda-50 text-panda-600'}"><i class="fa-solid fa-check"></i></button>
+            <button ${isDebtor ? 'disabled' : `onclick="toggleItemPaid('${ib.id}')"`} class="w-8 h-8 rounded-xl flex items-center justify-center ${ib.paid?'bg-emerald-500 text-white':'bg-panda-50 text-panda-600'}"><i class="fa-solid fa-check"></i></button>
             <div>
               <div class="font-bold text-xs sm:text-sm text-neutral-800 ${ib.paid?'line-through text-neutral-400':''}">${i+1}. ${escapeHtml(ib.name)} ${ib.assignedNames.length?`<span class="text-[10px] bg-panda-50 text-panda-700 px-1 rounded">${ib.assignedNames.join(',')}</span>`:''}</div>
               <div class="text-[11px] text-neutral-500">原價$${ib.originalPrice.toFixed(1)} → 減$${ib.discountShare.toFixed(1)} 加$${ib.feeShare.toFixed(1)}</div>
@@ -1832,7 +1491,6 @@
           </div>
         </div>
       `).join('');
-
       const l = [];
       l.push(`🍱 *【${rec.title} - ${rec.platform || '外賣'}折實夾錢清單】*`);
       if (rec.restaurant) l.push(`🏪 餐廳：${rec.restaurant} (${rec.date || ''})`);
@@ -1862,74 +1520,57 @@
       });
       renderActiveRecordAll();
     }
-
     function updateOrderMetadata() {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r) return;
       r.title = document.getElementById('orderTitleInput').value.trim();
       r.date = document.getElementById('orderDateInput').value;
       r.restaurant = document.getElementById('orderRestaurantInput').value.trim();
       saveDatabase(); renderActiveRecordAll();
     }
-
     function handlePlatformChange(p) {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r) return;
-      r.platform = p;
-      r.verifiedPromos = [...(PLATFORM_PROMOS[p] || PLATFORM_PROMOS['foodpanda'])];
-      applyPlatformTheme(p);
-      saveDatabase();
-      renderActiveRecordAll();
-      showToast(`已切換為 ${p} 主題配色！`);
+      r.platform = p; r.verifiedPromos = [...(PLATFORM_PROMOS[p] || PLATFORM_PROMOS['foodpanda'])];
+      applyPlatformTheme(p); saveDatabase(); renderActiveRecordAll(); showToast(`已切換為 ${p} 主題配色！`);
     }
-
     function addNewItem() {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r) return;
-      const pInput = document.getElementById('newItemPrice');
-      const nInput = document.getElementById('newItemName');
+      const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName');
       const p = parseFloat(pInput.value);
       if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; }
-      const n = nInput.value.trim() || `餐點 #${r.items.length + 1}`;
+      const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`;
       r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false });
-      nInput.value = ''; pInput.value = '';
-      saveDatabase(); renderActiveRecordAll();
-      showToast(`已加入「${n}」($${p})`);
+      nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`);
     }
-
     function addRapidBatchPrices() {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r) return;
       const input = document.getElementById('rapidBatchPricesInput');
       const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0);
       if (nums.length === 0) { showToast('請輸入至少一個金額'); return; }
-      nums.forEach((p, idx) => {
-        const numLabel = r.items.length + 1;
-        r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${numLabel}`, price: p, assignedTo: [], paid: false });
-      });
-      input.value = '';
-      saveDatabase(); renderActiveRecordAll();
-      showToast(`已極速加入 ${nums.length} 項餐點！`);
+      nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false }); });
+      input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`);
     }
-
     function clearAllItems() {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r || r.items.length === 0) return;
       if (!confirm('確定要清空目前清單中的所有餐點嗎？')) return;
       r.items = []; saveDatabase(); renderActiveRecordAll(); showToast('已清空餐點清單');
     }
-
     function applyVerifiedPromo(idx) {
-      const rec = getActiveRecord(); if (!rec) return;
-      const p = (rec.verifiedPromos || [])[idx]; if (!p) return;
-      rec.discount.mode = p.mode || 'percent_cap';
-      rec.discount.percentOff = Number(p.percentOff) || 0;
-      rec.discount.capAmount = Number(p.capAmount) || 0;
-      saveDatabase(); renderActiveRecordAll();
-      showToast(`已套用優惠：${p.title}`);
+      if (appMode === 'debtor') return;
+      const rec = getActiveRecord(); if (!rec) return; const p = (rec.verifiedPromos || [])[idx]; if (!p) return;
+      rec.discount.mode = p.mode || 'percent_cap'; rec.discount.percentOff = Number(p.percentOff) || 0; rec.discount.capAmount = Number(p.capAmount) || 0;
+      saveDatabase(); renderActiveRecordAll(); showToast(`已套用優惠：${p.title}`);
     }
-
-    function clearAllParticipants() { const r = getActiveRecord(); if (!r) return; r.participants = []; r.items.forEach(i => i.assignedTo = []); breakdownViewMode = 'item'; saveDatabase(); renderActiveRecordAll(); showToast('已清空成員'); }
-    function removeParticipant(pid) { const r = getActiveRecord(); r.participants = (r.participants || []).filter(p => p.id !== pid); r.items.forEach(i => i.assignedTo = (i.assignedTo || []).filter(id => id !== pid)); saveDatabase(); renderActiveRecordAll(); }
-    function toggleItemAssignee(iid, pid) { const r = getActiveRecord(); const i = r.items.find(x => x.id === iid); if (!i) return; if (!i.assignedTo) i.assignedTo = []; const idx = i.assignedTo.indexOf(pid); if (idx >= 0) i.assignedTo.splice(idx, 1); else i.assignedTo.push(pid); saveDatabase(); renderActiveRecordAll(); }
-    function setDiscountMode(m) { getActiveRecord().discount.mode = m; saveDatabase(); renderActiveRecordAll(); }
-
+    function clearAllParticipants() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.participants = []; r.items.forEach(i => i.assignedTo = []); breakdownViewMode = 'item'; saveDatabase(); renderActiveRecordAll(); showToast('已清空成員'); }
+    function removeParticipant(pid) { if (appMode === 'debtor') return; const r = getActiveRecord(); r.participants = (r.participants || []).filter(p => p.id !== pid); r.items.forEach(i => i.assignedTo = (i.assignedTo || []).filter(id => id !== pid)); saveDatabase(); renderActiveRecordAll(); }
+    function toggleItemAssignee(iid, pid) { if (appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === iid); if (!i) return; if (!i.assignedTo) i.assignedTo = []; const idx = i.assignedTo.indexOf(pid); if (idx >= 0) i.assignedTo.splice(idx, 1); else i.assignedTo.push(pid); saveDatabase(); renderActiveRecordAll(); }
+    function setDiscountMode(m) { if (appMode === 'debtor') return; getActiveRecord().discount.mode = m; saveDatabase(); renderActiveRecordAll(); }
     function updateDiscountParams() {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r) return;
       r.discount.directAmount = parseFloat(document.getElementById('inputDiscountDirect').value) || 0;
       r.discount.fixedAmount = parseFloat(document.getElementById('inputDiscountFixed').value) || 0;
@@ -1938,60 +1579,55 @@
       r.discount.overrideFinalTotal = parseFloat(document.getElementById('inputReceiptOverride').value) || 0;
       saveDatabase(); renderActiveRecordAll();
     }
-
     function updateFeeParams() {
+      if (appMode === 'debtor') return;
       const r = getActiveRecord(); if (!r) return;
       r.fees.delivery = parseFloat(document.getElementById('inputFeeDelivery').value) || 0;
       r.fees.platform = parseFloat(document.getElementById('inputFeePlatform').value) || 0;
       r.fees.packaging = parseFloat(document.getElementById('inputFeePackaging').value) || 0;
       saveDatabase(); renderActiveRecordAll();
     }
-
-    function setFeeSplitMode(m) { getActiveRecord().fees.splitMode = m; saveDatabase(); renderActiveRecordAll(); }
-    function setRoundingMode(m) { getActiveRecord().fees.rounding = m; saveDatabase(); renderActiveRecordAll(); }
+    function setFeeSplitMode(m) { if (appMode === 'debtor') return; getActiveRecord().fees.splitMode = m; saveDatabase(); renderActiveRecordAll(); }
+    function setRoundingMode(m) { if (appMode === 'debtor') return; getActiveRecord().fees.rounding = m; saveDatabase(); renderActiveRecordAll(); }
     function setBreakdownViewMode(m) { const r = getActiveRecord(); if (m === 'person' && (!r.participants || r.participants.length === 0)) { showToast('未設成員'); breakdownViewMode = 'item'; } else { breakdownViewMode = m; } renderActiveRecordAll(); }
-    function toggleItemPaid(id) { const i = getActiveRecord().items.find(x => x.id === id); if (i) { i.paid = !i.paid; saveDatabase(); renderActiveRecordAll(); } }
-    function markAllPaid(s) { getActiveRecord().items.forEach(i => i.paid = s); saveDatabase(); renderActiveRecordAll(); }
-
+    function toggleItemPaid(id) { if (appMode === 'debtor') return; const i = getActiveRecord().items.find(x => x.id === id); if (i) { i.paid = !i.paid; saveDatabase(); renderActiveRecordAll(); } }
+    function markAllPaid(s) { if (appMode === 'debtor') return; getActiveRecord().items.forEach(i => i.paid = s); saveDatabase(); renderActiveRecordAll(); }
     function updatePaymentInfo() {
-      const r = getActiveRecord(); if (!r) return;
-      if (!r.paymentInfo) r.paymentInfo = { fps: '', payme: '' };
-      r.paymentInfo.fps = document.getElementById('inputPaymentFps').value;
-      r.paymentInfo.payme = document.getElementById('inputPaymentPayme').value;
+      if (appMode === 'debtor') return;
+      const r = getActiveRecord(); if (!r) return; if (!r.paymentInfo) r.paymentInfo = { fps: '', payme: '' };
+      r.paymentInfo.fps = document.getElementById('inputPaymentFps').value; r.paymentInfo.payme = document.getElementById('inputPaymentPayme').value;
       saveDatabase(); renderActiveRecordAll();
     }
-
     function clearPaymentInfoFields() {
-      const r = getActiveRecord(); if (!r) return;
-      r.paymentInfo = { fps: '', payme: '' };
-      document.getElementById('inputPaymentFps').value = '';
-      document.getElementById('inputPaymentPayme').value = '';
-      saveDatabase(); renderActiveRecordAll();
-      showToast('已清空收款資料欄目');
+      if (appMode === 'debtor') return;
+      const r = getActiveRecord(); if (!r) return; r.paymentInfo = { fps: '', payme: '' };
+      document.getElementById('inputPaymentFps').value = ''; document.getElementById('inputPaymentPayme').value = '';
+      saveDatabase(); renderActiveRecordAll(); showToast('已清空收款資料欄目');
     }
-
     function copyShareMessage() { navigator.clipboard.writeText(document.getElementById('whatsappMessageOutput').value).then(() => showToast('已複製催收清單')); }
     function copySingleItemReminder(id) {
-      const r = getActiveRecord();
-      const ib = calculateRecordBill(r).itemBreakdown.find(x => x.id === id);
-      if (!ib) return;
+      const r = getActiveRecord(); const ib = calculateRecordBill(r).itemBreakdown.find(x => x.id === id); if (!ib) return;
       const pInfo = r.paymentInfo || { fps: '', payme: '' };
       const payLine = (pInfo.fps || pInfo.payme) ? `\n📲 FPS: ${pInfo.fps || '-'} / PayMe: ${pInfo.payme || '-'}` : '';
       navigator.clipboard.writeText(`🍱 【${r.title}】餐點：*${ib.name}*\n• 折實應付：*$${ib.finalPayable.toFixed(1)}*${payLine}`).then(() => showToast('已複製'));
     }
-
-    function openAddParticipantModal() { document.getElementById('modalParticipantName').value = ''; document.getElementById('participantModal').classList.remove('hidden'); setTimeout(() => document.getElementById('modalParticipantName').focus(), 80); }
+    function openAddParticipantModal() { if (appMode === 'debtor') return; document.getElementById('modalParticipantName').value = ''; document.getElementById('participantModal').classList.remove('hidden'); setTimeout(() => document.getElementById('modalParticipantName').focus(), 80); }
     function closeParticipantModal() { document.getElementById('participantModal').classList.add('hidden'); }
-    function confirmAddParticipant() { const r = getActiveRecord(); const n = document.getElementById('modalParticipantName').value.trim(); if (!n) return; if (!r.participants) r.participants = []; r.participants.push({ id: 'p_' + Date.now(), name: n }); closeParticipantModal(); saveDatabase(); renderActiveRecordAll(); }
+    function confirmAddParticipant() {
+      if (appMode === 'debtor') return;
+      const r = getActiveRecord(); const n = sanitizeCleanName(document.getElementById('modalParticipantName').value);
+      if (!n) return; if (!r.participants) r.participants = [];
+      r.participants.push({ id: 'p_' + Date.now(), name: n }); closeParticipantModal(); saveDatabase(); renderActiveRecordAll();
+    }
     function toggleReceiptDrawer() { document.getElementById('receiptDrawer').classList.toggle('hidden'); }
-
     function openItemActionSheet(id) {
+      if (appMode === 'debtor') return;
       const i = getActiveRecord().items.find(x => x.id === id); if (!i) return;
       document.getElementById('actionSheetTitle').textContent = `編輯：${i.name}`;
       document.getElementById('actionSheetBody').innerHTML = `
         <div class="grid grid-cols-2 gap-2 mb-2">
           <div><label class="text-[11px] text-neutral-500">名稱</label><input id="editItemName" value="${escapeHtml(i.name)}" class="w-full px-2 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl" /></div>
-          <div><label class="text-[11px] text-neutral-500">原價 ($) (點選用內建鍵盤)</label><input id="editItemPrice" type="text" inputmode="none" readonly onclick="openNumericKeypad('editItemPrice', '修改餐點原價 ($)')" value="${i.price}" class="w-full px-2 py-1.5 text-xs font-bold bg-panda-50/40 border border-panda-200 rounded-xl cursor-pointer" /></div>
+          <div><label class="text-[11px] text-neutral-500">原價 ($) (點選用鍵盤)</label><input id="editItemPrice" type="text" inputmode="none" readonly onclick="openNumericKeypad('editItemPrice', '修改餐點原價 ($)')" value="${i.price}" class="w-full px-2 py-1.5 text-xs font-bold bg-panda-50/40 border border-panda-200 rounded-xl cursor-pointer" /></div>
         </div>
         <button onclick="saveItemEdit('${i.id}')" class="w-full py-2.5 rounded-xl bg-panda-600 text-white font-bold text-xs mb-1">儲存</button>
         <div class="grid grid-cols-2 gap-2">
@@ -2002,18 +1638,16 @@
       document.getElementById('actionSheetModal').classList.remove('hidden');
     }
     function closeActionSheet() { closeNumericKeypad(); document.getElementById('actionSheetModal').classList.add('hidden'); }
-    function saveItemEdit(id) { const i = getActiveRecord().items.find(x => x.id === id); if (!i) return; const n = document.getElementById('editItemName').value.trim(); const p = parseFloat(document.getElementById('editItemPrice').value); if (n && !isNaN(p) && p >= 0) { i.name = n; i.price = p; closeActionSheet(); saveDatabase(); renderActiveRecordAll(); } }
-    function duplicateItem(id) { const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false }); saveDatabase(); renderActiveRecordAll(); }
-    function deleteItem(id) { const r = getActiveRecord(); r.items = r.items.filter(x => x.id !== id); saveDatabase(); renderActiveRecordAll(); }
+    function saveItemEdit(id) { if(appMode === 'debtor') return; const i = getActiveRecord().items.find(x => x.id === id); if (!i) return; const n = sanitizeCleanName(document.getElementById('editItemName').value); const p = parseFloat(document.getElementById('editItemPrice').value); if (n && !isNaN(p) && p >= 0) { i.name = n; i.price = p; closeActionSheet(); saveDatabase(); renderActiveRecordAll(); } }
+    function duplicateItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false }); saveDatabase(); renderActiveRecordAll(); }
+    function deleteItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); r.items = r.items.filter(x => x.id !== id); saveDatabase(); renderActiveRecordAll(); }
     function openCloudModal() { document.getElementById('cloudRoomIdInput').value = currentRoomId; document.getElementById('cloudModal').classList.remove('hidden'); }
     function closeCloudModal() { document.getElementById('cloudModal').classList.add('hidden'); }
     function joinCloudRoom() { const v = document.getElementById('cloudRoomIdInput').value.trim().toUpperCase(); if (!v) return; currentRoomId = v; localStorage.setItem('panda_room_id', currentRoomId); if (window._firebaseBridge) window._firebaseBridge.subscribeRoom(currentRoomId); closeCloudModal(); }
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
-
     window.addEventListener('DOMContentLoaded', () => { initAuthLock(); });
   </script>
-
   <!-- ========================================================= -->
   <!-- FIREBASE CLOUD SYNC (rice-money-back)                     -->
   <!-- ========================================================= -->
@@ -2032,12 +1666,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v5', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v6', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v5', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v6', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
