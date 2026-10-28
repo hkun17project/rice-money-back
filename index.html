@@ -62,7 +62,7 @@
   </style>
 </head>
 <body data-theme="foodpanda" class="min-h-screen pb-28 md:pb-10">
-  <!-- 1. PASSCODE LOCK SCREEN (密碼: 246135) -->
+  <!-- 1. PASSCODE LOCK SCREEN -->
   <div id="passcodeScreen" class="fixed inset-0 z-50 theme-header-gradient flex flex-col items-center justify-center p-6 text-white">
     <div class="w-full max-w-xs text-center space-y-5">
       <div class="mx-auto w-20 h-20 rounded-3xl bg-white text-panda-600 flex items-center justify-center shadow-2xl text-4xl"><i class="fa-solid fa-bowl-rice"></i></div>
@@ -73,18 +73,10 @@
       </div>
       <p id="passcodeHint" class="text-xs text-amber-200 font-semibold h-4">請輸入 6 位數通行密碼解鎖</p>
       <div class="grid grid-cols-3 gap-3 max-w-[260px] mx-auto pt-1">
-        <button onclick="pressPinDigit('1')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">1</button>
-        <button onclick="pressPinDigit('2')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">2</button>
-        <button onclick="pressPinDigit('3')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">3</button>
-        <button onclick="pressPinDigit('4')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">4</button>
-        <button onclick="pressPinDigit('5')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">5</button>
-        <button onclick="pressPinDigit('6')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">6</button>
-        <button onclick="pressPinDigit('7')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">7</button>
-        <button onclick="pressPinDigit('8')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">8</button>
-        <button onclick="pressPinDigit('9')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">9</button>
-        <button onclick="clearPinDigits()" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold transition">清除</button>
-        <button onclick="pressPinDigit('0')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">0</button>
-        <button onclick="backspacePinDigit()" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-base font-bold transition"><i class="fa-solid fa-delete-left"></i></button>
+        <button onclick="pressPinDigit('1')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">1</button><button onclick="pressPinDigit('2')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">2</button><button onclick="pressPinDigit('3')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">3</button>
+        <button onclick="pressPinDigit('4')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">4</button><button onclick="pressPinDigit('5')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">5</button><button onclick="pressPinDigit('6')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">6</button>
+        <button onclick="pressPinDigit('7')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">7</button><button onclick="pressPinDigit('8')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">8</button><button onclick="pressPinDigit('9')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">9</button>
+        <button onclick="clearPinDigits()" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold transition">清除</button><button onclick="pressPinDigit('0')" class="h-14 rounded-2xl bg-white/15 hover:bg-white/25 active:scale-95 text-xl font-extrabold transition">0</button><button onclick="backspacePinDigit()" class="h-14 rounded-2xl bg-white/10 hover:bg-white/20 active:scale-95 text-base font-bold transition"><i class="fa-solid fa-delete-left"></i></button>
       </div>
     </div>
   </div>
@@ -185,7 +177,7 @@
         <div class="grid grid-cols-3 gap-1.5" id="receiptToolsActionGrid">
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste text-sm"></i><span>1. 貼上收據</span><span class="text-[9px] opacity-80 font-normal">自動匯入資訊</span></button>
           <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">支援多張長圖</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
-          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">Y-Axis空間重組</span></button>
+          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">精準小數點還原</span></button>
         </div>
         <div id="receiptGalleryStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
         <div id="zoomReceiptBox" class="hidden bg-black/60 p-2 rounded-xl border border-neutral-700 max-h-64 overflow-y-auto">
@@ -356,11 +348,11 @@
   <div id="smartPasteModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3.5 border border-panda-100">
       <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
-        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領 1x/2x 餐點及匯入所有費用</p></div></div>
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用</p></div></div>
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
-        <textarea id="smartPasteTextarea" rows="8" placeholder="請貼上收據文字...&#10;• 全面自動濾除特殊符號&#10;• 支援「訂購於」或頂部提取餐廳名稱&#10;• 支援 1x/2x/3x 等所有點餐格式" class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
+        <textarea id="smartPasteTextarea" rows="8" placeholder="請貼上收據文字...&#10;• 全面自動濾除特殊符號&#10;• 支援「訂購於」或頂部提取餐廳名稱&#10;• 支援智能識別被劃線的原價，只提取最終折實價" class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
         <div class="flex gap-2 pt-1">
           <button onclick="closeSmartPasteModal()" class="py-2.5 px-4 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
           <button onclick="parseSmartTextAndImport(false)" class="flex-1 py-2.5 rounded-xl bg-panda-100 text-panda-700 font-bold">附加餐點</button>
@@ -415,8 +407,8 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v7';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v7';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v8';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v8';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     const PLATFORM_PROMOS = {
@@ -433,18 +425,16 @@
     
     function loadDatabase() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v6');
+        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v7');
         if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; }
       } catch (e) {}
       return JSON.parse(JSON.stringify(defaultDatabase));
     }
 
-    // ★ 強化版儲存庫：加入了防爆容量偵測
     function saveDatabase() {
       try { 
         localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); 
       } catch (e) {
-        console.error("Storage save failed:", e);
         if(e.name === 'QuotaExceededError') {
            alert('手機瀏覽器儲存空間已滿！由於安全限制，最近加入的內容或截圖可能無法保存。請嘗試刪除舊紀錄。');
         }
@@ -455,7 +445,7 @@
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
     
-    // ★ 符號過濾淨化器：全面拔除 ", ', ×, =, _, <, >, !, @, #, %, &, *, :, ;, ? 等符號
+    // ★ 全面符號淨化器：過濾所有特殊符號
     function sanitizeCleanName(str) {
       if (!str) return '';
       return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim();
@@ -533,7 +523,7 @@
       }).join('');
     }
     
-    // ★ 預設標題改為：外賣分賬 (當日日期)
+    // ★ 預設標題更新
     function createNewRecord() {
       const ts = new Date().toISOString().split('T')[0];
       const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
@@ -581,20 +571,18 @@
       return { totalOriginal: totalOrig, totalDiscount: totalDisc, totalFees, sumRoundedCollectible: sumRound, effectiveRatio: totalOrig > 0 ? ((totalOrig - totalDisc) / totalOrig) * 100 : 100, discountRuleSummary: dSum, itemBreakdown, personBreakdown };
     }
 
-    // --- 5. ENHANCED RECEIPT PARSER ---
+    // --- 5. ENHANCED RECEIPT PARSER (INTELLIGENT DECIMALS & FALLBACK) ---
     function openSmartPasteModal() { if (appMode === 'debtor') return; closeNumericKeypad(); document.getElementById('smartPasteTextarea').value = ''; document.getElementById('smartPasteModal').classList.remove('hidden'); setTimeout(() => document.getElementById('smartPasteTextarea').focus(), 80); }
     function closeSmartPasteModal() { document.getElementById('smartPasteModal').classList.add('hidden'); }
     
-    // ★ 智能銀碼提取：提取最後一組看起來像金額的數字，防雜訊
+    // ★ 智慧提取整段文字裡「最後一個」合理金額，免疫原價被劃線干擾
     function extractLastPrice(str) {
       if (!str) return null;
-      const matches = str.match(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*(\d+(?:\.\d{1,2})?)/gi);
-      if (matches && matches.length > 0) {
-        const lastMatch = matches[matches.length - 1];
-        const numMatch = lastMatch.match(/(\d+(?:\.\d{1,2})?)/);
-        if (numMatch) return parseFloat(numMatch[1]);
-      }
-      return null;
+      let cleaned = str.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2'); 
+      const regex = /(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*(\d+(?:\.\d{1,2})?)/gi;
+      let lastVal = null; let match;
+      while ((match = regex.exec(cleaned)) !== null) { lastVal = parseFloat(match[1]); }
+      return lastVal;
     }
     
     function extractFeeFromLineOrNext(lines, idx) {
@@ -603,7 +591,7 @@
       if (idx + 1 < lines.length) {
         const nextLine = lines[idx + 1];
         const valNext = extractLastPrice(nextLine);
-        if (valNext !== null && /^(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(nextLine.trim())) {
+        if (valNext !== null && /^(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(nextLine.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2').trim())) {
           return { val: valNext, nextIdx: idx + 1 };
         }
       }
@@ -623,7 +611,8 @@
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       const extractedItems = []; const seenFingerprints = new Set();
       let duplicatesSkipped = 0; let detectedRestaurant = null; let detectedDelivery = null; let detectedPlatformFee = null; let detectedPackagingFee = null; let detectedDirectDiscount = null; let detectedVoucher = null; let detectedFinalTotal = null;
-      const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*\#|訂\s*購\s*[於放菸自]|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*[台臺合]\s*費|平\s*[台臺合]\s*服\s*務\s*費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費)/i;
+      
+      const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*\#|訂\s*購\s*[於放菸自]|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費)/i;
       const hasAnyQtyMarkers = lines.some(l => matchQuantityPrefix(l) !== null);
       let pendingItemName = null; let pendingQty = 1; let pendingLockedByQty = false;
       let possibleHeaderLines = [];
@@ -632,7 +621,7 @@
         const line = lines[i].replace(/\s+/g, ' ').trim();
         if (i < 5 && !matchQuantityPrefix(line) && !/(foodpanda|keeta|uber eats|order|delivery|total|小計|平台|HK\$|\d{2}:\d{2})/i.test(line)) possibleHeaderLines.push(line);
 
-        // 1. "訂購於"
+        // 1. Restaurant
         const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
         if (restHeaderMatch) {
           let candidate = restHeaderMatch[1].replace(/\s*(?:HK\s*[\$S5s]|\$).*$/i, '').trim();
@@ -644,42 +633,45 @@
           pendingItemName = null; pendingLockedByQty = false; continue;
         }
 
-        const qtyInfo = matchQuantityPrefix(line);
+        // 2. Fees & Discounts
+        if (/(平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line)) { if (/免\s*運\s*費|free/i.test(line)) detectedDelivery = 0; else { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
 
-        // ★ 僅在不屬於 "數量x" (即餐點行) 的情況下，才去辨識費用/優惠，防止衝突
-        if (!qtyInfo) {
-          if (/(平\s*[台臺合]\s*.*費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line)) { if (/免\s*運\s*費|free/i.test(line)) detectedDelivery = 0; else { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        }
-
+        // 3. Blacklist
         if (nonItemBlacklistRegex.test(line)) { pendingItemName = null; pendingLockedByQty = false; continue; }
 
+        // 4. Qty Marker items
+        const qtyInfo = matchQuantityPrefix(line);
         if (qtyInfo) {
           const parsedQty = qtyInfo.qty; let restOfLine = qtyInfo.rest;
           if (!restOfLine && i + 1 < lines.length) {
             const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
             if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { restOfLine = nextLine; i++; }
           }
-          const cleanedRest = restOfLine.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2');
-          const inlinePriceMatch = cleanedRest.match(/^(.+?)\s+[-－]?\s*(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
-          if (inlinePriceMatch) {
-            let itemName = sanitizeCleanName(inlinePriceMatch[1].replace(/^[\*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim());
-            const itemPrice = parseFloat(inlinePriceMatch[2]);
-            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 10000) {
-              const fp = `${parsedQty}x_${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
-              if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, itemName, itemPrice, parsedQty); }
+          const cleanedRest = restOfLine.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2');
+          const lastPrice = extractLastPrice(cleanedRest);
+          
+          if (lastPrice !== null) {
+            let itemName = cleanedRest;
+            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
+            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
+            itemName = sanitizeCleanName(itemName.replace(/^[\*\-•·\s]+/, ''));
+            if (itemName && !nonItemBlacklistRegex.test(itemName)) {
+              const fp = `${parsedQty}x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`;
+              if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, itemName, lastPrice, parsedQty); }
             }
             pendingItemName = null; pendingLockedByQty = false; continue;
           } else {
             pendingQty = parsedQty; pendingItemName = sanitizeCleanName(restOfLine.replace(/^[\*\-•·\s]+/, '').trim()); pendingLockedByQty = true; continue;
           }
         }
-        const cleanedLine = line.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2');
-        const standalonePrice = cleanedLine.match(/^(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
+
+        const cleanedLine = line.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2');
+        const standalonePrice = cleanedLine.match(/^(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*(\d+(?:\.\d{1,2})?)\s*$/i);
         if (standalonePrice && pendingItemName) {
           const itemPrice = parseFloat(standalonePrice[1]);
           if (itemPrice > 0 && itemPrice < 10000 && !nonItemBlacklistRegex.test(pendingItemName)) {
@@ -688,23 +680,18 @@
           }
           pendingItemName = null; pendingQty = 1; pendingLockedByQty = false; continue;
         }
-        if (pendingLockedByQty && pendingItemName) {
-          const lineTrailingPrice = extractLastPrice(line);
-          if (lineTrailingPrice !== null && lineTrailingPrice > 0 && lineTrailingPrice < 10000) {
-            const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${lineTrailingPrice.toFixed(1)}`;
-            if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, pendingItemName, lineTrailingPrice, pendingQty); }
-            pendingItemName = null; pendingQty = 1; pendingLockedByQty = false;
-          }
-          continue;
-        }
+        
+        // 5. Fallback items
         if (!hasAnyQtyMarkers) {
-          const fallbackMatch = cleanedLine.match(/^(.+?)\s+(?:HK\s*[\$S5s]|[\$￥元])?\s*([0-9]+(?:\.[0-9]{1,2})?)\s*$/i);
-          if (fallbackMatch) {
-            let itemName = sanitizeCleanName(fallbackMatch[1].replace(/^[\*\-•·\s]+/, '').replace(/\s*HK\s*$/i, '').trim());
-            const itemPrice = parseFloat(fallbackMatch[2]);
-            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemPrice > 0 && itemPrice < 10000) {
-              const fp = `1x_${itemName.toLowerCase()}_${itemPrice.toFixed(1)}`;
-              if (!seenFingerprints.has(fp)) { seenFingerprints.add(fp); extractedItems.push({ name: itemName, price: itemPrice }); }
+          const lastPrice = extractLastPrice(cleanedLine);
+          if (lastPrice !== null) {
+            let itemName = cleanedLine;
+            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
+            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
+            itemName = sanitizeCleanName(itemName.replace(/^[\*\-•·\s]+/, ''));
+            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemName.length > 1) {
+              const fp = `1x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`;
+              if (!seenFingerprints.has(fp)) { seenFingerprints.add(fp); extractedItems.push({ name: itemName, price: lastPrice }); }
             }
           }
         }
@@ -758,7 +745,7 @@
     }
     function openSmartPasteWithText() { document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || ''; document.getElementById('smartPasteModal').classList.remove('hidden'); }
     
-    // ★ 圖片壓縮上傳處理：強制壓縮長截圖以防 localStorage 爆掉
+    // ★ 圖片上傳：1200px 智慧壓縮技術，徹底保留高解析文字又能節省容量防崩潰
     function handleMultiReceiptUpload(event) {
       if (appMode === 'debtor') return;
       const files = Array.from(event.target.files || []); if (files.length === 0) return;
@@ -771,14 +758,12 @@
           img.onload = () => {
             const canvas = document.createElement('canvas');
             let w = img.width; let h = img.height;
-            const MAX = 1400; // 壓縮長寬上限
-            if (w > h && w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-            else if (h > w && h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+            const MAX_WIDTH = 1200;
+            if (w > MAX_WIDTH) { h = Math.round(h * MAX_WIDTH / w); w = MAX_WIDTH; }
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, w, h);
-            // 壓縮成 60% 畫質的 JPEG，大幅減少體積
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
             rec.receipts.push({ id: 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6), name: file.name, dataUrl: dataUrl });
             loaded++;
             if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已載入 ${files.length} 張截圖！可點擊本機識圖`); }
@@ -924,9 +909,8 @@
         </div>
       `).join('');
       
-      // ★ 重新排版的 WhatsApp 文字預覽，利用斷行與縮排讓視覺更舒適清晰
       const l = [];
-      l.push(`🍱 *【${rec.title} - ${rec.platform || '外賣'}夾錢單】*`);
+      l.push(`🍱 *【${rec.title}】*`);
       if (rec.restaurant) l.push(`🏪 餐廳：${rec.restaurant}`);
       l.push(``);
       l.push(`📊 總原價：$${calc.totalOriginal.toFixed(1)} | 折扣：-$${calc.totalDiscount.toFixed(1)} | 費用：+$${calc.totalFees.toFixed(1)}`);
@@ -1024,12 +1008,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v7', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v8', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v7', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v8', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
