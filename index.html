@@ -85,18 +85,25 @@
   <div id="recordsListView" class="hidden max-w-md md:max-w-2xl mx-auto min-h-screen shadow-xl md:my-4 md:rounded-3xl md:border md:border-panda-100 overflow-hidden">
     <header class="theme-header-gradient text-white p-5 rounded-b-3xl shadow-md relative overflow-hidden">
       <div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/10 pointer-events-none"></div>
-      <div class="flex items-center justify-between relative z-10">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-white text-panda-600 flex items-center justify-center shadow-md font-extrabold text-xl"><i class="fa-solid fa-bowl-rice"></i></div>
-          <div>
-            <h1 class="font-extrabold text-lg leading-tight">外賣分賬紀錄庫</h1>
-            <div class="flex items-center gap-2 text-[11px] text-white/85 mt-0.5">
+      <div class="flex items-center justify-between relative z-10 gap-1">
+        <div class="flex items-center gap-2">
+          <div class="w-10 h-10 rounded-2xl bg-white text-panda-600 flex items-center justify-center shadow-md font-extrabold text-lg shrink-0"><i class="fa-solid fa-bowl-rice"></i></div>
+          <div class="min-w-0">
+            <h1 class="font-extrabold text-base sm:text-lg leading-tight truncate">外賣分賬紀錄庫</h1>
+            <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/85 mt-0.5">
               <button onclick="openCloudModal()" class="bg-black/25 hover:bg-black/35 px-2 py-0.5 rounded-full flex items-center gap-1 transition"><span id="listCloudDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span id="listCloudText">Firebase 同步</span></button>
-              <span id="totalRecordsCountBadge" class="bg-white/20 px-2 py-0.5 rounded-full font-bold">0 筆紀錄</span>
+              <span id="totalRecordsCountBadge" class="bg-white/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">0 筆</span>
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-1.5"><button onclick="lockApp()" title="鎖定" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-xs transition active:scale-95"><i class="fa-solid fa-lock"></i></button></div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <!-- List View Mode Toggle -->
+          <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner">
+             <button id="listModeCreditorBtn" onclick="setAppMode('creditor')" class="px-2.5 py-1 rounded-full bg-white text-panda-700 text-[10px] sm:text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
+             <button id="listModeDebtorBtn" onclick="setAppMode('debtor')" class="px-2.5 py-1 rounded-full text-white/80 hover:text-white text-[10px] sm:text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
+          </div>
+          <button onclick="lockApp()" title="鎖定" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-xs transition active:scale-95 shrink-0"><i class="fa-solid fa-lock"></i></button>
+        </div>
       </div>
       <div class="mt-4 space-y-2.5 relative z-10">
         <div class="relative">
@@ -117,7 +124,7 @@
       </div>
     </header>
     <div class="p-4 space-y-3">
-      <button onclick="createNewRecord()" class="w-full py-3.5 px-4 rounded-2xl theme-bar-gradient hover:opacity-95 text-white font-extrabold text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-98"><i class="fa-solid fa-plus-circle text-base"></i><span>新增外賣分賬紀錄</span></button>
+      <button id="createNewRecordBtn" onclick="createNewRecord()" class="w-full py-3.5 px-4 rounded-2xl theme-bar-gradient hover:opacity-95 text-white font-extrabold text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-98"><i class="fa-solid fa-plus-circle text-base"></i><span>新增外賣分賬紀錄</span></button>
       <div id="recordsListContainer" class="space-y-3 pt-1"></div>
     </div>
   </div>
@@ -130,10 +137,10 @@
         <div class="flex items-center justify-between mb-3 relative z-10">
           <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0"><i class="fa-solid fa-chevron-left"></i><span>列表</span></button>
           
-          <!-- 債主 / 債仔 Mode Toggle Switch -->
+          <!-- Detail View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
-             <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition">債主 Mode</button>
-             <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition">債仔 Mode</button>
+             <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
+             <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
           </div>
 
           <div class="flex items-center gap-1.5 shrink-0" id="headerActionBtns">
@@ -159,7 +166,7 @@
           </div>
         </div>
         
-        <!-- Live Calculation Summary with Absolute Match Badge (修復排版) -->
+        <!-- Live Calculation Summary with Absolute Match Badge -->
         <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10 items-stretch">
           <div class="flex flex-col justify-center"><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
           <div class="flex flex-col justify-center"><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
@@ -429,8 +436,8 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v11';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v11';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v12';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v12';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     const PLATFORM_PROMOS = {
@@ -447,7 +454,7 @@
     
     function loadDatabase() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v10');
+        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v11');
         if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; }
       } catch (e) {}
       return JSON.parse(JSON.stringify(defaultDatabase));
@@ -483,9 +490,22 @@
 
     function setAppMode(mode) {
       appMode = mode; const isDebtor = mode === 'debtor';
-      document.getElementById('modeCreditorBtn').className = !isDebtor ? 'px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition' : 'px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer';
-      document.getElementById('modeDebtorBtn').className = isDebtor ? 'px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition' : 'px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer';
-      document.getElementById('headerActionBtns').style.display = isDebtor ? 'none' : 'flex';
+      const activeClass = 'px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition whitespace-nowrap';
+      const inactiveClass = 'px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer whitespace-nowrap';
+      
+      const cBtn = document.getElementById('modeCreditorBtn'); if(cBtn) cBtn.className = !isDebtor ? activeClass : inactiveClass;
+      const dBtn = document.getElementById('modeDebtorBtn'); if(dBtn) dBtn.className = isDebtor ? activeClass : inactiveClass;
+      
+      const lcBtn = document.getElementById('listModeCreditorBtn'); if(lcBtn) lcBtn.className = !isDebtor ? 'px-2.5 py-1 rounded-full bg-white text-panda-700 text-[10px] sm:text-[11px] font-extrabold shadow-sm transition whitespace-nowrap' : 'px-2.5 py-1 rounded-full text-white/80 hover:text-white text-[10px] sm:text-[11px] font-bold transition cursor-pointer whitespace-nowrap';
+      const ldBtn = document.getElementById('listModeDebtorBtn'); if(ldBtn) ldBtn.className = isDebtor ? 'px-2.5 py-1 rounded-full bg-white text-panda-700 text-[10px] sm:text-[11px] font-extrabold shadow-sm transition whitespace-nowrap' : 'px-2.5 py-1 rounded-full text-white/80 hover:text-white text-[10px] sm:text-[11px] font-bold transition cursor-pointer whitespace-nowrap';
+
+      const headerActionBtns = document.getElementById('headerActionBtns');
+      if (headerActionBtns) headerActionBtns.style.display = isDebtor ? 'none' : 'flex';
+
+      const createBtn = document.getElementById('createNewRecordBtn');
+      if (createBtn) createBtn.style.display = isDebtor ? 'none' : 'flex';
+
+      renderRecordsList();
       renderActiveRecordAll();
       showToast(isDebtor ? '已切換為「債仔唯讀瀏覽模式」' : '已恢復為「債主管理模式」');
     }
@@ -518,12 +538,13 @@
     function toggleSortOrder() { sortNewestFirst = !sortNewestFirst; document.getElementById('sortOrderLabel').textContent = sortNewestFirst ? '最新優先' : '最舊優先'; renderRecordsList(); }
     function clearRecordSearch() { document.getElementById('recordSearchInput').value = ''; renderRecordsList(); }
     function renderRecordsList() {
-      const query = (document.getElementById('recordSearchInput')?.value || '').trim().toLowerCase(); document.getElementById('clearSearchBtn').classList.toggle('hidden', !query); document.getElementById('totalRecordsCountBadge').textContent = `${dbState.records.length} 筆紀錄`;
+      const query = (document.getElementById('recordSearchInput')?.value || '').trim().toLowerCase(); document.getElementById('clearSearchBtn').classList.toggle('hidden', !query); document.getElementById('totalRecordsCountBadge').textContent = `${dbState.records.length} 筆`;
       let filtered = dbState.records.filter(rec => { if (currentFilterPlatform !== 'ALL' && rec.platform !== currentFilterPlatform) return false; if (!query) return true; return (rec.title||'').toLowerCase().includes(query) || (rec.restaurant||'').toLowerCase().includes(query) || (rec.date||'').toLowerCase().includes(query) || (rec.platform||'').toLowerCase().includes(query) || (rec.items||[]).some(i => (i.name||'').toLowerCase().includes(query)); });
       filtered.sort((a, b) => { const dA = new Date(a.date || 0).getTime() || a.createdAt || 0; const dB = new Date(b.date || 0).getTime() || b.createdAt || 0; return sortNewestFirst ? (dB - dA) : (dA - dB); });
       const container = document.getElementById('recordsListContainer');
       if (filtered.length === 0) { container.innerHTML = `<div class="bg-white rounded-3xl p-10 text-center border border-dashed border-panda-200 text-neutral-400 space-y-2"><i class="fa-solid fa-folder-open text-3xl text-panda-300 block"></i><div class="text-xs font-bold text-neutral-600">尚無分賬紀錄，請點擊上方按鈕新增</div></div>`; return; }
       const badges = { 'foodpanda': 'bg-[#fff0f6] text-[#d70f64] border-[#ffc2dc]', 'Keeta': 'bg-amber-100 text-neutral-900 border-amber-300', 'Uber Eats': 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+      const isDebtor = (appMode === 'debtor');
       container.innerHTML = filtered.map(rec => {
         const calc = calculateRecordBill(rec); const t = rec.items.length; const pd = rec.items.filter(i => i.paid).length; const style = badges[rec.platform] || 'bg-indigo-50 text-indigo-700 border-indigo-200';
         return `
@@ -536,7 +557,7 @@
               </div>
               <div class="text-right flex flex-col items-end justify-between">
                 <div><div class="text-[10px] text-neutral-400">折實總應收</div><div class="font-extrabold text-base sm:text-lg text-panda-600">$${calc.sumRoundedCollectible.toFixed(1)}</div></div>
-                <button onclick="event.stopPropagation(); deleteRecord('${rec.id}')" class="mt-2 w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs transition"><i class="fa-regular fa-trash-can"></i></button>
+                ${isDebtor ? '' : `<button onclick="event.stopPropagation(); deleteRecord('${rec.id}')" class="mt-2 w-7 h-7 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs transition"><i class="fa-regular fa-trash-can"></i></button>`}
               </div>
             </div>
           </div>
@@ -544,10 +565,19 @@
       }).join('');
     }
     
+    // ★ 清空 OCR 狀態方塊的輔助函數
+    function resetOcrStatusBox() {
+        const box = document.getElementById('aiScanStatusBox');
+        if (box) box.classList.add('hidden');
+        const txt = document.getElementById('aiScanStatusText');
+        if (txt) txt.innerHTML = '準備就緒';
+    }
+
     function createNewRecord() {
-      // 確保每次建立新記錄時，把原本開啟著的任何預覽圖與畫廊收起
+      // ★ 確保每次建立新記錄時，把原本開啟著的任何預覽圖與 OCR 狀態收起並清空
       document.getElementById('zoomReceiptBox').classList.add('hidden');
       document.getElementById('zoomReceiptImg').src = '';
+      resetOcrStatusBox();
       
       const ts = new Date().toISOString().split('T')[0];
       const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
@@ -567,9 +597,10 @@
     function deleteRecord(id) { if (appMode === 'debtor') return; const t = dbState.records.find(r => r.id === id); if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; dbState.records = dbState.records.filter(r => r.id !== id); if (dbState.activeRecordId === id) dbState.activeRecordId = null; saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); }
     
     function openRecordDetail(id) { 
-      // 切換記錄前，強制關閉舊預覽圖以防殘留
+      // ★ 切換記錄前，強制關閉舊預覽圖與 OCR 狀態以防殘留
       document.getElementById('zoomReceiptBox').classList.add('hidden');
       document.getElementById('zoomReceiptImg').src = '';
+      resetOcrStatusBox();
       
       dbState.activeRecordId = id; const rec = getActiveRecord(); if (rec) applyPlatformTheme(rec.platform || 'foodpanda'); saveDatabase(); document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.remove('hidden'); renderActiveRecordAll(); 
     }
@@ -848,7 +879,7 @@
       document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`;
       document.getElementById('sumFinal').textContent = `$${calc.sumRoundedCollectible.toFixed(1)}`;
       
-      // ★ 總計核對 Badge 邏輯 (完全獨立絕對定位，不影響排版)
+      // ★ 總計核對 Badge 邏輯 (完全獨立絕對定位)
       const matchBadge = document.getElementById('totalMatchBadge');
       if (rec.receiptTotal > 0) {
         const diff = Math.abs(calc.sumRoundedCollectible - rec.receiptTotal);
@@ -1074,12 +1105,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v11', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v12', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v11', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v12', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
@@ -1087,13 +1118,11 @@
               if (data && data.dbPayload && data.updatedBy !== clientUid) {
                 isApplyingRemoteUpdate = true;
                 
-                // ★ 收到雲端更新時，預先備份本機的所有截圖
                 const localReceiptsMap = {};
                 dbState.records.forEach(r => { localReceiptsMap[r.id] = r.receipts || []; });
                 
                 dbState = data.dbPayload;
                 
-                // ★ 寫入雲端數據後，將本機截圖還原，確保圖片永不消失
                 dbState.records.forEach(r => {
                   if (localReceiptsMap[r.id] && localReceiptsMap[r.id].length > 0) {
                     r.receipts = localReceiptsMap[r.id];
