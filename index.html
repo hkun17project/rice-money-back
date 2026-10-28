@@ -130,7 +130,7 @@
         <div class="flex items-center justify-between mb-3 relative z-10">
           <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0"><i class="fa-solid fa-chevron-left"></i><span>列表</span></button>
           
-          <!-- 債主 / 債仔 Mode Toggle Switch -->
+          <!-- 債主 / 債仔 Mode -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
              <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition">債主 Mode</button>
              <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition">債仔 Mode</button>
@@ -158,17 +158,16 @@
             </div>
           </div>
         </div>
-        <!-- Live Calculation Summary -->
+        <!-- Live Calculation Summary with Match Badge -->
         <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10">
           <div><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
-          <div><div class="text-[11px] text-amber-200">總折扣優惠</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
+          <div><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
           <div><div class="text-[11px] text-white/80">運費/平台費</div><div id="sumFees" class="font-bold text-sm sm:text-base text-white mt-0.5">+$0.0</div></div>
-          <div class="bg-white text-panda-600 rounded-xl py-1 px-1 shadow-xs relative">
-            <div class="text-[10px] font-bold uppercase tracking-tight">最終實付</div>
-            <div class="flex justify-center items-center gap-1 mt-0.5">
-              <div id="sumFinal" class="font-extrabold text-sm sm:text-base">$0.0</div>
-              <div id="totalMatchBadge" class="hidden"></div>
+          <div class="bg-white text-panda-600 rounded-xl py-1 px-1 shadow-xs flex flex-col justify-center items-center relative overflow-hidden">
+            <div class="text-[10px] font-bold uppercase tracking-tight flex items-center justify-center w-full">
+              最終實付 <span id="totalMatchBadge" class="flex items-center"></span>
             </div>
+            <div id="sumFinal" class="font-extrabold text-sm sm:text-base mt-0.5">$0.0</div>
           </div>
         </div>
         <div class="mt-2.5 flex items-center justify-between text-xs text-white px-1 relative z-10">
@@ -183,7 +182,7 @@
         <div class="grid grid-cols-3 gap-1.5" id="receiptToolsActionGrid">
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste text-sm"></i><span>1. 貼上收據</span><span class="text-[9px] opacity-80 font-normal">自動匯入資訊</span></button>
           <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">支援多張長圖</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
-          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">精準小數點還原</span></button>
+          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">總計智能核對</span></button>
         </div>
         <div id="receiptGalleryStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
         <div id="zoomReceiptBox" class="hidden bg-black/60 p-2 rounded-xl border border-neutral-700 max-h-64 overflow-y-auto">
@@ -268,12 +267,12 @@
               <button onclick="setDiscountMode('receipt_exact')" id="modeBtn-receipt_exact" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"><div class="flex items-center justify-between"><span class="text-xs font-bold">按收據「折扣+優惠券」</span><i class="fa-solid fa-receipt text-xs"></i></div></button>
               <button onclick="setDiscountMode('percent_cap')" id="modeBtn-percent_cap" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"><div class="flex items-center justify-between"><span class="text-xs font-bold">百分比折數 + 上限</span><i class="fa-solid fa-crown text-xs"></i></div></button>
               <button onclick="setDiscountMode('percent')" id="modeBtn-percent" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"><div class="flex items-center justify-between"><span class="text-xs font-bold">純百分比折扣 (%)</span><i class="fa-solid fa-percent text-xs"></i></div></button>
-              <button onclick="setDiscountMode('override')" id="modeBtn-override" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"><div class="flex items-center justify-between"><span class="text-xs font-bold">按「總計 HK$」反推</span><i class="fa-solid fa-wand-magic-sparkles text-xs"></i></div></button>
+              <button onclick="setDiscountMode('override')" id="modeBtn-override" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"><div class="flex items-center justify-between"><span class="text-xs font-bold">按「目標實付」反推</span><i class="fa-solid fa-wand-magic-sparkles text-xs"></i></div></button>
             </div>
             <div id="discountParamsBox" class="p-3 bg-panda-50/40 rounded-xl border border-panda-100 space-y-3">
               <div id="paramRow-percent" class="flex items-center justify-between gap-3"><div><label class="text-xs font-bold text-neutral-800 block">折扣減免百分比 (% Off)</label></div><div class="flex items-center gap-1.5"><input id="inputDiscountPercent" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputDiscountPercent', '折扣減免百分比 (% Off)')" value="20" class="w-20 px-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl cursor-pointer text-panda-600" /><span class="text-xs font-bold text-panda-700">%</span></div></div>
               <div id="paramRow-cap" class="flex items-center justify-between gap-3 pt-2 border-t border-panda-100"><div><label class="text-xs font-bold text-neutral-800 block">最高折扣金額上限 (Cap $)</label></div><div class="relative"><span class="absolute left-2.5 top-1.5 text-xs text-neutral-400">$</span><input id="inputDiscountCap" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputDiscountCap', '最高折扣上限 (Cap $)')" value="60" class="w-24 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border border-panda-200 rounded-xl cursor-pointer text-panda-600" /></div></div>
-              <div id="paramRow-override" class="hidden flex items-center justify-between gap-3"><div><label class="text-xs font-bold text-panda-700 block">收據「總計 HK$」實付總額 ($)</label></div><div class="relative"><span class="absolute left-2.5 top-1.5 text-xs text-panda-400">$</span><input id="inputReceiptOverride" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputReceiptOverride', '收據「總計 HK$」最終實付金額')" value="0" class="w-28 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border-2 border-panda-500 text-panda-600 rounded-xl cursor-pointer" /></div></div>
+              <div id="paramRow-override" class="hidden flex items-center justify-between gap-3"><div><label class="text-xs font-bold text-panda-700 block">手動設定最終實付金額 ($)</label></div><div class="relative"><span class="absolute left-2.5 top-1.5 text-xs text-panda-400">$</span><input id="inputReceiptOverride" type="text" inputmode="none" readonly onclick="openNumericKeypad('inputReceiptOverride', '強制設定最終實付金額')" value="0" class="w-28 pl-6 pr-2.5 py-1.5 text-right font-extrabold text-sm bg-white border-2 border-panda-500 text-panda-600 rounded-xl cursor-pointer" /></div></div>
             </div>
             <div id="discountStatusBanner" class="p-3 rounded-xl bg-panda-50 border border-panda-200 text-xs text-panda-800 flex items-start gap-2"><i class="fa-solid fa-circle-info mt-0.5 text-panda-600"></i><div id="discountExplanationText">計算中...</div></div>
             <div class="pt-2 border-t border-panda-100/80 space-y-2.5">
@@ -358,7 +357,7 @@
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
-        <textarea id="smartPasteTextarea" rows="8" placeholder="請貼上收據文字...&#10;• 全面自動濾除特殊符號&#10;• 支援「訂購於」提取餐廳名稱&#10;• 支援智能識別被劃線的原價，只提取最終金額" class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
+        <textarea id="smartPasteTextarea" rows="8" placeholder="請貼上收據文字...&#10;• 全面自動濾除特殊符號&#10;• 支援「訂購於」或頂部提取餐廳名稱&#10;• 支援智能識別被劃線的原價，只提取最終折實價" class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
         <div class="flex gap-2 pt-1">
           <button onclick="closeSmartPasteModal()" class="py-2.5 px-4 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
           <button onclick="parseSmartTextAndImport(false)" class="flex-1 py-2.5 rounded-xl bg-panda-100 text-panda-700 font-bold">附加餐點</button>
@@ -413,8 +412,8 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v9';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v9';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v10';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v10';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     const PLATFORM_PROMOS = {
@@ -423,8 +422,6 @@
       'Uber Eats': [ { title: 'Uber One 全單 85折 (上限$50)', badge: 'Uber One', mode: 'percent_cap', percentOff: 15, capAmount: 50 }, { title: '精選餐廳全單 8折 (上限$60)', badge: '限時推廣', mode: 'percent_cap', percentOff: 20, capAmount: 60 } ],
       '其他平台': [ { title: '全單 9折優惠', badge: '通用', mode: 'percent', percentOff: 10, capAmount: 0 } ]
     };
-    
-    // DB Schema Added: expectedTotal to store receipt total for validation badge
     const defaultDatabase = { activeRecordId: null, paymentInfo: { fps: '', payme: '' }, records: [] };
     let dbState = loadDatabase();
     let currentRoomId = (localStorage.getItem('panda_room_id') || 'PANDA-8842').toUpperCase();
@@ -433,22 +430,27 @@
     
     function loadDatabase() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v8');
+        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v9');
         if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; }
       } catch (e) {}
       return JSON.parse(JSON.stringify(defaultDatabase));
     }
 
     function saveDatabase() {
-      try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); } 
-      catch (e) { if(e.name === 'QuotaExceededError') alert('手機瀏覽器儲存空間已滿！由於安全限制，最近加入的內容或截圖可能無法保存。請嘗試刪除舊紀錄。'); }
+      try { 
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); 
+      } catch (e) {
+        if(e.name === 'QuotaExceededError') {
+           alert('手機瀏覽器儲存空間已滿！由於安全限制，最近加入的內容或截圖可能無法保存。請嘗試刪除舊紀錄。');
+        }
+      }
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
     }
     
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
     
-    // 全面符號淨化器：嚴格過濾所有指定特殊符號
+    // ★ 全面符號淨化器
     function sanitizeCleanName(str) {
       if (!str) return '';
       return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim();
@@ -476,7 +478,8 @@
     let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
     function setInputValSafe(id, val) { if (keypadState && keypadState.targetId === id) return; const el = document.getElementById(id); if (el) el.value = val; }
     function openNumericKeypad(inputId, labelText, isAddItemTrigger = false, allowSpaces = false) {
-      if (appMode === 'debtor') return; document.querySelectorAll('.keypad-target-active').forEach(el => el.classList.remove('keypad-target-active'));
+      if (appMode === 'debtor') return;
+      document.querySelectorAll('.keypad-target-active').forEach(el => el.classList.remove('keypad-target-active'));
       const inputEl = document.getElementById(inputId); if (!inputEl) return;
       inputEl.classList.add('keypad-target-active'); keypadState.targetId = inputId; keypadState.isAddItemTrigger = isAddItemTrigger; keypadState.allowSpaces = allowSpaces;
       document.getElementById('keypadFieldLabel').textContent = labelText || '輸入數值'; document.getElementById('keypadLiveValue').textContent = inputEl.value !== '' ? inputEl.value : '0'; document.getElementById('keypadSpaceBtn').classList.toggle('hidden', !allowSpaces); document.getElementById('keypadSubmitBtn').textContent = isAddItemTrigger ? '加入餐點' : '確認'; document.getElementById('numericKeypadSheet').classList.remove('hidden');
@@ -525,20 +528,21 @@
       }).join('');
     }
     
+    // ★ 預設標題更新：改為「外賣分賬 (日期)」
     function createNewRecord() {
       const ts = new Date().toISOString().split('T')[0];
       const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
       const newRec = {
         id: 'rec_' + Date.now(), title: `外賣分賬 (${ts})`, date: ts, createdAt: Date.now(),
-        platform: defaultPlatform, restaurant: '', participants: [], receipts: [],
+        platform: defaultPlatform, restaurant: '', participants: [], receipts: [], receiptTotal: 0,
         verifiedPromos: [...(PLATFORM_PROMOS[defaultPlatform] || PLATFORM_PROMOS['foodpanda'])],
-        items: [], paymentInfo: { fps: '', payme: '' }, expectedTotal: null,
+        items: [], paymentInfo: { fps: '', payme: '' },
         discount: { mode: 'receipt_exact', directAmount: 0, fixedAmount: 0, percentOff: 20, capAmount: 60, overrideFinalTotal: 0 },
         fees: { delivery: 0, platform: 0, packaging: 0, splitMode: 'equal', rounding: 'exact' }
       };
       dbState.paymentInfo = { fps: '', payme: '' };
       dbState.records.unshift(newRec); dbState.activeRecordId = newRec.id;
-      saveDatabase(); openRecordDetail(newRec.id); showToast('已建立新分賬紀錄！');
+      saveDatabase(); openRecordDetail(newRec.id); showToast('已建立新分賬紀錄 (收款資料已清空)！');
     }
     
     function deleteRecord(id) { if (appMode === 'debtor') return; const t = dbState.records.find(r => r.id === id); if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; dbState.records = dbState.records.filter(r => r.id !== id); if (dbState.activeRecordId === id) dbState.activeRecordId = null; saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); }
@@ -572,13 +576,14 @@
       return { totalOriginal: totalOrig, totalDiscount: totalDisc, totalFees, sumRoundedCollectible: sumRound, effectiveRatio: totalOrig > 0 ? ((totalOrig - totalDisc) / totalOrig) * 100 : 100, discountRuleSummary: dSum, itemBreakdown, personBreakdown };
     }
 
-    // --- 5. ENHANCED RECEIPT PARSER (INTELLIGENT DECIMALS & FREE DETECTION) ---
+    // --- 5. ENHANCED RECEIPT PARSER (INTELLIGENT DECIMALS & FALLBACK) ---
     function openSmartPasteModal() { if (appMode === 'debtor') return; closeNumericKeypad(); document.getElementById('smartPasteTextarea').value = ''; document.getElementById('smartPasteModal').classList.remove('hidden'); setTimeout(() => document.getElementById('smartPasteTextarea').focus(), 80); }
     function closeSmartPasteModal() { document.getElementById('smartPasteModal').classList.add('hidden'); }
     
-    // ★ 智慧提取整段文字裡「最後一個」合理金額，並還原遺失的小數點
+    // ★ 智慧提取整段文字裡「最後一個」合理金額，免疫原價被劃線干擾
     function extractLastPrice(str) {
       if (!str) return null;
+      // 修復 OCR 將小數點辨識成空格或逗號的情況 (例: 15 , 0 -> 15.0)
       let cleaned = str.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2'); 
       const regex = /(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*(\d+(?:\.\d{1,2})?)/gi;
       let lastVal = null; let match;
@@ -599,12 +604,20 @@
       return { val: null, nextIdx: idx };
     }
     
+    // ★ 辨識 'Nx' (支援只擷取到 x 的情況，但嚴格要求尾隨金額)
     function matchQuantityPrefix(line) {
-      const m = line.match(/^\s*([0-9IilL|OoS]{1,3})\s*[xX×*✕]\s*(.*)$/);
+      const m = line.match(/^\s*([0-9IilL|OoS]*)\s*[xX×*✕]\s*(.*)$/);
       if (!m) return null;
-      const normalizedDigits = m[1].replace(/[IilL|]/g, '1').replace(/[Oo]/g, '0').replace(/[S]/g, '5');
-      const qty = parseInt(normalizedDigits, 10);
+      let digits = m[1].replace(/[IilL|]/g, '1').replace(/[Oo]/g, '0').replace(/[S]/g, '5');
+      let qty = digits === '' ? 1 : parseInt(digits, 10);
       if (isNaN(qty) || qty <= 0 || qty > 500) return null;
+      
+      // 若只有 x (沒有數字)，嚴格要求這行字最後必須像是一個價格，以防誤認英文單字
+      if (digits === '') {
+        if (!/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(line.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2'))) {
+          return null;
+        }
+      }
       return { qty, rest: m[2].trim() };
     }
     
@@ -618,48 +631,71 @@
       let pendingItemName = null; let pendingQty = 1; let pendingLockedByQty = false;
       let possibleHeaderLines = [];
 
+      // ★ 餐廳名稱多維度提取 (支援從 "送達於" 和 "送達到" 之間提取)
+      let deliverToIdx = lines.findIndex(l => /(送\s*達\s*到|送\s*遞\s*地\s*址|deliver\s*to)/i.test(l));
+      let deliverAtIdx = lines.findIndex(l => /(送\s*達\s*於|送\s*遞\s*於|deliver(?:ed)?\s*at)/i.test(l));
+      
+      if (deliverToIdx !== -1) {
+        let startIdx = deliverAtIdx !== -1 ? deliverAtIdx + 1 : Math.max(0, deliverToIdx - 4);
+        for (let j = deliverToIdx - 1; j >= startIdx; j--) {
+          let text = lines[j].replace(/\s+/g, ' ').trim();
+          if (/(訂\s*購\s*[於放菸自]|ordered?\s*from)$/i.test(text)) continue;
+          // 過濾最前方的特殊/亂碼符號 (如 ©, @, (8, [O 等等)
+          text = text.replace(/^[©@\(8O0\[\]\{\}\.\-\|]+\s*/, '');
+          if (text.length >= 2 && !/(訂\s*單|編\s*號|order|送\s*達)/i.test(text)) {
+            detectedRestaurant = sanitizeCleanName(text);
+            break;
+          }
+        }
+      }
+
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].replace(/\s+/g, ' ').trim();
         if (i < 5 && !matchQuantityPrefix(line) && !/(foodpanda|keeta|uber eats|order|delivery|total|小計|平台|HK\$|\d{2}:\d{2})/i.test(line)) possibleHeaderLines.push(line);
 
-        // 1. Restaurant
-        const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
-        if (restHeaderMatch) {
-          let candidate = restHeaderMatch[1].replace(/\s*(?:HK\s*[\$S5s]|\$).*$/i, '').trim();
-          if (candidate.length >= 2) { detectedRestaurant = sanitizeCleanName(candidate); } 
-          else if (i + 1 < lines.length) {
-            const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
-            if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { detectedRestaurant = sanitizeCleanName(nextLine); i++; }
+        // 1. Restaurant Fallback (訂購於) - 若上方的預先掃描未抓到，則採用行內掃描
+        if (!detectedRestaurant) {
+          const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
+          if (restHeaderMatch) {
+            let candidate = restHeaderMatch[1].replace(/\s*(?:HK\s*[\$S5s]|\$).*$/i, '').trim();
+            candidate = candidate.replace(/^[©@\(8O0\[\]\{\}\.\-\|]+\s*/, '');
+            if (candidate.length >= 2) { detectedRestaurant = sanitizeCleanName(candidate); } 
+            else if (i + 1 < lines.length) {
+              const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
+              if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { 
+                detectedRestaurant = sanitizeCleanName(nextLine.replace(/^[©@\(8O0\[\]\{\}\.\-\|]+\s*/, '')); 
+                i++; 
+              }
+            }
+            pendingItemName = null; pendingLockedByQty = false; continue;
           }
-          pendingItemName = null; pendingLockedByQty = false; continue;
         }
 
-        // ★ 判斷是否為 Nx 數量開頭的餐點
+        // 2. Fees & Discounts
+        if (/(平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        
+        // ★ 運費: 專門檢查「免費」
+        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line) && !matchQuantityPrefix(line)) { 
+          if (/免\s*費|免\s*運\s*費|free/i.test(line)) {
+            detectedDelivery = 0; 
+          } else { 
+            const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } 
+          } 
+          pendingItemName = null; pendingLockedByQty = false; continue; 
+        }
+        
+        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+        
+        // ★ 總計
+        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
+
+        // 3. Blacklist
+        if (nonItemBlacklistRegex.test(line)) { pendingItemName = null; pendingLockedByQty = false; continue; }
+
+        // 4. Qty Marker items (1x, 2x... or x)
         const qtyInfo = matchQuantityPrefix(line);
-
-        // 如果不是餐點數量行，才去辨識運費與優惠 (防止 1x 特選優惠被誤認為優惠券)
-        if (!qtyInfo) {
-          if (/(平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          // ★ 運費免運智能識別：掃描本行及下一行是否出現「免費/免運費/free」
-          if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line)) { 
-            const checkStr = line + " " + (lines[i+1] || "");
-            if (/(免\s*運\s*費|免\s*費|free)/i.test(checkStr)) { 
-               detectedDelivery = 0; 
-            } else { 
-               const res = extractFeeFromLineOrNext(lines, i); 
-               if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } 
-            } 
-            pendingItemName = null; pendingLockedByQty = false; continue; 
-          }
-          if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          // ★ 獲取「總計」用作 Badge 驗證
-          if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-          
-          if (nonItemBlacklistRegex.test(line)) { pendingItemName = null; pendingLockedByQty = false; continue; }
-        }
-
         if (qtyInfo) {
           const parsedQty = qtyInfo.qty; let restOfLine = qtyInfo.rest;
           if (!restOfLine && i + 1 < lines.length) {
@@ -670,8 +706,9 @@
           const lastPrice = extractLastPrice(cleanedRest);
           
           if (lastPrice !== null) {
-            let itemName = cleanedRest.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
-            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim(); // Double check for crossed-out prices
+            let itemName = cleanedRest;
+            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
+            itemName = itemName.replace(/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
             itemName = sanitizeCleanName(itemName.replace(/^[\*\-•·\s]+/, ''));
             if (itemName && !nonItemBlacklistRegex.test(itemName)) {
               const fp = `${parsedQty}x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`;
@@ -693,17 +730,8 @@
           }
           pendingItemName = null; pendingQty = 1; pendingLockedByQty = false; continue;
         }
-        if (pendingLockedByQty && pendingItemName) {
-          const lineTrailingPrice = extractLastPrice(line);
-          if (lineTrailingPrice !== null && lineTrailingPrice > 0 && lineTrailingPrice < 10000) {
-            const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${lineTrailingPrice.toFixed(1)}`;
-            if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, pendingItemName, lineTrailingPrice, pendingQty); }
-            pendingItemName = null; pendingQty = 1; pendingLockedByQty = false;
-          }
-          continue;
-        }
         
-        // 5. Fallback items (If no "Nx" found at all)
+        // 5. Fallback items
         if (!hasAnyQtyMarkers) {
           const lastPrice = extractLastPrice(cleanedLine);
           if (lastPrice !== null) {
@@ -727,19 +755,22 @@
     }
     
     function pushItemWithQty(list, name, totalLinePrice, qty) { if (qty > 1) { const unitPrice = Math.round((totalLinePrice / qty) * 100) / 100; for (let k = 1; k <= qty; k++) list.push({ name: `${name} (${k}/${qty})`, price: unitPrice }); } else list.push({ name, price: totalLinePrice }); }
+    
     function applyParsedReceiptToRecord(rec, res, replaceExisting = true) {
       if (res.extractedItems.length > 0) { if (replaceExisting) rec.items = []; res.extractedItems.forEach((it, idx) => { rec.items.push({ id: 'sp_' + Date.now() + '_' + idx, name: it.name, price: it.price, assignedTo: [], paid: false }); }); }
       let importedMetaLabels = [];
       if (res.detectedRestaurant) { rec.restaurant = res.detectedRestaurant; const restInput = document.getElementById('orderRestaurantInput'); if (restInput) restInput.value = res.detectedRestaurant; importedMetaLabels.push(`餐廳「${res.detectedRestaurant}」`); }
       if (res.detectedDelivery !== null) { rec.fees.delivery = res.detectedDelivery; importedMetaLabels.push(`運費 $${res.detectedDelivery}`); }
-      if (res.detectedPlatformFee !== null) { rec.fees.platform = res.detectedPlatformFee; importedMetaLabels.push(`平台費 $${res.detectedPlatformFee}`); }
+      if (res.detectedPlatformFee !== null) { rec.fees.platform = res.detectedPlatformFee; importedMetaLabels.push(`平台服務費 $${res.detectedPlatformFee}`); }
       if (res.detectedPackagingFee !== null) { rec.fees.packaging = res.detectedPackagingFee; importedMetaLabels.push(`包裝費 $${res.detectedPackagingFee}`); }
       if (res.detectedDirectDiscount !== null) { rec.discount.directAmount = res.detectedDirectDiscount; rec.discount.mode = 'receipt_exact'; importedMetaLabels.push(`折扣 -$${res.detectedDirectDiscount}`); }
       if (res.detectedVoucher !== null) { rec.discount.fixedAmount = res.detectedVoucher; rec.discount.mode = 'receipt_exact'; importedMetaLabels.push(`優惠券 -$${res.detectedVoucher}`); }
       
-      // ★ 儲存擷取到的總計用作驗證
-      if (res.detectedFinalTotal !== null) { rec.expectedTotal = res.detectedFinalTotal; }
-      
+      // ★ 儲存核對用的總計
+      if (res.detectedFinalTotal !== null) { 
+        rec.receiptTotal = res.detectedFinalTotal; 
+        importedMetaLabels.push(`收據總計 $${res.detectedFinalTotal}`); 
+      }
       return importedMetaLabels;
     }
     function parseSmartTextAndImport(replaceExisting) { const raw = document.getElementById('smartPasteTextarea').value; if (!raw.trim()) { showToast('請先貼上收據文字'); return; } const res = parseReceiptRawText(raw); const rec = getActiveRecord(); const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting); closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll(); showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`); }
@@ -753,7 +784,7 @@
       try {
         let combinedText = '';
         for (let i = 0; i < images.length; i++) {
-          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在掃描第 ${i + 1}/${images.length} 張截圖 (應用空間座標重組)...`;
+          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>正在掃描第 ${i + 1}/${images.length} 張截圖 (應用 Y-Axis 空間座標重組)...`;
           const result = await Tesseract.recognize(images[i].dataUrl, 'chi_tra+eng');
           const words = result.data.words || []; let currentY = -1; let currentLine = []; let linesArr = [];
           words.sort((a, b) => a.bbox.y0 - b.bbox.y0).forEach(w => {
@@ -770,7 +801,7 @@
     }
     function openSmartPasteWithText() { document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || ''; document.getElementById('smartPasteModal').classList.remove('hidden'); }
     
-    // ★ 圖片上傳：1200px 智慧壓縮技術，徹底保留高解析文字又能大幅節省容量防崩潰
+    // ★ 圖片上傳：1200px 智慧壓縮技術
     function handleMultiReceiptUpload(event) {
       if (appMode === 'debtor') return;
       const files = Array.from(event.target.files || []); if (files.length === 0) return;
@@ -788,10 +819,10 @@
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, w, h);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.7); // 70% 畫質的 JPEG 即可精準辨識且體積極小
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
             rec.receipts.push({ id: 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6), name: file.name, dataUrl: dataUrl });
             loaded++;
-            if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已壓縮並載入 ${files.length} 張截圖！`); }
+            if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已載入 ${files.length} 張截圖！可點擊本機識圖`); }
           };
           img.src = e.target.result;
         };
@@ -819,22 +850,22 @@
       document.getElementById('sumOriginal').textContent = `$${calc.totalOriginal.toFixed(1)}`;
       document.getElementById('sumDiscount').textContent = `-$${calc.totalDiscount.toFixed(1)}`;
       document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`;
-      
-      // ★ 渲染最終實付金額，並觸發「總計」核對 Badge
       document.getElementById('sumFinal').textContent = `$${calc.sumRoundedCollectible.toFixed(1)}`;
+      
+      // ★ 總計核對 Badge 邏輯 (紅綠燈提示)
       const matchBadge = document.getElementById('totalMatchBadge');
-      if (rec.expectedTotal > 0) {
-        matchBadge.classList.remove('hidden');
-        // 容許小數點進位產生的 $0.5 內誤差
-        if (Math.abs(calc.sumRoundedCollectible - rec.expectedTotal) < 0.2) {
-          matchBadge.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-sm shadow-sm" title="與收據總額 $${rec.expectedTotal} 吻合"></i>`;
+      if (rec.receiptTotal > 0) {
+        const diff = Math.abs(calc.sumRoundedCollectible - rec.receiptTotal);
+        // 容許 $1 內的捨入誤差
+        if (diff <= 1.0) {
+          matchBadge.innerHTML = `<span class="bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded-full text-[10px] ml-1 flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-circle-check"></i>吻合</span>`;
         } else {
-          matchBadge.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500 text-sm animate-pulse drop-shadow-md" title="警告：與收據總額 $${rec.expectedTotal} 不符"></i>`;
+          matchBadge.innerHTML = `<span class="bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full text-[10px] ml-1 flex items-center gap-0.5 shadow-sm" title="與收據不符，請檢查餐點或折扣"><i class="fa-solid fa-circle-exclamation"></i>收據 $${rec.receiptTotal.toFixed(1)}</span>`;
         }
       } else {
-        matchBadge.classList.add('hidden');
+        matchBadge.innerHTML = '';
       }
-      
+
       document.getElementById('effectiveRateBadge').textContent = `折實率: ${calc.effectiveRatio.toFixed(1)}%`;
       document.getElementById('roundingModeBadge').textContent = { exact: '精確 $0.1', half: '進位 $0.5', dollar: '湊整 $1' }[rec.fees.rounding];
       document.getElementById('collectionStatusText').textContent = `已收 ${rec.items.filter(i=>i.paid).length} / ${rec.items.length} 項`;
@@ -1048,12 +1079,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v9', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v10', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v9', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v10', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
