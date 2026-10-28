@@ -130,7 +130,7 @@
         <div class="flex items-center justify-between mb-3 relative z-10">
           <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0"><i class="fa-solid fa-chevron-left"></i><span>列表</span></button>
           
-          <!-- 債主 / 債仔 Mode -->
+          <!-- 債主 / 債仔 Mode Toggle Switch -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
              <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition">債主 Mode</button>
              <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition">債仔 Mode</button>
@@ -158,18 +158,20 @@
             </div>
           </div>
         </div>
-        <!-- Live Calculation Summary with Match Badge -->
-        <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10">
-          <div><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
-          <div><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
-          <div><div class="text-[11px] text-white/80">運費/平台費</div><div id="sumFees" class="font-bold text-sm sm:text-base text-white mt-0.5">+$0.0</div></div>
-          <div class="bg-white text-panda-600 rounded-xl py-1 px-1 shadow-xs flex flex-col justify-center items-center relative overflow-hidden">
-            <div class="text-[10px] font-bold uppercase tracking-tight flex items-center justify-center w-full">
-              最終實付 <span id="totalMatchBadge" class="flex items-center"></span>
-            </div>
+        
+        <!-- Live Calculation Summary with Absolute Match Badge (修復排版) -->
+        <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10 items-stretch">
+          <div class="flex flex-col justify-center"><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
+          <div class="flex flex-col justify-center"><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
+          <div class="flex flex-col justify-center"><div class="text-[11px] text-white/80">運費/平台費</div><div id="sumFees" class="font-bold text-sm sm:text-base text-white mt-0.5">+$0.0</div></div>
+          
+          <div class="bg-white text-panda-600 rounded-xl py-1.5 px-1 shadow-xs flex flex-col justify-center items-center relative">
+            <div id="totalMatchBadge" class="absolute -top-2.5 -right-2 z-20"></div>
+            <div class="text-[10px] font-bold uppercase tracking-tight w-full">最終實付</div>
             <div id="sumFinal" class="font-extrabold text-sm sm:text-base mt-0.5">$0.0</div>
           </div>
         </div>
+        
         <div class="mt-2.5 flex items-center justify-between text-xs text-white px-1 relative z-10">
           <div class="flex items-center gap-1.5"><span class="px-2.5 py-0.5 rounded-full bg-white/20 border border-white/30 text-white font-bold text-[11px]" id="effectiveRateBadge">折實率: 100%</span><span id="roundingModeBadge" class="text-[11px] text-white/85">精確至 $0.1</span></div>
           <div id="collectionStatusText" class="font-bold text-amber-200">已收 0 / 0 項</div>
@@ -182,7 +184,7 @@
         <div class="grid grid-cols-3 gap-1.5" id="receiptToolsActionGrid">
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste text-sm"></i><span>1. 貼上收據</span><span class="text-[9px] opacity-80 font-normal">自動匯入資訊</span></button>
           <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">支援多張長圖</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
-          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">總計智能核對</span></button>
+          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">精準小數點還原</span></button>
         </div>
         <div id="receiptGalleryStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
         <div id="zoomReceiptBox" class="hidden bg-black/60 p-2 rounded-xl border border-neutral-700 max-h-64 overflow-y-auto">
@@ -340,11 +342,26 @@
           <button onclick="closeNumericKeypad()" class="px-3 py-1.5 rounded-xl bg-panda-600 text-white text-xs font-extrabold">完成 <i class="fa-solid fa-check ml-0.5"></i></button>
         </div>
       </div>
+      <!-- Phone Layout Keypad (1,2,3 at top) -->
       <div class="grid grid-cols-4 gap-2 text-center">
-        <button onclick="keypadPress('7')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">7</button><button onclick="keypadPress('8')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">8</button><button onclick="keypadPress('9')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">9</button><button onclick="keypadBackspace()" class="h-12 rounded-2xl bg-neutral-700 hover:bg-neutral-600 active:scale-95 text-base font-bold text-amber-300"><i class="fa-solid fa-delete-left"></i></button>
-        <button onclick="keypadPress('4')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">4</button><button onclick="keypadPress('5')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">5</button><button onclick="keypadPress('6')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">6</button><button onclick="keypadClear()" class="h-12 rounded-2xl bg-rose-900/60 hover:bg-rose-800 active:scale-95 text-xs font-extrabold text-rose-200">清空</button>
-        <button onclick="keypadPress('1')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">1</button><button onclick="keypadPress('2')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">2</button><button onclick="keypadPress('3')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">3</button><button onclick="keypadPress('.')" class="h-12 rounded-2xl bg-amber-400/25 border-2 border-amber-400 hover:bg-amber-400/40 active:scale-95 text-2xl font-extrabold text-amber-300">.</button>
-        <button onclick="keypadPress('0')" class="col-span-2 h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">0</button><button onclick="keypadPress('00')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-sm font-extrabold">00</button><button id="keypadSubmitBtn" onclick="keypadConfirmAction()" class="h-12 rounded-2xl theme-bar-gradient active:scale-95 text-xs font-extrabold text-white shadow-md">確認</button>
+        <button onclick="keypadPress('1')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">1</button>
+        <button onclick="keypadPress('2')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">2</button>
+        <button onclick="keypadPress('3')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">3</button>
+        <button onclick="keypadBackspace()" class="h-12 rounded-2xl bg-neutral-700 hover:bg-neutral-600 active:scale-95 text-base font-bold text-amber-300"><i class="fa-solid fa-delete-left"></i></button>
+        
+        <button onclick="keypadPress('4')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">4</button>
+        <button onclick="keypadPress('5')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">5</button>
+        <button onclick="keypadPress('6')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">6</button>
+        <button onclick="keypadClear()" class="h-12 rounded-2xl bg-rose-900/60 hover:bg-rose-800 active:scale-95 text-xs font-extrabold text-rose-200">清空</button>
+        
+        <button onclick="keypadPress('7')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">7</button>
+        <button onclick="keypadPress('8')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">8</button>
+        <button onclick="keypadPress('9')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">9</button>
+        <button onclick="keypadPress('.')" class="h-12 rounded-2xl bg-amber-400/25 border-2 border-amber-400 hover:bg-amber-400/40 active:scale-95 text-2xl font-extrabold text-amber-300">.</button>
+        
+        <button onclick="keypadPress('0')" class="col-span-2 h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">0</button>
+        <button onclick="keypadPress('00')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-sm font-extrabold">00</button>
+        <button id="keypadSubmitBtn" onclick="keypadConfirmAction()" class="h-12 rounded-2xl theme-bar-gradient active:scale-95 text-xs font-extrabold text-white shadow-md">確認</button>
       </div>
     </div>
   </div>
@@ -412,8 +429,8 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v10';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v10';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v11';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v11';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     const PLATFORM_PROMOS = {
@@ -430,7 +447,7 @@
     
     function loadDatabase() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v9');
+        const saved = localStorage.getItem(STORAGE_KEY_DB) || localStorage.getItem('panda_split_records_db_v10');
         if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; }
       } catch (e) {}
       return JSON.parse(JSON.stringify(defaultDatabase));
@@ -450,7 +467,6 @@
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
     
-    // ★ 全面符號淨化器
     function sanitizeCleanName(str) {
       if (!str) return '';
       return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim();
@@ -528,8 +544,11 @@
       }).join('');
     }
     
-    // ★ 預設標題更新：改為「外賣分賬 (日期)」
     function createNewRecord() {
+      // 確保每次建立新記錄時，把原本開啟著的任何預覽圖與畫廊收起
+      document.getElementById('zoomReceiptBox').classList.add('hidden');
+      document.getElementById('zoomReceiptImg').src = '';
+      
       const ts = new Date().toISOString().split('T')[0];
       const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
       const newRec = {
@@ -546,7 +565,14 @@
     }
     
     function deleteRecord(id) { if (appMode === 'debtor') return; const t = dbState.records.find(r => r.id === id); if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; dbState.records = dbState.records.filter(r => r.id !== id); if (dbState.activeRecordId === id) dbState.activeRecordId = null; saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); }
-    function openRecordDetail(id) { dbState.activeRecordId = id; const rec = getActiveRecord(); if (rec) applyPlatformTheme(rec.platform || 'foodpanda'); saveDatabase(); document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.remove('hidden'); renderActiveRecordAll(); }
+    
+    function openRecordDetail(id) { 
+      // 切換記錄前，強制關閉舊預覽圖以防殘留
+      document.getElementById('zoomReceiptBox').classList.add('hidden');
+      document.getElementById('zoomReceiptImg').src = '';
+      
+      dbState.activeRecordId = id; const rec = getActiveRecord(); if (rec) applyPlatformTheme(rec.platform || 'foodpanda'); saveDatabase(); document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.remove('hidden'); renderActiveRecordAll(); 
+    }
 
     // --- 4. CORE BILL CALCULATION ---
     function calculateRecordBill(rec) {
@@ -580,10 +606,8 @@
     function openSmartPasteModal() { if (appMode === 'debtor') return; closeNumericKeypad(); document.getElementById('smartPasteTextarea').value = ''; document.getElementById('smartPasteModal').classList.remove('hidden'); setTimeout(() => document.getElementById('smartPasteTextarea').focus(), 80); }
     function closeSmartPasteModal() { document.getElementById('smartPasteModal').classList.add('hidden'); }
     
-    // ★ 智慧提取整段文字裡「最後一個」合理金額，免疫原價被劃線干擾
     function extractLastPrice(str) {
       if (!str) return null;
-      // 修復 OCR 將小數點辨識成空格或逗號的情況 (例: 15 , 0 -> 15.0)
       let cleaned = str.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2'); 
       const regex = /(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*(\d+(?:\.\d{1,2})?)/gi;
       let lastVal = null; let match;
@@ -604,15 +628,12 @@
       return { val: null, nextIdx: idx };
     }
     
-    // ★ 辨識 'Nx' (支援只擷取到 x 的情況，但嚴格要求尾隨金額)
     function matchQuantityPrefix(line) {
       const m = line.match(/^\s*([0-9IilL|OoS]*)\s*[xX×*✕]\s*(.*)$/);
       if (!m) return null;
       let digits = m[1].replace(/[IilL|]/g, '1').replace(/[Oo]/g, '0').replace(/[S]/g, '5');
       let qty = digits === '' ? 1 : parseInt(digits, 10);
       if (isNaN(qty) || qty <= 0 || qty > 500) return null;
-      
-      // 若只有 x (沒有數字)，嚴格要求這行字最後必須像是一個價格，以防誤認英文單字
       if (digits === '') {
         if (!/(?:HK\s*[\$S5s]|[\$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(line.replace(/(\d)\s*[\.,]\s*(\d)/g, '$1.$2'))) {
           return null;
@@ -631,16 +652,13 @@
       let pendingItemName = null; let pendingQty = 1; let pendingLockedByQty = false;
       let possibleHeaderLines = [];
 
-      // ★ 餐廳名稱多維度提取 (支援從 "送達於" 和 "送達到" 之間提取)
       let deliverToIdx = lines.findIndex(l => /(送\s*達\s*到|送\s*遞\s*地\s*址|deliver\s*to)/i.test(l));
       let deliverAtIdx = lines.findIndex(l => /(送\s*達\s*於|送\s*遞\s*於|deliver(?:ed)?\s*at)/i.test(l));
-      
       if (deliverToIdx !== -1) {
         let startIdx = deliverAtIdx !== -1 ? deliverAtIdx + 1 : Math.max(0, deliverToIdx - 4);
         for (let j = deliverToIdx - 1; j >= startIdx; j--) {
           let text = lines[j].replace(/\s+/g, ' ').trim();
           if (/(訂\s*購\s*[於放菸自]|ordered?\s*from)$/i.test(text)) continue;
-          // 過濾最前方的特殊/亂碼符號 (如 ©, @, (8, [O 等等)
           text = text.replace(/^[©@\(8O0\[\]\{\}\.\-\|]+\s*/, '');
           if (text.length >= 2 && !/(訂\s*單|編\s*號|order|送\s*達)/i.test(text)) {
             detectedRestaurant = sanitizeCleanName(text);
@@ -653,7 +671,6 @@
         const line = lines[i].replace(/\s+/g, ' ').trim();
         if (i < 5 && !matchQuantityPrefix(line) && !/(foodpanda|keeta|uber eats|order|delivery|total|小計|平台|HK\$|\d{2}:\d{2})/i.test(line)) possibleHeaderLines.push(line);
 
-        // 1. Restaurant Fallback (訂購於) - 若上方的預先掃描未抓到，則採用行內掃描
         if (!detectedRestaurant) {
           const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
           if (restHeaderMatch) {
@@ -671,30 +688,17 @@
           }
         }
 
-        // 2. Fees & Discounts
         if (/(平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        
-        // ★ 運費: 專門檢查「免費」
         if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line) && !matchQuantityPrefix(line)) { 
-          if (/免\s*費|免\s*運\s*費|free/i.test(line)) {
-            detectedDelivery = 0; 
-          } else { 
-            const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } 
-          } 
+          if (/免\s*費|免\s*運\s*費|free/i.test(line)) { detectedDelivery = 0; } else { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } } 
           pendingItemName = null; pendingLockedByQty = false; continue; 
         }
-        
         if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
         if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
         if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        
-        // ★ 總計
         if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-
-        // 3. Blacklist
         if (nonItemBlacklistRegex.test(line)) { pendingItemName = null; pendingLockedByQty = false; continue; }
 
-        // 4. Qty Marker items (1x, 2x... or x)
         const qtyInfo = matchQuantityPrefix(line);
         if (qtyInfo) {
           const parsedQty = qtyInfo.qty; let restOfLine = qtyInfo.rest;
@@ -731,7 +735,6 @@
           pendingItemName = null; pendingQty = 1; pendingLockedByQty = false; continue;
         }
         
-        // 5. Fallback items
         if (!hasAnyQtyMarkers) {
           const lastPrice = extractLastPrice(cleanedLine);
           if (lastPrice !== null) {
@@ -765,17 +768,11 @@
       if (res.detectedPackagingFee !== null) { rec.fees.packaging = res.detectedPackagingFee; importedMetaLabels.push(`包裝費 $${res.detectedPackagingFee}`); }
       if (res.detectedDirectDiscount !== null) { rec.discount.directAmount = res.detectedDirectDiscount; rec.discount.mode = 'receipt_exact'; importedMetaLabels.push(`折扣 -$${res.detectedDirectDiscount}`); }
       if (res.detectedVoucher !== null) { rec.discount.fixedAmount = res.detectedVoucher; rec.discount.mode = 'receipt_exact'; importedMetaLabels.push(`優惠券 -$${res.detectedVoucher}`); }
-      
-      // ★ 儲存核對用的總計
-      if (res.detectedFinalTotal !== null) { 
-        rec.receiptTotal = res.detectedFinalTotal; 
-        importedMetaLabels.push(`收據總計 $${res.detectedFinalTotal}`); 
-      }
+      if (res.detectedFinalTotal !== null) { rec.receiptTotal = res.detectedFinalTotal; importedMetaLabels.push(`收據總計 $${res.detectedFinalTotal}`); }
       return importedMetaLabels;
     }
     function parseSmartTextAndImport(replaceExisting) { const raw = document.getElementById('smartPasteTextarea').value; if (!raw.trim()) { showToast('請先貼上收據文字'); return; } const res = parseReceiptRawText(raw); const rec = getActiveRecord(); const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting); closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll(); showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`); }
 
-    // 本機離線 OCR (Y-Axis)
     async function runLocalOfflineOcr() {
       if (appMode === 'debtor') return;
       const rec = getActiveRecord(); if (!rec) return; const images = (rec.receipts || []).filter(r => r.dataUrl); const statusBox = document.getElementById('aiScanStatusBox'); const statusText = document.getElementById('aiScanStatusText');
@@ -801,7 +798,6 @@
     }
     function openSmartPasteWithText() { document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || ''; document.getElementById('smartPasteModal').classList.remove('hidden'); }
     
-    // ★ 圖片上傳：1200px 智慧壓縮技術
     function handleMultiReceiptUpload(event) {
       if (appMode === 'debtor') return;
       const files = Array.from(event.target.files || []); if (files.length === 0) return;
@@ -852,15 +848,14 @@
       document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`;
       document.getElementById('sumFinal').textContent = `$${calc.sumRoundedCollectible.toFixed(1)}`;
       
-      // ★ 總計核對 Badge 邏輯 (紅綠燈提示)
+      // ★ 總計核對 Badge 邏輯 (完全獨立絕對定位，不影響排版)
       const matchBadge = document.getElementById('totalMatchBadge');
       if (rec.receiptTotal > 0) {
         const diff = Math.abs(calc.sumRoundedCollectible - rec.receiptTotal);
-        // 容許 $1 內的捨入誤差
         if (diff <= 1.0) {
-          matchBadge.innerHTML = `<span class="bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded-full text-[10px] ml-1 flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-circle-check"></i>吻合</span>`;
+          matchBadge.innerHTML = `<span class="bg-emerald-500 text-white px-1.5 py-0.5 rounded-full text-[9px] font-bold shadow-md flex items-center gap-0.5 whitespace-nowrap"><i class="fa-solid fa-circle-check"></i> 吻合</span>`;
         } else {
-          matchBadge.innerHTML = `<span class="bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full text-[10px] ml-1 flex items-center gap-0.5 shadow-sm" title="與收據不符，請檢查餐點或折扣"><i class="fa-solid fa-circle-exclamation"></i>收據 $${rec.receiptTotal.toFixed(1)}</span>`;
+          matchBadge.innerHTML = `<span class="bg-rose-500 text-white px-1.5 py-0.5 rounded-full text-[9px] font-bold shadow-md flex items-center gap-0.5 whitespace-nowrap animate-pulse"><i class="fa-solid fa-circle-exclamation"></i> 收據 $${rec.receiptTotal.toFixed(1)}</span>`;
         }
       } else {
         matchBadge.innerHTML = '';
@@ -1079,19 +1074,32 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v10', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v11', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v10', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v11', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
               const data = snap.data();
               if (data && data.dbPayload && data.updatedBy !== clientUid) {
-                isApplyingRemoteUpdate = true; const oldRec = getActiveRecord(); dbState = data.dbPayload;
-                if (oldRec && oldRec.receipts) { const newRec = dbState.records.find(r => r.id === oldRec.id); if (newRec) newRec.receipts = oldRec.receipts; }
+                isApplyingRemoteUpdate = true;
+                
+                // ★ 收到雲端更新時，預先備份本機的所有截圖
+                const localReceiptsMap = {};
+                dbState.records.forEach(r => { localReceiptsMap[r.id] = r.receipts || []; });
+                
+                dbState = data.dbPayload;
+                
+                // ★ 寫入雲端數據後，將本機截圖還原，確保圖片永不消失
+                dbState.records.forEach(r => {
+                  if (localReceiptsMap[r.id] && localReceiptsMap[r.id].length > 0) {
+                    r.receipts = localReceiptsMap[r.id];
+                  }
+                });
+                
                 renderRecordsList(); renderActiveRecordAll(); isApplyingRemoteUpdate = false;
               }
             } else pushState();
