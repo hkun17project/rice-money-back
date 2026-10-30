@@ -107,7 +107,6 @@
           </div>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <!-- List View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner">
              <button id="listModeCreditorBtn" onclick="setAppMode('creditor')" class="px-2.5 py-1 rounded-full bg-white text-panda-700 text-[10px] sm:text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
              <button id="listModeDebtorBtn" onclick="setAppMode('debtor')" class="px-2.5 py-1 rounded-full text-white/80 hover:text-white text-[10px] sm:text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
@@ -147,7 +146,6 @@
         <div class="flex items-center justify-between mb-3 relative z-10">
           <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0"><i class="fa-solid fa-chevron-left"></i><span>列表</span></button>
           
-          <!-- Detail View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
              <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
              <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
@@ -176,7 +174,6 @@
           </div>
         </div>
         
-        <!-- Live Calculation Summary with Absolute Match Badge -->
         <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10 items-stretch">
           <div class="flex flex-col justify-center"><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
           <div class="flex flex-col justify-center"><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
@@ -200,7 +197,7 @@
         <div class="flex items-center justify-between"><div class="text-xs font-bold flex items-center gap-1.5 text-amber-300"><i class="fa-solid fa-bolt"></i><span>收據識圖與自動匯入工作台</span></div><button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1"><i class="fa-solid fa-xmark"></i></button></div>
         <div class="grid grid-cols-3 gap-1.5" id="receiptToolsActionGrid">
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste text-sm"></i><span>1. 貼上收據</span><span class="text-[9px] opacity-80 font-normal">自動匯入資訊</span></button>
-          <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">支援多張長圖</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
+          <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">極限壓縮防爆</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
           <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">多重驗證修復</span></button>
         </div>
         <div id="receiptGalleryStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
@@ -359,7 +356,7 @@
           <button onclick="closeNumericKeypad()" class="px-3 py-1.5 rounded-xl bg-panda-600 text-white text-xs font-extrabold">完成 <i class="fa-solid fa-check ml-0.5"></i></button>
         </div>
       </div>
-      <!-- Phone Layout Keypad (1,2,3 at top) -->
+      <!-- Phone Layout Keypad -->
       <div class="grid grid-cols-4 gap-2 text-center">
         <button onclick="keypadPress('1')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">1</button>
         <button onclick="keypadPress('2')" class="h-12 rounded-2xl bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-lg font-extrabold">2</button>
@@ -387,7 +384,7 @@
   <div id="smartPasteModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3.5 border border-panda-100">
       <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
-        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用 (含會計恆等式自動驗算)</p></div></div>
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用 (含自動驗算)</p></div></div>
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
@@ -446,8 +443,8 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v13_1';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v13_1';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v13_3';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v13_3';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     function safeStorageGet(key, fallback = null) {
@@ -477,7 +474,7 @@
     window._firebaseBridge = { pushState: () => {}, subscribeRoom: () => {} };
     
     function loadDatabase() {
-      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v13', 'panda_split_records_db_v12', 'panda_split_records_db_v11', 'panda_split_records_db_v10'];
+      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v13_1', 'panda_split_records_db_v13', 'panda_split_records_db_v12', 'panda_split_records_db_v11', 'panda_split_records_db_v10'];
       for (const k of keys) {
         try {
           const saved = safeStorageGet(k);
@@ -490,12 +487,41 @@
       return JSON.parse(JSON.stringify(defaultDatabase));
     }
 
+    // ★ 智慧儲存配額管家 (Smart Quota Manager)：防爆容量與自動清除舊圖
     function saveDatabase() {
-      try { 
-        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); 
-      } catch (e) {
-        if (e && e.name === 'QuotaExceededError') {
-           alert('手機瀏覽器儲存空間已滿！由於安全限制，最近加入的內容或截圖可能無法保存。請嘗試刪除舊紀錄。');
+      let saved = false;
+      let retryCount = 0;
+      while (!saved && retryCount < 10) {
+        try { 
+          localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); 
+          saved = true;
+        } catch (e) {
+          let purged = false;
+          // 1. 優先從最舊的記錄清除圖片（排除當前記錄）
+          for (let i = dbState.records.length - 1; i >= 0; i--) {
+            const r = dbState.records[i];
+            if (r.id !== dbState.activeRecordId && r.receipts && r.receipts.some(img => img.dataUrl && img.dataUrl.length > 100)) {
+              r.receipts.forEach(img => img.dataUrl = '');
+              purged = true;
+              showToast('儲存空間不足，已自動清除舊記錄的截圖以釋放空間');
+              break; 
+            }
+          }
+          // 2. 如果舊記錄都沒圖片了，只好清除當前記錄的圖片
+          if (!purged) {
+            const activeRec = getActiveRecord();
+            if (activeRec && activeRec.receipts && activeRec.receipts.some(img => img.dataUrl && img.dataUrl.length > 100)) {
+              activeRec.receipts.forEach(img => img.dataUrl = '');
+              purged = true;
+              alert('手機瀏覽器儲存容量已達物理極限！系統已強制清空剛上傳的截圖以保全分賬數據。請手動刪除無用的舊紀錄。');
+            }
+          }
+          // 3. 真的沒東西可以清了
+          if (!purged) {
+            alert('嚴重錯誤：瀏覽器儲存空間完全爆滿，請立即手動刪除舊紀錄！');
+            break; 
+          }
+          retryCount++;
         }
       }
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
@@ -510,7 +536,7 @@
     }
 
     function initAuthLock() { 
-      const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true' || safeStorageGet('panda_split_unlocked_v13') === 'true'; 
+      const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true' || safeStorageGet('panda_split_unlocked_v13_1') === 'true' || safeStorageGet('panda_split_unlocked_v13') === 'true'; 
       if (unlocked) {
         unlockAppSuccess(false); 
       } else { 
@@ -911,7 +937,6 @@
       if (res.detectedFinalTotal !== null) { rec.receiptTotal = res.detectedFinalTotal; importedMetaLabels.push(`收據總計 $${res.detectedFinalTotal}`); }
       return importedMetaLabels;
     }
-
     function parseSmartTextAndImport(replaceExisting) { const raw = document.getElementById('smartPasteTextarea').value; if (!raw.trim()) { showToast('請先貼上收據文字'); return; } const res = parseReceiptRawText(raw); const rec = getActiveRecord(); const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting); closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll(); showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`); }
 
     async function runLocalOfflineOcr() {
@@ -944,17 +969,36 @@
     }
     function openSmartPasteWithText() { document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || ''; document.getElementById('smartPasteModal').classList.remove('hidden'); }
     
+    // ★ 極限壓縮上傳處理：最大寬度收緊至 800px，0.5 JPEG 畫質
     function handleMultiReceiptUpload(event) {
-      if (appMode === 'debtor') return; const files = Array.from(event.target.files || []); if (files.length === 0) return; const rec = getActiveRecord(); if (!rec) return; if (!rec.receipts) rec.receipts = []; let loaded = 0;
+      if (appMode === 'debtor') return; 
+      const files = Array.from(event.target.files || []); if (files.length === 0) return; 
+      const rec = getActiveRecord(); if (!rec) return; if (!rec.receipts) rec.receipts = []; 
+      let loaded = 0;
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
           img.onload = () => {
-            const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; const MAX_WIDTH = 1200;
+            const canvas = document.createElement('canvas'); 
+            let w = img.width; let h = img.height; 
+            
+            // 激進壓縮：最大寬度 800px，限制超長截圖高度 4000px 以防記憶體不足
+            const MAX_WIDTH = 800;
             if (w > MAX_WIDTH) { h = Math.round(h * MAX_WIDTH / w); w = MAX_WIDTH; }
-            canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-            rec.receipts.push({ id: 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6), name: file.name, dataUrl: dataUrl }); loaded++;
+            const MAX_HEIGHT = 4000;
+            if (h > MAX_HEIGHT) { w = Math.round(w * MAX_HEIGHT / h); h = MAX_HEIGHT; }
+            
+            canvas.width = w; canvas.height = h; 
+            const ctx = canvas.getContext('2d'); 
+            ctx.fillStyle = '#FFFFFF'; // 防止透明PNG變黑底
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h); 
+            // 輸出為 0.5 畫質的 JPEG，大幅縮小體積
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+            
+            rec.receipts.push({ id: 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6), name: file.name, dataUrl: dataUrl }); 
+            loaded++;
             if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已載入 ${files.length} 張截圖！可點擊本機識圖`); }
           };
           img.src = e.target.result;
@@ -974,7 +1018,8 @@
       document.getElementById('orderDateInput').value = rec.date || ''; document.getElementById('orderDateInput').readOnly = isDebtor;
       document.getElementById('orderPlatformSelect').value = rec.platform || 'foodpanda'; document.getElementById('orderPlatformSelect').disabled = isDebtor;
       document.getElementById('orderRestaurantInput').value = rec.restaurant || ''; document.getElementById('orderRestaurantInput').readOnly = isDebtor;
-      document.getElementById('receiptCountBadge').textContent = (rec.receipts || []).length;
+      document.getElementById('receiptCountBadge').textContent = (rec.receipts || []).filter(r => r.dataUrl).length; // 僅計算未被自動清除的圖片
+      
       document.getElementById('sumOriginal').textContent = `$${calc.totalOriginal.toFixed(1)}`; document.getElementById('sumDiscount').textContent = `-$${calc.totalDiscount.toFixed(1)}`;
       document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`; document.getElementById('sumFinal').textContent = `$${calc.sumRoundedCollectible.toFixed(1)}`;
       
@@ -992,12 +1037,18 @@
     function renderReceiptGallery(rec, isDebtor) {
       const strip = document.getElementById('receiptGalleryStrip'); const r = rec.receipts || [];
       if (r.length === 0) { strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`; return; }
-      strip.innerHTML = r.map((rc, i) => `
-        <div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
+      strip.innerHTML = r.map((rc, i) => {
+        // 如果截圖已被自動釋放，顯示 placeholder
+        if (!rc.dataUrl) {
+          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70">
+            <div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-cloud-arrow-down mb-1 text-sm block"></i>圖片已為節省空間而釋放</div>
+          </div>`;
+        }
+        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div>
           <img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" />
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
     function renderParticipantChips(rec, calc, isDebtor) {
       const p = rec.participants || []; document.getElementById('participantCount').textContent = p.length; document.getElementById('clearAllMembersBtn').style.display = (isDebtor || p.length === 0) ? 'none' : 'flex'; document.getElementById('addMemberBtn').style.display = isDebtor ? 'none' : 'flex';
@@ -1121,7 +1172,6 @@
       document.getElementById('whatsappMessageOutput').value = l.join('\n');
     }
 
-    // --- 7. HANDLERS ---
     function switchTab(t) { closeNumericKeypad(); activeTab = t; ['items','discounts','breakdown','collect'].forEach(x => { document.getElementById(`tab-${x}`).classList.toggle('hidden', x !== t); const m = document.getElementById(`mobTab-${x}`); if (m) m.className = x === t ? 'flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold' : 'flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 font-medium'; const d = document.getElementById(`deskTab-${x}`); if (d) d.className = x === t ? 'py-2 rounded-xl text-xs font-bold bg-panda-600 text-white' : 'py-2 rounded-xl text-xs font-bold text-panda-800'; }); renderActiveRecordAll(); }
     function updateOrderMetadata() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.title = document.getElementById('orderTitleInput').value.trim(); r.date = document.getElementById('orderDateInput').value; r.restaurant = document.getElementById('orderRestaurantInput').value.trim(); saveDatabase(); renderActiveRecordAll(); }
     function handlePlatformChange(p) { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.platform = p; r.verifiedPromos = [...(PLATFORM_PROMOS[p] || PLATFORM_PROMOS['foodpanda'])]; applyPlatformTheme(p); saveDatabase(); renderActiveRecordAll(); showToast(`已切換為 ${p} 主題配色！`); }
@@ -1171,6 +1221,8 @@
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
+    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom });
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initAuthLock);
     } else {
@@ -1194,12 +1246,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v13', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v13_3', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v13', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v13_3', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
