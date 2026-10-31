@@ -107,6 +107,7 @@
           </div>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
+          <!-- List View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner">
              <button id="listModeCreditorBtn" onclick="setAppMode('creditor')" class="px-2.5 py-1 rounded-full bg-white text-panda-700 text-[10px] sm:text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
              <button id="listModeDebtorBtn" onclick="setAppMode('debtor')" class="px-2.5 py-1 rounded-full text-white/80 hover:text-white text-[10px] sm:text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
@@ -146,6 +147,7 @@
         <div class="flex items-center justify-between mb-3 relative z-10">
           <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0"><i class="fa-solid fa-chevron-left"></i><span>列表</span></button>
           
+          <!-- Detail View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
              <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
              <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
@@ -174,6 +176,7 @@
           </div>
         </div>
         
+        <!-- Live Calculation Summary with Absolute Match Badge -->
         <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10 items-stretch">
           <div class="flex flex-col justify-center"><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
           <div class="flex flex-col justify-center"><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
@@ -195,20 +198,10 @@
       <!-- RECEIPT OCR & MULTI-SCREENSHOT WORKBENCH -->
       <div id="receiptDrawer" class="bg-neutral-900 text-white p-3.5 border-b border-neutral-800 transition-all space-y-3">
         <div class="flex items-center justify-between"><div class="text-xs font-bold flex items-center gap-1.5 text-amber-300"><i class="fa-solid fa-bolt"></i><span>收據識圖與自動匯入工作台</span></div><button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1"><i class="fa-solid fa-xmark"></i></button></div>
-        
-        <!-- ★ 雙引擎 Toggle 與設定 -->
-        <div class="flex items-center justify-between bg-neutral-800 rounded-xl p-1 mb-2 border border-neutral-700">
-          <div class="flex items-center gap-1 w-full relative">
-             <button id="engineLocalBtn" onclick="setOcrEngine('local')" class="flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition">🟢 本機引擎</button>
-             <button id="engineAiBtn" onclick="setOcrEngine('ai')" class="flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition">🔵 AI 引擎</button>
-          </div>
-          <button onclick="openApiKeyModal()" class="ml-2 w-8 h-8 rounded-lg bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center transition shrink-0" title="設定 API Key"><i class="fa-solid fa-gear"></i></button>
-        </div>
-
         <div class="grid grid-cols-3 gap-1.5" id="receiptToolsActionGrid">
           <button onclick="openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 hover:bg-amber-300 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste text-sm"></i><span>1. 貼上收據</span><span class="text-[9px] opacity-80 font-normal">自動匯入資訊</span></button>
-          <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">極限壓縮防爆</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
-          <button onclick="runSmartOcr()" id="smartOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-microchip text-sm"></i><span>3. 執行識圖</span><span class="text-[9px] text-white/85 font-normal">多重驗證修復</span></button>
+          <label class="py-2.5 px-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 transition active:scale-95"><i class="fa-solid fa-file-arrow-up text-panda-300 text-sm"></i><span>2. 上傳截圖</span><span class="text-[9px] text-neutral-400 font-normal">IndexedDB 儲存</span><input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" /></label>
+          <button onclick="runLocalOfflineOcr()" id="localOcrBtn" class="py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-eye text-sm"></i><span>3. 離線識圖</span><span class="text-[9px] text-white/85 font-normal">微切片與重掃修正</span></button>
         </div>
         <div id="receiptGalleryStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"></div>
         <div id="zoomReceiptBox" class="hidden bg-black/60 p-2 rounded-xl border border-neutral-700 max-h-64 overflow-y-auto">
@@ -390,29 +383,11 @@
     </div>
   </div>
 
-  <!-- ★ API KEY MODAL -->
-  <div id="apiKeyModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-sky-200 relative overflow-hidden">
-      <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-sky-50 pointer-events-none"></div>
-      <div class="flex items-center justify-between border-b border-sky-100 pb-2.5 relative z-10">
-        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center"><i class="fa-solid fa-key"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">Gemini API 金鑰</h3><p class="text-[10px] text-neutral-500">啟用高精度 🔵 AI 視覺引擎</p></div></div>
-        <button onclick="closeApiKeyModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-3 text-xs relative z-10">
-        <input id="apiKeyValueInput" type="password" placeholder="AIzaSy..." class="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-sky-500" />
-        <p class="text-[10px] text-neutral-400">您的金鑰僅加密儲存於本機瀏覽器，絕不會上傳至第三方伺服器。若留空並儲存，將切回 🟢 本機引擎。</p>
-        <div class="flex gap-2 pt-1">
-          <button onclick="closeApiKeyModal()" class="flex-1 py-2 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
-          <button onclick="saveApiKey()" class="flex-1 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold shadow-sm">儲存並啟用</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <!-- MODALS -->
   <div id="smartPasteModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3.5 border border-panda-100">
       <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
-        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用 (含自動驗算)</p></div></div>
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用</p></div></div>
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
@@ -467,17 +442,13 @@
   </div>
 
   <!-- ========================================================= -->
-  <!-- CORE APPLICATION LOGIC                                    -->
+  <!-- CORE APPLICATION LOGIC (v16 - Micro-Crops & Auto-Healer)  -->
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v14';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v14';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v16';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v16';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
-
-    // ★ 雙引擎狀態管理
-    let currentOcrEngine = 'local'; // 'local' or 'ai'
-    let geminiApiKey = safeStorageGet('split_rice_gemini_key', '');
 
     function safeStorageGet(key, fallback = null) {
       try { const val = localStorage.getItem(key); if (val !== null) return val; } catch (e) {}
@@ -492,6 +463,57 @@
       try { localStorage.removeItem(key); } catch (e) {}
       try { sessionStorage.removeItem(key); } catch (e) {}
     }
+    
+    function clearLegacyStorage() {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) {
+          localStorage.removeItem(k);
+        }
+      }
+    }
+
+    const ImageDB = {
+      db: null,
+      async init() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open('SplitThatRiceImages', 1);
+          req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('receipts')) {
+              db.createObjectStore('receipts', { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = e => { this.db = e.target.result; resolve(); };
+          req.onerror = e => reject(e);
+        });
+      },
+      async save(id, dataUrl) {
+        if (!this.db) await this.init();
+        return new Promise(resolve => {
+          const tx = this.db.transaction('receipts', 'readwrite');
+          tx.objectStore('receipts').put({ id, dataUrl });
+          tx.oncomplete = () => resolve();
+        });
+      },
+      async get(id) {
+        if (!this.db) await this.init();
+        return new Promise(resolve => {
+          const tx = this.db.transaction('receipts', 'readonly');
+          const req = tx.objectStore('receipts').get(id);
+          req.onsuccess = () => resolve(req.result ? req.result.dataUrl : null);
+          req.onerror = () => resolve(null);
+        });
+      },
+      async remove(id) {
+        if (!this.db) await this.init();
+        return new Promise(resolve => {
+          const tx = this.db.transaction('receipts', 'readwrite');
+          tx.objectStore('receipts').delete(id);
+          tx.oncomplete = () => resolve();
+        });
+      }
+    };
 
     const PLATFORM_PROMOS = {
       'foodpanda': [ { title: 'pandapro 8折優惠 (封頂減$60)', badge: '熱門餐廳優惠', mode: 'percent_cap', percentOff: 20, capAmount: 60 }, { title: '指定餐廳全單 75折 (封頂減$80)', badge: '限時閃購', mode: 'percent_cap', percentOff: 25, capAmount: 80 }, { title: '外賣自取全單 85折 (無上限)', badge: '自取優惠', mode: 'percent', percentOff: 15, capAmount: 0 } ],
@@ -506,55 +528,45 @@
     window._firebaseBridge = { pushState: () => {}, subscribeRoom: () => {} };
     
     function loadDatabase() {
-      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v13_3', 'panda_split_records_db_v13_1', 'panda_split_records_db_v13', 'panda_split_records_db_v12'];
-      for (const k of keys) {
+      const saved = safeStorageGet(STORAGE_KEY_DB);
+      if (saved) {
         try {
-          const saved = safeStorageGet(k);
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed && Array.isArray(parsed.records)) return parsed;
-          }
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.records)) return parsed;
         } catch (e) {}
       }
       return JSON.parse(JSON.stringify(defaultDatabase));
     }
 
     function saveDatabase() {
-      let saved = false;
-      let retryCount = 0;
-      while (!saved && retryCount < 10) {
-        try { 
-          localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); 
-          saved = true;
-        } catch (e) {
-          let purged = false;
-          for (let i = dbState.records.length - 1; i >= 0; i--) {
-            const r = dbState.records[i];
-            if (r.id !== dbState.activeRecordId && r.receipts && r.receipts.some(img => img.dataUrl && img.dataUrl.length > 100)) {
-              r.receipts.forEach(img => img.dataUrl = '');
-              purged = true;
-              showToast('儲存空間不足，已自動清除舊記錄的截圖以釋放空間');
-              break; 
-            }
-          }
-          if (!purged) {
-            const activeRec = getActiveRecord();
-            if (activeRec && activeRec.receipts && activeRec.receipts.some(img => img.dataUrl && img.dataUrl.length > 100)) {
-              activeRec.receipts.forEach(img => img.dataUrl = '');
-              purged = true;
-              alert('手機瀏覽器儲存容量已達物理極限！系統已強制清空剛上傳的截圖以保全分賬數據。請手動刪除無用的舊紀錄。');
-            }
-          }
-          if (!purged) {
-            alert('嚴重錯誤：瀏覽器儲存空間完全爆滿，請立即手動刪除舊紀錄！');
-            break; 
-          }
-          retryCount++;
+      const stateToSave = JSON.parse(JSON.stringify(dbState));
+      stateToSave.records.forEach(r => {
+        if (r.receipts) {
+          r.receipts.forEach(img => {
+            delete img.dataUrl; 
+          });
         }
+      });
+      try { 
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); 
+      } catch (e) {
+        alert('手機瀏覽器儲存空間已滿！');
       }
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
     }
     
+    async function preloadActiveImages() {
+      const rec = getActiveRecord();
+      if (rec && rec.receipts) {
+        for (let r of rec.receipts) {
+          if (!r.dataUrl) {
+            r.dataUrl = await ImageDB.get(r.id);
+          }
+        }
+        renderReceiptGallery(rec, appMode === 'debtor');
+      }
+    }
+
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
     
@@ -564,18 +576,13 @@
     }
 
     function initAuthLock() { 
-      const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true' || safeStorageGet('panda_split_unlocked_v13_3') === 'true'; 
+      const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true' || safeStorageGet('panda_split_unlocked_v15') === 'true'; 
       if (unlocked) {
         unlockAppSuccess(false); 
       } else { 
         const ps = document.getElementById('passcodeScreen');
         if (ps) ps.classList.remove('hidden'); 
       } 
-      // 載入儲存的引擎設定
-      const savedEngine = safeStorageGet('split_rice_ocr_engine');
-      if (savedEngine === 'ai' || savedEngine === 'local') {
-        setOcrEngine(savedEngine, true);
-      }
     }
     
     function pressPinDigit(digit) { 
@@ -626,51 +633,6 @@
       const headerActionBtns = document.getElementById('headerActionBtns'); if (headerActionBtns) headerActionBtns.style.display = isDebtor ? 'none' : 'flex';
       const createBtn = document.getElementById('createNewRecordBtn'); if (createBtn) createBtn.style.display = isDebtor ? 'none' : 'flex';
       renderRecordsList(); renderActiveRecordAll(); showToast(isDebtor ? '已切換為「債仔唯讀瀏覽模式」' : '已恢復為「債主管理模式」');
-    }
-
-    // ★ 雙引擎 UI 切換邏輯
-    function setOcrEngine(engine, isInit = false) {
-      currentOcrEngine = engine;
-      safeStorageSet('split_rice_ocr_engine', engine);
-      
-      const localBtn = document.getElementById('engineLocalBtn');
-      const aiBtn = document.getElementById('engineAiBtn');
-      const actionBtn = document.getElementById('smartOcrBtn');
-      
-      if (engine === 'local') {
-        localBtn.className = 'flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition';
-        aiBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
-        actionBtn.innerHTML = `<i class="fa-solid fa-microchip text-sm"></i><span>3. 執行識圖</span><span class="text-[9px] text-white/85 font-normal">多重驗證修復</span>`;
-        if (!isInit) showToast('已切換為 🟢 本機引擎');
-      } else {
-        localBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
-        aiBtn.className = 'flex-1 py-1.5 rounded-lg bg-sky-600 text-white text-[11px] font-bold shadow-sm transition';
-        actionBtn.innerHTML = `<i class="fa-solid fa-brain text-sm"></i><span>3. AI 識圖</span><span class="text-[9px] text-white/85 font-normal">Gemini 高精度</span>`;
-        if (!isInit) showToast('已切換為 🔵 AI 引擎');
-      }
-    }
-
-    function openApiKeyModal() {
-      document.getElementById('apiKeyValueInput').value = geminiApiKey || '';
-      document.getElementById('apiKeyModal').classList.remove('hidden');
-    }
-    
-    function closeApiKeyModal() {
-      document.getElementById('apiKeyModal').classList.add('hidden');
-    }
-
-    function saveApiKey() {
-      const val = document.getElementById('apiKeyValueInput').value.trim();
-      geminiApiKey = val;
-      safeStorageSet('split_rice_gemini_key', val);
-      closeApiKeyModal();
-      if (val) {
-        setOcrEngine('ai');
-        showToast('API Key 已儲存並啟用 🔵 AI 引擎！');
-      } else {
-        setOcrEngine('local');
-        showToast('已清空金鑰並切回 🟢 本機引擎');
-      }
     }
 
     let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
@@ -742,11 +704,20 @@
       saveDatabase(); openRecordDetail(newRec.id); showToast('已建立新分賬紀錄 (收款資料已清空)！');
     }
     
-    function deleteRecord(id) { if (appMode === 'debtor') return; const t = dbState.records.find(r => r.id === id); if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; dbState.records = dbState.records.filter(r => r.id !== id); if (dbState.activeRecordId === id) dbState.activeRecordId = null; saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); }
+    function deleteRecord(id) { 
+      if (appMode === 'debtor') return; 
+      const t = dbState.records.find(r => r.id === id); 
+      if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; 
+      if (t.receipts) { t.receipts.forEach(rcp => ImageDB.remove(rcp.id)); }
+      dbState.records = dbState.records.filter(r => r.id !== id); 
+      if (dbState.activeRecordId === id) dbState.activeRecordId = null; 
+      saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); 
+    }
     
     function openRecordDetail(id) { 
       document.getElementById('zoomReceiptBox').classList.add('hidden'); document.getElementById('zoomReceiptImg').src = ''; resetOcrStatusBox();
-      dbState.activeRecordId = id; const rec = getActiveRecord(); if (rec) applyPlatformTheme(rec.platform || 'foodpanda'); saveDatabase(); document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.remove('hidden'); renderActiveRecordAll(); 
+      dbState.activeRecordId = id; const rec = getActiveRecord(); if (rec) applyPlatformTheme(rec.platform || 'foodpanda'); 
+      preloadActiveImages().then(() => { renderActiveRecordAll(); });
     }
 
     function calculateRecordBill(rec) {
@@ -765,7 +736,7 @@
         const rawF = Math.max(0, p - iD + iF); let rF = rawF;
         if (rec.fees.rounding === 'half') rF = Math.ceil(rawF * 2) / 2; else if (rec.fees.rounding === 'dollar') rF = Math.ceil(rawF); else rF = Math.round(rawF * 10) / 10;
         sumRound += rF;
-        itemBreakdown.push({ id: it.id, name: it.name, originalPrice: p, ratio, discountShare: iD, feeShare: iF, rawFinal: rawF, finalPayable: rF, paid: !!it.paid, assignedTo: it.assignedTo || [], assignedNames: (it.assignedTo || []).map(pid => (rec.participants || []).find(x => x.id === pid)?.name).filter(Boolean) });
+        itemBreakdown.push({ id: it.id, name: it.name, originalPrice: p, ratio, discountShare: iD, feeShare: iF, rawFinal: rawF, finalPayable: rF, paid: !!it.paid, assignedTo: it.assignedTo || [], assignedNames: (it.assignedTo || []).map(pid => (rec.participants || []).find(x => x.id === pid)?.name).filter(Boolean), microCrop: it.microCrop || null });
       });
       const personBreakdown = {};
       (rec.participants || []).forEach(p => personBreakdown[p.id] = { id: p.id, name: p.name, items: [], subtotal: 0, discountShare: 0, feeShare: 0, finalPayable: 0 });
@@ -788,11 +759,12 @@
       return lastVal;
     }
     
-    function extractFeeFromLineOrNext(lines, idx) {
-      const valSameLine = extractLastPrice(lines[idx]);
+    // ★ 抽取行物件取代純字串
+    function extractFeeFromLineOrNext(linesObjArray, idx) {
+      const valSameLine = extractLastPrice(linesObjArray[idx].text);
       if (valSameLine !== null) return { val: valSameLine, nextIdx: idx };
-      if (idx + 1 < lines.length) {
-        const nextLine = lines[idx + 1];
+      if (idx + 1 < linesObjArray.length) {
+        const nextLine = linesObjArray[idx + 1].text;
         const valNext = extractLastPrice(nextLine);
         if (valNext !== null && /^(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(nextLine.replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2').trim())) {
           return { val: valNext, nextIdx: idx + 1 };
@@ -801,14 +773,14 @@
       return { val: null, nextIdx: idx };
     }
     
-    function matchQuantityPrefix(line) {
-      const m = line.match(/^\s*([0-9IilL|OoS]*)\s*[xX×*✕]\s*(.*)$/);
+    function matchQuantityPrefix(lineText) {
+      const m = lineText.match(/^\s*([0-9IilL|OoS]*)\s*[xX×*✕]\s*(.*)$/);
       if (!m) return null;
       let digits = m[1].replace(/[IilL|]/g, '1').replace(/[Oo]/g, '0').replace(/[S]/g, '5');
       let qty = digits === '' ? 1 : parseInt(digits, 10);
       if (isNaN(qty) || qty <= 0 || qty > 500) return null;
       if (digits === '') {
-        if (!/(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(line.replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2'))) {
+        if (!/(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i.test(lineText.replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2'))) {
           return null;
         }
       }
@@ -835,18 +807,54 @@
       });
     }
 
-    function reconstructLinesFromWords(words) {
+    // ★ 空間重組：回傳攜帶 Bbox 座標的行物件
+    function reconstructLineObjects(words, dataUrl) {
       const validWords = (words || []).filter(w => w && w.text && w.text.trim());
       let currentY = -1; let currentLine = []; let linesArr = [];
       validWords.sort((a, b) => a.bbox.y0 - b.bbox.y0).forEach(w => {
         const yCenter = (w.bbox.y0 + w.bbox.y1) / 2;
         if (currentY === -1 || Math.abs(yCenter - currentY) > 14) {
-          if (currentLine.length > 0) { currentLine.sort((a, b) => a.bbox.x0 - b.bbox.x0); linesArr.push(currentLine.map(x => x.text).join(' ')); }
+          if (currentLine.length > 0) { 
+            currentLine.sort((a, b) => a.bbox.x0 - b.bbox.x0); 
+            const text = currentLine.map(x => x.text).join(' ');
+            const bbox = { x0: Math.min(...currentLine.map(x => x.bbox.x0)), y0: Math.min(...currentLine.map(x => x.bbox.y0)), x1: Math.max(...currentLine.map(x => x.bbox.x1)), y1: Math.max(...currentLine.map(x => x.bbox.y1)) };
+            linesArr.push({ text, bbox, dataUrl }); 
+          }
           currentLine = [w]; currentY = yCenter;
         } else { currentLine.push(w); currentY = (currentY * (currentLine.length - 1) + yCenter) / currentLine.length; }
       });
-      if (currentLine.length > 0) { currentLine.sort((a, b) => a.bbox.x0 - b.bbox.x0); linesArr.push(currentLine.map(x => x.text).join(' ')); }
-      return linesArr.join('\n');
+      if (currentLine.length > 0) { 
+        currentLine.sort((a, b) => a.bbox.x0 - b.bbox.x0); 
+        const text = currentLine.map(x => x.text).join(' ');
+        const bbox = { x0: Math.min(...currentLine.map(x => x.bbox.x0)), y0: Math.min(...currentLine.map(x => x.bbox.y0)), x1: Math.max(...currentLine.map(x => x.bbox.x1)), y1: Math.max(...currentLine.map(x => x.bbox.y1)) };
+        linesArr.push({ text, bbox, dataUrl }); 
+      }
+      return linesArr;
+    }
+
+    // ★ 從綁定的 dataUrl 與 bbox 抽取出微切片 (Micro-Crop)
+    async function extractMicroCrop(lineObj) {
+      if (!lineObj || !lineObj.dataUrl || !lineObj.bbox) return null;
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const padding = 6;
+          const x0 = Math.max(0, lineObj.bbox.x0 - padding);
+          const y0 = Math.max(0, lineObj.bbox.y0 - padding);
+          const x1 = Math.min(img.width, lineObj.bbox.x1 + padding);
+          const y1 = Math.min(img.height, lineObj.bbox.y1 + padding);
+          const w = x1 - x0; const h = y1 - y0;
+          if (w <= 0 || h <= 0) { resolve(null); return; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, x0, y0, w, h, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = () => resolve(null);
+        img.src = lineObj.dataUrl;
+      });
     }
 
     function evaluateParsedScore(parsed) {
@@ -866,7 +874,7 @@
       return score;
     }
 
-    function runAccountingAutoHeal(res, rawLines) {
+    function runAccountingAutoHeal(res, rawLinesText) {
       const healLogs = []; let items = res.extractedItems || []; let subtotal = res.detectedSubtotal; const finalTotal = res.detectedFinalTotal;
       const sumItems = () => Math.round(items.reduce((acc, it) => acc + (Number(it.price) || 0), 0) * 10) / 10;
 
@@ -902,7 +910,7 @@
         if (finalTotal > baseSubtotal * 2 && Math.abs(calcExpected() - (finalTotal / 10)) <= 1.0) { const ftDiv10 = Math.round((finalTotal / 10) * 10) / 10; healLogs.push(`收據總計小數點校正 ($${finalTotal} → $${ftDiv10.toFixed(1)})`); res.detectedFinalTotal = ftDiv10; diff = Math.round((calcExpected() - ftDiv10) * 10) / 10; }
         if (diff < -0.2 && Math.abs(diff) <= 15 && res.detectedPlatformFee === null) { const missingFee = Math.round(Math.abs(diff) * 10) / 10; res.detectedPlatformFee = missingFee; healLogs.push(`會計恆等式自動補回平台費 ($${missingFee.toFixed(1)})`); diff = Math.round((calcExpected() - res.detectedFinalTotal) * 10) / 10; }
         if (diff > 0.5 && diff <= baseSubtotal) {
-          const missingDisc = Math.round(diff * 10) / 10; const rawJoined = (rawLines || []).join(' '); const targetStr1 = missingDisc.toFixed(1); const targetStr2 = String(Math.round(missingDisc * 10));
+          const missingDisc = Math.round(diff * 10) / 10; const rawJoined = (rawLinesText || []).join(' '); const targetStr1 = missingDisc.toFixed(1); const targetStr2 = String(Math.round(missingDisc * 10));
           if (rawJoined.includes(targetStr1) || rawJoined.includes(targetStr2)) {
             if (res.detectedVoucher === null && /優\s*惠|現\s*金\s*券|voucher|coupon|panda|payme/i.test(rawJoined)) { res.detectedVoucher = missingDisc; healLogs.push(`會計恆等式自動補回優惠券 (-$${missingDisc.toFixed(1)})`); } 
             else if (res.detectedDirectDiscount === null) { res.detectedDirectDiscount = missingDisc; healLogs.push(`會計恆等式自動補回折扣 (-$${missingDisc.toFixed(1)})`); }
@@ -912,22 +920,23 @@
       res.autoHealLogs = healLogs; return res;
     }
     
-    function parseReceiptRawText(rawText) {
-      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    // ★ 接收陣列物件 (包含 bbox) 的解析器
+    function parseReceiptRawText(linesObjArray) {
+      const lines = linesObjArray.filter(l => l && l.text && l.text.trim());
       const extractedItems = []; const seenFingerprints = new Set();
       let duplicatesSkipped = 0; let detectedRestaurant = null; let detectedSubtotal = null; let detectedDelivery = null; let detectedPlatformFee = null; let detectedPackagingFee = null; let detectedDirectDiscount = null; let detectedVoucher = null; let detectedFinalTotal = null;
       
       const nonItemBlacklistRegex = /(訂\s*單|編\s*號|order\s*#|訂\s*購\s*[於放菸自]|送\s*達\s*到|送\s*遞\s*地\s*址|小\s*計|subtotal|運\s*費|外\s*送\s*費|送\s*遞\s*費|delivery\s*fee|折\s*扣|discount|平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee|優\s*惠\s*券|優\s*惠\s*碼|現\s*金\s*券|voucher|coupon|總\s*計|總\s*金\s*額|實\s*付|total|付\s*款\s*方\s*式|payment|信\s*用\s*卡|apple\s*pay|google\s*pay|payme|visa|mastercard|包\s*裝\s*費|餐\s*盒\s*費|下\s*載\s*帳\s*單|重\s*新\s*訂\s*購)/i;
-      const hasAnyQtyMarkers = lines.some(l => matchQuantityPrefix(l) !== null);
-      let pendingItemName = null; let pendingQty = 1; let pendingLockedByQty = false;
+      const hasAnyQtyMarkers = lines.some(l => matchQuantityPrefix(l.text) !== null);
+      let pendingItemName = null; let pendingQty = 1; let pendingLockedByQty = false; let pendingLineObj = null;
       let possibleHeaderLines = [];
 
-      let deliverToIdx = lines.findIndex(l => /(送\s*達\s*到|送\s*遞\s*地\s*址|deliver\s*to)/i.test(l));
-      let deliverAtIdx = lines.findIndex(l => /(送\s*達\s*於|送\s*遞\s*於|deliver(?:ed)?\s*at)/i.test(l));
+      let deliverToIdx = lines.findIndex(l => /(送\s*達\s*到|送\s*遞\s*地\s*址|deliver\s*to)/i.test(l.text));
+      let deliverAtIdx = lines.findIndex(l => /(送\s*達\s*於|送\s*遞\s*於|deliver(?:ed)?\s*at)/i.test(l.text));
       if (deliverToIdx !== -1) {
         let startIdx = deliverAtIdx !== -1 ? deliverAtIdx + 1 : Math.max(0, deliverToIdx - 4);
         for (let j = deliverToIdx - 1; j >= startIdx; j--) {
-          let text = lines[j].replace(/\s+/g, ' ').trim();
+          let text = lines[j].text.replace(/\s+/g, ' ').trim();
           if (/(訂\s*購\s*[於放菸自]|ordered?\s*from)$/i.test(text)) continue;
           text = text.replace(/^[©@(8O0\[\]{}.\-|]+\s*/, '');
           if (text.length >= 2 && !/(訂\s*單|編\s*號|order|送\s*達)/i.test(text)) { detectedRestaurant = sanitizeCleanName(text); break; }
@@ -935,36 +944,42 @@
       }
 
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].replace(/\s+/g, ' ').trim();
-        if (i < 5 && !matchQuantityPrefix(line) && !/(foodpanda|keeta|uber eats|order|delivery|total|小計|平台|HK\$|\d{2}:\d{2})/i.test(line)) possibleHeaderLines.push(line);
+        const lineText = lines[i].text.replace(/\s+/g, ' ').trim();
+        if (i < 5 && !matchQuantityPrefix(lineText) && !/(foodpanda|keeta|uber eats|order|delivery|total|小計|平台|HK\$|\d{2}:\d{2})/i.test(lineText)) possibleHeaderLines.push(lineText);
 
         if (!detectedRestaurant) {
-          const restHeaderMatch = line.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
+          const restHeaderMatch = lineText.match(/(?:訂\s*購\s*[於放菸自]|ordered?\s*from)\s*[:：]?\s*(.*)$/i);
           if (restHeaderMatch) {
             let candidate = restHeaderMatch[1].replace(/(?:HK\s*[$S5s]|\$).*$/i, '').trim();
             candidate = candidate.replace(/^[©@(8O0\[\]{}.\-|]+\s*/, '');
             if (candidate.length >= 2) { detectedRestaurant = sanitizeCleanName(candidate); } 
             else if (i + 1 < lines.length) {
-              const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim();
+              const nextLine = lines[i + 1].text.replace(/\s+/g, ' ').trim();
               if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { detectedRestaurant = sanitizeCleanName(nextLine.replace(/^[©@(8O0\[\]{}.\-|]+\s*/, '')); i++; }
             }
-            pendingItemName = null; pendingLockedByQty = false; continue;
+            pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue;
           }
         }
 
-        if (/(小\s*計|subtotal)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedSubtotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (/(平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(line) && !matchQuantityPrefix(line)) { if (/免\s*費|免\s*運\s*費|free/i.test(line)) { detectedDelivery = 0; } else { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo|pandabox|pandadeal|payme)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(line) && !matchQuantityPrefix(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(line)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; continue; }
-        if (nonItemBlacklistRegex.test(line)) { pendingItemName = null; pendingLockedByQty = false; continue; }
+        if (/(小\s*計|subtotal)/i.test(lineText) && !matchQuantityPrefix(lineText)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedSubtotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (/(平\s*[台臺合]\s*(?:服\s*務\s*)?費|服\s*務\s*費|platform\s*fee|service\s*fee)/i.test(lineText) && !matchQuantityPrefix(lineText)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPlatformFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (/(運\s*費|外\s*送\s*費|送\s*遞\s*費|送\s*餐\s*費|delivery\s*fee)/i.test(lineText) && !matchQuantityPrefix(lineText)) { if (/免\s*費|免\s*運\s*費|free/i.test(lineText)) { detectedDelivery = 0; } else { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDelivery = res.val; i = res.nextIdx; } } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (/(包\s*裝\s*費|餐\s*盒\s*費|外\s*賣\s*盒|container|packaging)/i.test(lineText) && !matchQuantityPrefix(lineText)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedPackagingFee = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (/(優\s*惠|現\s*金\s*券|扣\s*減|voucher|coupon|promo|pandabox|pandadeal|payme)/i.test(lineText) && !matchQuantityPrefix(lineText)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedVoucher = (detectedVoucher || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (/(折\s*扣|減\s*免|立\s*減|會\s*員\s*折|pandapro|discount)/i.test(lineText) && !matchQuantityPrefix(lineText)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedDirectDiscount = (detectedDirectDiscount || 0) + res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(lineText)) { const res = extractFeeFromLineOrNext(lines, i); if (res.val !== null) { detectedFinalTotal = res.val; i = res.nextIdx; } pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
+        if (nonItemBlacklistRegex.test(lineText)) { pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue; }
 
-        const qtyInfo = matchQuantityPrefix(line);
+        const qtyInfo = matchQuantityPrefix(lineText);
         if (qtyInfo) {
           const parsedQty = qtyInfo.qty; let restOfLine = qtyInfo.rest;
-          if (!restOfLine && i + 1 < lines.length) { const nextLine = lines[i + 1].replace(/\s+/g, ' ').trim(); if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { restOfLine = nextLine; i++; } }
+          let targetLineObj = lines[i]; // 預設使用同行物件
+          if (!restOfLine && i + 1 < lines.length) { 
+             const nextLine = lines[i + 1].text.replace(/\s+/g, ' ').trim(); 
+             if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { 
+                restOfLine = nextLine; targetLineObj = lines[i+1]; i++; 
+             } 
+          }
           const cleanedRest = restOfLine.replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2');
           const lastPrice = extractLastPrice(cleanedRest);
           
@@ -972,17 +987,19 @@
             let itemName = cleanedRest.replace(/(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
             itemName = itemName.replace(/(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
             itemName = sanitizeCleanName(itemName.replace(/^[\*\-•·\s]+/, ''));
-            if (itemName && !nonItemBlacklistRegex.test(itemName)) { const fp = `${parsedQty}x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`; if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, itemName, lastPrice, parsedQty); } }
-            pendingItemName = null; pendingLockedByQty = false; continue;
-          } else { pendingQty = parsedQty; pendingItemName = sanitizeCleanName(restOfLine.replace(/^[\*\-•·\s]+/, '').trim()); pendingLockedByQty = true; continue; }
+            if (itemName && !nonItemBlacklistRegex.test(itemName)) { const fp = `${parsedQty}x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`; if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, itemName, lastPrice, parsedQty, targetLineObj); } }
+            pendingItemName = null; pendingLockedByQty = false; pendingLineObj = null; continue;
+          } else { 
+            pendingQty = parsedQty; pendingItemName = sanitizeCleanName(restOfLine.replace(/^[\*\-•·\s]+/, '').trim()); pendingLockedByQty = true; pendingLineObj = targetLineObj; continue; 
+          }
         }
 
-        const cleanedLine = line.replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2');
+        const cleanedLine = lineText.replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2');
         const standalonePrice = cleanedLine.match(/^(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*(\d+(?:\.\d{1,2})?)\s*$/i);
         if (standalonePrice && pendingItemName) {
           const itemPrice = parseFloat(standalonePrice[1]);
-          if (itemPrice > 0 && itemPrice < 10000 && !nonItemBlacklistRegex.test(pendingItemName)) { const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${itemPrice.toFixed(1)}`; if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, pendingItemName, itemPrice, pendingQty); } }
-          pendingItemName = null; pendingQty = 1; pendingLockedByQty = false; continue;
+          if (itemPrice > 0 && itemPrice < 10000 && !nonItemBlacklistRegex.test(pendingItemName)) { const fp = `${pendingQty}x_${pendingItemName.toLowerCase()}_${itemPrice.toFixed(1)}`; if (seenFingerprints.has(fp)) duplicatesSkipped++; else { seenFingerprints.add(fp); pushItemWithQty(extractedItems, pendingItemName, itemPrice, pendingQty, pendingLineObj); } }
+          pendingItemName = null; pendingQty = 1; pendingLockedByQty = false; pendingLineObj = null; continue;
         }
         
         if (!hasAnyQtyMarkers) {
@@ -991,20 +1008,53 @@
             let itemName = cleanedLine.replace(/(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
             itemName = itemName.replace(/(?:HK\s*[$S5s]|[$￥元])?\s*[-－]?\s*\d+(?:\.\d{1,2})?\s*$/i, '').trim();
             itemName = sanitizeCleanName(itemName.replace(/^[\*\-•·\s]+/, ''));
-            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemName.length > 1) { const fp = `1x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`; if (!seenFingerprints.has(fp)) { seenFingerprints.add(fp); extractedItems.push({ name: itemName, price: lastPrice }); } }
+            if (itemName && !nonItemBlacklistRegex.test(itemName) && itemName.length > 1) { const fp = `1x_${itemName.toLowerCase()}_${lastPrice.toFixed(1)}`; if (!seenFingerprints.has(fp)) { seenFingerprints.add(fp); pushItemWithQty(extractedItems, itemName, lastPrice, 1, lines[i]); } }
           }
         }
       }
 
       if (!detectedRestaurant && possibleHeaderLines.length > 0) { const validH = possibleHeaderLines.filter(h => h.length >= 2 && h.length < 30); if (validH.length > 0) detectedRestaurant = sanitizeCleanName(validH[0]); }
       const rawResult = { extractedItems, duplicatesSkipped, detectedRestaurant, detectedSubtotal, detectedDelivery, detectedPlatformFee, detectedPackagingFee, detectedDirectDiscount, detectedVoucher, detectedFinalTotal, autoHealLogs: [] };
-      return runAccountingAutoHeal(rawResult, lines);
+      return runAccountingAutoHeal(rawResult, lines.map(l => l.text));
     }
     
-    function pushItemWithQty(list, name, totalLinePrice, qty) { if (qty > 1) { const unitPrice = Math.round((totalLinePrice / qty) * 100) / 100; for (let k = 1; k <= qty; k++) list.push({ name: `${name} (${k}/${qty})`, price: unitPrice }); } else list.push({ name, price: totalLinePrice }); }
+    function pushItemWithQty(list, name, totalLinePrice, qty, lineObj) { 
+      if (qty > 1) { const unitPrice = Math.round((totalLinePrice / qty) * 100) / 100; for (let k = 1; k <= qty; k++) list.push({ name: `${name} (${k}/${qty})`, price: unitPrice, lineObj }); } 
+      else list.push({ name, price: totalLinePrice, lineObj }); 
+    }
     
+    // ★ 處理微切片與純中文亂碼重掃 (Healer)
+    async function healGibberishItems(parsedResult, statusTextEl) {
+      for (let i = 0; i < parsedResult.extractedItems.length; i++) {
+        let item = parsedResult.extractedItems[i];
+        if (item.lineObj) {
+           item.microCrop = await extractMicroCrop(item.lineObj);
+           delete item.lineObj; // 刪除以節省 JSON 容量
+        }
+        // 若偵測到超過 4 個連讀英文字母 (忽略 HK)，且有微切片，則觸發純中文模型重掃
+        const noHk = item.name.replace(/HK/i, '');
+        if (/[A-Za-z]{4,}/.test(noHk) && item.microCrop) {
+           if(statusTextEl) statusTextEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 發現亂碼「${item.name}」，純中文模型局部重掃中...`;
+           try {
+             const res = await Tesseract.recognize(item.microCrop, 'chi_tra');
+             const newName = sanitizeCleanName(res.data.text.replace(/[\r\n]+/g, ' '));
+             if (newName && newName.length > 1) {
+               parsedResult.autoHealLogs.push(`亂碼自動重掃: ${item.name} → ${newName}`);
+               item.name = newName;
+             }
+           } catch(e) {}
+        }
+      }
+      return parsedResult;
+    }
+
     function applyParsedReceiptToRecord(rec, res, replaceExisting = true) {
-      if (res.extractedItems.length > 0) { if (replaceExisting) rec.items = []; res.extractedItems.forEach((it, idx) => { rec.items.push({ id: 'sp_' + Date.now() + '_' + idx, name: it.name, price: it.price, assignedTo: [], paid: false }); }); }
+      if (res.extractedItems.length > 0) { 
+        if (replaceExisting) rec.items = []; 
+        res.extractedItems.forEach((it, idx) => { 
+          rec.items.push({ id: 'sp_' + Date.now() + '_' + idx, name: it.name, price: it.price, microCrop: it.microCrop || null, assignedTo: [], paid: false }); 
+        }); 
+      }
       let importedMetaLabels = [];
       if (res.detectedRestaurant) { rec.restaurant = res.detectedRestaurant; const restInput = document.getElementById('orderRestaurantInput'); if (restInput) restInput.value = res.detectedRestaurant; importedMetaLabels.push(`餐廳「${res.detectedRestaurant}」`); }
       if (res.detectedDelivery !== null) { rec.fees.delivery = res.detectedDelivery; importedMetaLabels.push(`運費 $${res.detectedDelivery}`); }
@@ -1016,136 +1066,58 @@
       return importedMetaLabels;
     }
 
-    function parseSmartTextAndImport(replaceExisting) { const raw = document.getElementById('smartPasteTextarea').value; if (!raw.trim()) { showToast('請先貼上收據文字'); return; } const res = parseReceiptRawText(raw); const rec = getActiveRecord(); const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting); closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll(); showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`); }
-
-    // ★ 核心切換：智慧識圖引擎
-    async function runSmartOcr() {
-      if (appMode === 'debtor') return; 
-      if (currentOcrEngine === 'local') {
-        return await runLocalOfflineOcr();
-      }
-
-      // AI 模式
-      if (!geminiApiKey) {
-        openApiKeyModal();
-        return;
-      }
-
-      const rec = getActiveRecord(); if (!rec) return; 
-      const images = (rec.receipts || []).filter(r => r.dataUrl); 
-      const statusBox = document.getElementById('aiScanStatusBox'); 
-      const statusText = document.getElementById('aiScanStatusText');
-      statusBox.classList.remove('hidden'); 
-      if (images.length === 0) { 
-        statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「2. 上傳截圖」。`; 
-        return; 
-      }
-
-      statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-sky-400"></i>正在呼叫 🔵 AI 視覺引擎進行高精度解析...`;
-
-      try {
-        const aiResult = await runGeminiVisionApi(images);
-        const metaSummary = applyParsedReceiptToRecord(rec, aiResult, true);
-        saveDatabase(); 
-        renderActiveRecordAll();
-        statusText.innerHTML = `
-          <div class="text-sky-300 space-y-1">
-            <div><i class="fa-solid fa-circle-check mr-1"></i><b>🔵 AI 智能識圖完成！</b></div>
-            <div>• 匯入餐點：<b>${aiResult.extractedItems.length}</b> 項</div>
-            <div>• 自動匯入：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>
-          </div>
-        `;
-        showToast(`AI 識圖成功！匯入 ${aiResult.extractedItems.length} 項餐點`);
-      } catch (err) {
-        console.error("AI 識圖失敗，觸發靜默降級:", err);
-        statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>🔵 AI 連線波動，無縫降級至 🟢 本機引擎...`;
-        setTimeout(() => {
-          runLocalOfflineOcr();
-        }, 800);
-      }
+    function parseSmartTextAndImport(replaceExisting) { 
+      const raw = document.getElementById('smartPasteTextarea').value; if (!raw.trim()) { showToast('請先貼上收據文字'); return; } 
+      // 貼上文字模式沒有圖片座標，包裝成假陣列
+      const mockLines = raw.split(/\r?\n/).map(l => ({ text: l, bbox: null, dataUrl: null }));
+      const res = parseReceiptRawText(mockLines); 
+      const rec = getActiveRecord(); const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting); closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll(); showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`); 
     }
 
-    async function runGeminiVisionApi(images) {
-      const parts = images.map(img => {
-        const base64 = img.dataUrl.split(',')[1];
-        const mimeType = img.dataUrl.match(/data:(.*?);/)[1];
-        return { inlineData: { data: base64, mimeType } };
+    // ★ 智能裁切函數
+    async function cropImageTopAndBottom(dataUrl, words) {
+      let cropY0 = 0; let cropY1 = 999999; let foundTop = false, foundBottom = false;
+      words.forEach(w => {
+        if (/(訂\s*購\s*[於放菸自]|ordered?\s*from)/i.test(w.text)) { cropY0 = Math.max(0, w.bbox.y0 - 80); foundTop = true; }
+        if (/^(總\s*計|總\s*金\s*額|實\s*付\s*金\s*額|最終實付|total)/i.test(w.text)) { cropY1 = w.bbox.y1 + 120; foundBottom = true; }
       });
-      parts.unshift({
-        text: "請分析香港外賣收據。提取：restaurant(字串)、items(陣列，包含name, price(總價數字), qty(數量整數))、deliveryFee(運費)、platformFee(平台費)、packagingFee(包裝費)、directDiscount(折扣，轉為正數)、voucherDiscount(優惠券，轉為正數)、finalTotal(最終實付總計)。若無該項目請回傳 null。餐點名稱請去除無意義的符號。"
-      });
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts }],
-          generationConfig: {
-            temperature: 0.1,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                restaurant: { type: "STRING" },
-                items: {
-                  type: "ARRAY",
-                  items: {
-                    type: "OBJECT",
-                    properties: {
-                      name: { type: "STRING" },
-                      price: { type: "NUMBER" },
-                      qty: { type: "INTEGER" }
-                    }
-                  }
-                },
-                deliveryFee: { type: "NUMBER" },
-                platformFee: { type: "NUMBER" },
-                packagingFee: { type: "NUMBER" },
-                directDiscount: { type: "NUMBER" },
-                voucherDiscount: { type: "NUMBER" },
-                finalTotal: { type: "NUMBER" }
-              }
-            }
-          }
-        })
-      });
-
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
-      const data = await response.json();
-      const rawJson = data.candidates[0].content.parts[0].text;
-      const parsed = JSON.parse(rawJson);
-
-      const extractedItems = [];
-      (parsed.items || []).forEach(it => {
-        const qty = it.qty && it.qty > 0 ? it.qty : 1;
-        pushItemWithQty(extractedItems, sanitizeCleanName(it.name), it.price || 0, qty);
-      });
-
-      return {
-        extractedItems,
-        detectedRestaurant: sanitizeCleanName(parsed.restaurant) || null,
-        detectedDelivery: parsed.deliveryFee !== undefined ? parsed.deliveryFee : null,
-        detectedPlatformFee: parsed.platformFee !== undefined ? parsed.platformFee : null,
-        detectedPackagingFee: parsed.packagingFee !== undefined ? parsed.packagingFee : null,
-        detectedDirectDiscount: parsed.directDiscount !== undefined ? parsed.directDiscount : null,
-        detectedVoucher: parsed.voucherDiscount !== undefined ? parsed.voucherDiscount : null,
-        detectedFinalTotal: parsed.finalTotal !== undefined ? parsed.finalTotal : null,
-        detectedSubtotal: null // Skip subtotal logic for AI
-      };
+      if (foundTop && foundBottom && cropY1 > cropY0) {
+        return new Promise(resolve => {
+          const imgToCrop = new Image();
+          imgToCrop.onload = () => {
+            cropY1 = Math.min(imgToCrop.height, cropY1); const cropH = cropY1 - cropY0;
+            if (cropH > 200 && cropH < imgToCrop.height * 0.95) { 
+              const cropCanvas = document.createElement('canvas'); cropCanvas.width = imgToCrop.width; cropCanvas.height = cropH; const cropCtx = cropCanvas.getContext('2d'); cropCtx.fillStyle = '#FFFFFF'; cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height); cropCtx.drawImage(imgToCrop, 0, cropY0, imgToCrop.width, cropH, 0, 0, cropCanvas.width, cropH); resolve(cropCanvas.toDataURL('image/jpeg', 0.8));
+            } else { resolve(dataUrl); }
+          };
+          imgToCrop.onerror = () => resolve(dataUrl); imgToCrop.src = dataUrl;
+        });
+      }
+      return dataUrl;
     }
 
     async function runLocalOfflineOcr() {
-      const rec = getActiveRecord(); if (!rec) return; const images = (rec.receipts || []).filter(r => r.dataUrl); const statusBox = document.getElementById('aiScanStatusBox'); const statusText = document.getElementById('aiScanStatusText');
+      if (appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; const images = (rec.receipts || []).filter(r => r.dataUrl); const statusBox = document.getElementById('aiScanStatusBox'); const statusText = document.getElementById('aiScanStatusText');
+      statusBox.classList.remove('hidden'); if (images.length === 0) { statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「2. 上傳截圖」。`; return; }
       if (typeof Tesseract === 'undefined') { statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>本機 OCR 引擎載入中，請稍候重試。`; return; }
       try {
-        let pass1Combined = ''; let pass2Combined = '';
+        let pass1Lines = []; let pass2Lines = []; let croppedAny = false;
         for (let i = 0; i < images.length; i++) {
-          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 正在執行多重影像增強與本機識圖 (${i + 1}/${images.length})...`;
-          const resOrig = await Tesseract.recognize(images[i].dataUrl, 'chi_tra+eng'); pass1Combined += '\n' + reconstructLinesFromWords(resOrig.data.words);
-          const enhancedDataUrl = await preprocessImageForOcr(images[i].dataUrl); const resEnh = await Tesseract.recognize(enhancedDataUrl, 'chi_tra+eng'); pass2Combined += '\n' + reconstructLinesFromWords(resEnh.data.words);
+          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 正在掃描並識別版面區域 (${i + 1}/${images.length})...`;
+          const resOrig = await Tesseract.recognize(images[i].dataUrl, 'chi_tra+eng');
+          pass1Lines = pass1Lines.concat(reconstructLineObjects(resOrig.data.words, images[i].dataUrl));
+
+          const newUrl = await cropImageTopAndBottom(images[i].dataUrl, resOrig.data.words);
+          if (newUrl !== images[i].dataUrl) { images[i].dataUrl = newUrl; ImageDB.save(images[i].id, newUrl); croppedAny = true; }
+
+          statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 正在增強對比與重組空間座標 (${i + 1}/${images.length})...`;
+          const enhancedDataUrl = await preprocessImageForOcr(images[i].dataUrl); 
+          const resEnh = await Tesseract.recognize(enhancedDataUrl, 'chi_tra+eng'); 
+          pass2Lines = pass2Lines.concat(reconstructLineObjects(resEnh.data.words, enhancedDataUrl));
         }
-        const parsed1 = parseReceiptRawText(pass1Combined); const parsed2 = parseReceiptRawText(pass2Combined);
-        const bestParsed = evaluateParsedScore(parsed2) >= evaluateParsedScore(parsed1) ? parsed2 : parsed1; const backupParsed = bestParsed === parsed2 ? parsed1 : parsed2;
+        
+        const parsed1 = parseReceiptRawText(pass1Lines); const parsed2 = parseReceiptRawText(pass2Lines);
+        let bestParsed = evaluateParsedScore(parsed2) >= evaluateParsedScore(parsed1) ? parsed2 : parsed1; const backupParsed = bestParsed === parsed2 ? parsed1 : parsed2;
         if (!bestParsed.detectedRestaurant && backupParsed.detectedRestaurant) bestParsed.detectedRestaurant = backupParsed.detectedRestaurant;
         if (bestParsed.detectedPlatformFee === null && backupParsed.detectedPlatformFee !== null) bestParsed.detectedPlatformFee = backupParsed.detectedPlatformFee;
         if (bestParsed.detectedDelivery === null && backupParsed.detectedDelivery !== null) bestParsed.detectedDelivery = backupParsed.detectedDelivery;
@@ -1154,14 +1126,18 @@
         if (bestParsed.detectedFinalTotal === null && backupParsed.detectedFinalTotal !== null) bestParsed.detectedFinalTotal = backupParsed.detectedFinalTotal;
         if (bestParsed.detectedSubtotal === null && backupParsed.detectedSubtotal !== null) bestParsed.detectedSubtotal = backupParsed.detectedSubtotal;
         
-        const finalParsed = runAccountingAutoHeal(bestParsed, (pass2Combined + '\n' + pass1Combined).split(/\r?\n/));
-        window._lastOcrRawText = bestParsed === parsed2 ? pass2Combined : pass1Combined; const metaSummary = applyParsedReceiptToRecord(rec, finalParsed, true); saveDatabase(); renderActiveRecordAll();
-        const healHtml = (finalParsed.autoHealLogs && finalParsed.autoHealLogs.length > 0) ? `<div class="text-amber-300 text-[10px]">• 自動驗算修復：<b>${finalParsed.autoHealLogs.join('；')}</b></div>` : '';
-        statusText.innerHTML = `<div class="text-emerald-300 space-y-1"><div><i class="fa-solid fa-circle-check mr-1"></i><b>🟢 三重驗證本機識圖完成！</b></div><div>• 匯入餐點：<b>${finalParsed.extractedItems.length}</b> 項</div><div>• 自動匯入：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>${healHtml}<div><button onclick="openSmartPasteWithText()" class="underline text-amber-300">檢視重組後的 OCR 文字</button></div></div>`;
-        showToast(`本機識圖成功！匯入 ${finalParsed.extractedItems.length} 項餐點`);
+        if (croppedAny) bestParsed.autoHealLogs.push('自動裁切多餘底圖');
+        
+        // ★ 執行微切片提取與純中文亂碼重掃
+        bestParsed = await healGibberishItems(bestParsed, statusText);
+
+        window._lastOcrRawText = bestParsed === parsed2 ? pass2Lines.map(l=>l.text).join('\n') : pass1Lines.map(l=>l.text).join('\n'); 
+        const metaSummary = applyParsedReceiptToRecord(rec, bestParsed, true); saveDatabase(); renderActiveRecordAll();
+        const healHtml = (bestParsed.autoHealLogs && bestParsed.autoHealLogs.length > 0) ? `<div class="text-amber-300 text-[10px]">• 自動優化紀錄：<b>${bestParsed.autoHealLogs.join('；')}</b></div>` : '';
+        statusText.innerHTML = `<div class="text-emerald-300 space-y-1"><div><i class="fa-solid fa-circle-check mr-1"></i><b>🟢 智能本機識圖與重掃修復完成！</b></div><div>• 匯入餐點：<b>${bestParsed.extractedItems.length}</b> 項 (已附原圖切片)</div><div>• 自動匯入：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>${healHtml}<div><button onclick="openSmartPasteWithText()" class="underline text-amber-300">檢視重組後的 OCR 文字</button></div></div>`;
+        showToast(`本機識圖成功！匯入 ${bestParsed.extractedItems.length} 項餐點`);
       } catch (err) { statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>離線掃描發生錯誤 (${escapeHtml(err.message)})。`; }
     }
-    
     function openSmartPasteWithText() { document.getElementById('smartPasteTextarea').value = window._lastOcrRawText || ''; document.getElementById('smartPasteModal').classList.remove('hidden'); }
     
     function handleMultiReceiptUpload(event) {
@@ -1182,13 +1158,14 @@
             if (h > MAX_HEIGHT) { w = Math.round(w * MAX_HEIGHT / h); h = MAX_HEIGHT; }
             canvas.width = w; canvas.height = h; 
             const ctx = canvas.getContext('2d'); 
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, w, h);
-            ctx.drawImage(img, 0, 0, w, h); 
+            ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h); 
             const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-            rec.receipts.push({ id: 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6), name: file.name, dataUrl: dataUrl }); 
-            loaded++;
-            if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已載入 ${files.length} 張截圖！可點擊識圖`); }
+            const rcpId = 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
+            ImageDB.save(rcpId, dataUrl).then(() => {
+              rec.receipts.push({ id: rcpId, name: file.name, dataUrl: dataUrl }); 
+              loaded++;
+              if (loaded === files.length) { saveDatabase(); renderActiveRecordAll(); showToast(`已載入 ${files.length} 張截圖！可點擊識圖`); }
+            });
           };
           img.src = e.target.result;
         };
@@ -1198,7 +1175,7 @@
     }
     
     function zoomReceiptImage(dataUrl) { document.getElementById('zoomReceiptImg').src = dataUrl; document.getElementById('zoomReceiptBox').classList.remove('hidden'); }
-    function removeReceiptImage(id) { if(appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); }
+    function removeReceiptImage(id) { if(appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; ImageDB.remove(id); rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); }
 
     // --- 6. UI RENDER LOGIC ---
     function renderActiveRecordAll() {
@@ -1227,9 +1204,7 @@
       const strip = document.getElementById('receiptGalleryStrip'); const r = rec.receipts || [];
       if (r.length === 0) { strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`; return; }
       strip.innerHTML = r.map((rc, i) => {
-        if (!rc.dataUrl) {
-          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70"><div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-cloud-arrow-down mb-1 text-sm block"></i>圖片已為節省空間而釋放</div></div>`;
-        }
+        if (!rc.dataUrl) { return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70"><div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-spinner fa-spin mb-1 text-sm block"></i>正在從資料庫載入...</div></div>`; }
         return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between"><div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div><img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" /></div>`;
       }).join('');
     }
@@ -1247,12 +1222,13 @@
       const hm = (rec.participants || []).length > 0;
       c.innerHTML = calc.itemBreakdown.map((ib, idx) => `
         <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100">
-          <div class="flex items-center justify-between">
+          <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="font-bold text-xs sm:text-sm text-neutral-800">${idx+1}. ${escapeHtml(ib.name)} ${ib.assignedNames.length?`<span class="text-[10px] bg-panda-100 text-panda-700 px-1.5 py-0.5 rounded-full">${ib.assignedNames.join(',')}</span>`:''}</div>
               <div class="text-[11px] text-neutral-500 mt-0.5">原價 $${ib.originalPrice.toFixed(1)} <span class="text-emerald-600">-$${ib.discountShare.toFixed(1)}</span> <span class="text-amber-700">+$${ib.feeShare.toFixed(1)}</span></div>
+              ${ib.microCrop ? `<div class="mt-1.5"><img src="${ib.microCrop}" class="h-6 object-contain rounded border border-neutral-200 bg-neutral-50 shadow-sm" /></div>` : ''}
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-start gap-2 pt-0.5">
               <div class="text-right"><div class="text-[10px] text-neutral-400">折實應付</div><div class="font-extrabold text-sm sm:text-base text-panda-600">$${ib.finalPayable.toFixed(1)}</div></div>
               ${isDebtor ? '' : `<button onclick="openItemActionSheet('${ib.id}')" class="w-7 h-7 rounded-xl bg-panda-50 text-panda-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>`}
             </div>
@@ -1355,12 +1331,11 @@
       document.getElementById('whatsappMessageOutput').value = l.join('\n');
     }
 
-    // --- 7. HANDLERS ---
     function switchTab(t) { closeNumericKeypad(); activeTab = t; ['items','discounts','breakdown','collect'].forEach(x => { document.getElementById(`tab-${x}`).classList.toggle('hidden', x !== t); const m = document.getElementById(`mobTab-${x}`); if (m) m.className = x === t ? 'flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold' : 'flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 font-medium'; const d = document.getElementById(`deskTab-${x}`); if (d) d.className = x === t ? 'py-2 rounded-xl text-xs font-bold bg-panda-600 text-white' : 'py-2 rounded-xl text-xs font-bold text-panda-800'; }); renderActiveRecordAll(); }
     function updateOrderMetadata() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.title = document.getElementById('orderTitleInput').value.trim(); r.date = document.getElementById('orderDateInput').value; r.restaurant = document.getElementById('orderRestaurantInput').value.trim(); saveDatabase(); renderActiveRecordAll(); }
     function handlePlatformChange(p) { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.platform = p; r.verifiedPromos = [...(PLATFORM_PROMOS[p] || PLATFORM_PROMOS['foodpanda'])]; applyPlatformTheme(p); saveDatabase(); renderActiveRecordAll(); showToast(`已切換為 ${p} 主題配色！`); }
-    function addNewItem() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName'); const p = parseFloat(pInput.value); if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; } const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`; r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false }); nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`); }
-    function addRapidBatchPrices() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const input = document.getElementById('rapidBatchPricesInput'); const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0); if (nums.length === 0) { showToast('請輸入至少一個金額'); return; } nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false }); }); input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`); }
+    function addNewItem() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName'); const p = parseFloat(pInput.value); if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; } const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`; r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false, microCrop: null }); nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`); }
+    function addRapidBatchPrices() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const input = document.getElementById('rapidBatchPricesInput'); const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0); if (nums.length === 0) { showToast('請輸入至少一個金額'); return; } nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false, microCrop: null }); }); input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`); }
     function clearAllItems() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r || r.items.length === 0) return; if (!confirm('確定要清空目前清單中的所有餐點嗎？')) return; r.items = []; saveDatabase(); renderActiveRecordAll(); showToast('已清空餐點清單'); }
     function applyVerifiedPromo(idx) { if (appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; const p = (rec.verifiedPromos || [])[idx]; if (!p) return; rec.discount.mode = p.mode || 'percent_cap'; rec.discount.percentOff = Number(p.percentOff) || 0; rec.discount.capAmount = Number(p.capAmount) || 0; saveDatabase(); renderActiveRecordAll(); showToast(`已套用優惠：${p.title}`); }
     function clearAllParticipants() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.participants = []; r.items.forEach(i => i.assignedTo = []); breakdownViewMode = 'item'; saveDatabase(); renderActiveRecordAll(); showToast('已清空成員'); }
@@ -1397,7 +1372,7 @@
     }
     function closeActionSheet() { closeNumericKeypad(); document.getElementById('actionSheetModal').classList.add('hidden'); }
     function saveItemEdit(id) { if(appMode === 'debtor') return; const i = getActiveRecord().items.find(x => x.id === id); if (!i) return; const n = sanitizeCleanName(document.getElementById('editItemName').value); const p = parseFloat(document.getElementById('editItemPrice').value); if (n && !isNaN(p) && p >= 0) { i.name = n; i.price = p; closeActionSheet(); saveDatabase(); renderActiveRecordAll(); } }
-    function duplicateItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false }); saveDatabase(); renderActiveRecordAll(); }
+    function duplicateItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false, microCrop: i.microCrop || null }); saveDatabase(); renderActiveRecordAll(); }
     function deleteItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); r.items = r.items.filter(x => x.id !== id); saveDatabase(); renderActiveRecordAll(); }
     function openCloudModal() { document.getElementById('cloudRoomIdInput').value = currentRoomId; document.getElementById('cloudModal').classList.remove('hidden'); }
     function closeCloudModal() { document.getElementById('cloudModal').classList.add('hidden'); }
@@ -1405,12 +1380,16 @@
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
-    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey });
+    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom });
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initAuthLock);
+      document.addEventListener('DOMContentLoaded', () => {
+        clearLegacyStorage();
+        ImageDB.init().then(() => { initAuthLock(); preloadActiveImages(); });
+      });
     } else {
-      initAuthLock();
+      clearLegacyStorage();
+      ImageDB.init().then(() => { initAuthLock(); preloadActiveImages(); });
     }
   </script>
 
@@ -1430,12 +1409,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, dataUrl: '' })); }); await fb.setDoc(fb.doc(db, 'orders_v14', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v16', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v14', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v16', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
