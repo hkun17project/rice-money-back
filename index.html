@@ -107,7 +107,6 @@
           </div>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <!-- List View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner">
              <button id="listModeCreditorBtn" onclick="setAppMode('creditor')" class="px-2.5 py-1 rounded-full bg-white text-panda-700 text-[10px] sm:text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
              <button id="listModeDebtorBtn" onclick="setAppMode('debtor')" class="px-2.5 py-1 rounded-full text-white/80 hover:text-white text-[10px] sm:text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
@@ -147,7 +146,6 @@
         <div class="flex items-center justify-between mb-3 relative z-10">
           <button onclick="backToRecordsList()" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0"><i class="fa-solid fa-chevron-left"></i><span>列表</span></button>
           
-          <!-- Detail View Mode Toggle -->
           <div class="flex items-center bg-black/30 rounded-full p-0.5 border border-white/20 shadow-inner mx-1 shrink-0">
              <button id="modeCreditorBtn" onclick="setAppMode('creditor')" class="px-3 py-1 rounded-full bg-white text-panda-700 text-[11px] font-extrabold shadow-sm transition whitespace-nowrap">債主 Mode</button>
              <button id="modeDebtorBtn" onclick="setAppMode('debtor')" class="px-3 py-1 rounded-full text-white/80 hover:text-white text-[11px] font-bold transition cursor-pointer whitespace-nowrap">債仔 Mode</button>
@@ -176,7 +174,6 @@
           </div>
         </div>
         
-        <!-- Live Calculation Summary with Absolute Match Badge -->
         <div class="grid grid-cols-4 gap-2 bg-black/25 backdrop-blur-md p-2.5 rounded-2xl border border-white/15 text-center relative z-10 items-stretch">
           <div class="flex flex-col justify-center"><div class="text-[11px] text-white/80">餐點原價</div><div id="sumOriginal" class="font-bold text-sm sm:text-base mt-0.5">$0.0</div></div>
           <div class="flex flex-col justify-center"><div class="text-[11px] text-amber-200">總優惠券</div><div id="sumDiscount" class="font-bold text-sm sm:text-base text-amber-300 mt-0.5">-$0.0</div></div>
@@ -387,7 +384,7 @@
   <div id="smartPasteModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3.5 border border-panda-100">
       <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
-        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用</p></div></div>
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用 (含自動驗算)</p></div></div>
         <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="space-y-2 text-xs">
@@ -442,12 +439,12 @@
   </div>
 
   <!-- ========================================================= -->
-  <!-- CORE APPLICATION LOGIC (v16 - Micro-Crops & Auto-Healer)  -->
+  <!-- CORE APPLICATION LOGIC                                    -->
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v16';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v16';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v17';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v17';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     function safeStorageGet(key, fallback = null) {
@@ -576,7 +573,7 @@
     }
 
     function initAuthLock() { 
-      const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true' || safeStorageGet('panda_split_unlocked_v15') === 'true'; 
+      const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true' || safeStorageGet('panda_split_unlocked_v16') === 'true'; 
       if (unlocked) {
         unlockAppSuccess(false); 
       } else { 
@@ -717,6 +714,7 @@
     function openRecordDetail(id) { 
       document.getElementById('zoomReceiptBox').classList.add('hidden'); document.getElementById('zoomReceiptImg').src = ''; resetOcrStatusBox();
       dbState.activeRecordId = id; const rec = getActiveRecord(); if (rec) applyPlatformTheme(rec.platform || 'foodpanda'); 
+      document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.remove('hidden');
       preloadActiveImages().then(() => { renderActiveRecordAll(); });
     }
 
@@ -759,7 +757,6 @@
       return lastVal;
     }
     
-    // ★ 抽取行物件取代純字串
     function extractFeeFromLineOrNext(linesObjArray, idx) {
       const valSameLine = extractLastPrice(linesObjArray[idx].text);
       if (valSameLine !== null) return { val: valSameLine, nextIdx: idx };
@@ -807,7 +804,6 @@
       });
     }
 
-    // ★ 空間重組：回傳攜帶 Bbox 座標的行物件
     function reconstructLineObjects(words, dataUrl) {
       const validWords = (words || []).filter(w => w && w.text && w.text.trim());
       let currentY = -1; let currentLine = []; let linesArr = [];
@@ -832,7 +828,6 @@
       return linesArr;
     }
 
-    // ★ 從綁定的 dataUrl 與 bbox 抽取出微切片 (Micro-Crop)
     async function extractMicroCrop(lineObj) {
       if (!lineObj || !lineObj.dataUrl || !lineObj.bbox) return null;
       return new Promise(resolve => {
@@ -920,7 +915,6 @@
       res.autoHealLogs = healLogs; return res;
     }
     
-    // ★ 接收陣列物件 (包含 bbox) 的解析器
     function parseReceiptRawText(linesObjArray) {
       const lines = linesObjArray.filter(l => l && l.text && l.text.trim());
       const extractedItems = []; const seenFingerprints = new Set();
@@ -973,7 +967,7 @@
         const qtyInfo = matchQuantityPrefix(lineText);
         if (qtyInfo) {
           const parsedQty = qtyInfo.qty; let restOfLine = qtyInfo.rest;
-          let targetLineObj = lines[i]; // 預設使用同行物件
+          let targetLineObj = lines[i];
           if (!restOfLine && i + 1 < lines.length) { 
              const nextLine = lines[i + 1].text.replace(/\s+/g, ' ').trim(); 
              if (nextLine && !nonItemBlacklistRegex.test(nextLine) && !matchQuantityPrefix(nextLine)) { 
@@ -1029,9 +1023,8 @@
         let item = parsedResult.extractedItems[i];
         if (item.lineObj) {
            item.microCrop = await extractMicroCrop(item.lineObj);
-           delete item.lineObj; // 刪除以節省 JSON 容量
+           delete item.lineObj;
         }
-        // 若偵測到超過 4 個連讀英文字母 (忽略 HK)，且有微切片，則觸發純中文模型重掃
         const noHk = item.name.replace(/HK/i, '');
         if (/[A-Za-z]{4,}/.test(noHk) && item.microCrop) {
            if(statusTextEl) statusTextEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 發現亂碼「${item.name}」，純中文模型局部重掃中...`;
@@ -1068,13 +1061,11 @@
 
     function parseSmartTextAndImport(replaceExisting) { 
       const raw = document.getElementById('smartPasteTextarea').value; if (!raw.trim()) { showToast('請先貼上收據文字'); return; } 
-      // 貼上文字模式沒有圖片座標，包裝成假陣列
       const mockLines = raw.split(/\r?\n/).map(l => ({ text: l, bbox: null, dataUrl: null }));
       const res = parseReceiptRawText(mockLines); 
       const rec = getActiveRecord(); const metaSummary = applyParsedReceiptToRecord(rec, res, replaceExisting); closeSmartPasteModal(); saveDatabase(); renderActiveRecordAll(); showToast(`已匯入 ${res.extractedItems.length} 項餐點${metaSummary.length ? ` 及 ${metaSummary.join('、')}` : ''}！`); 
     }
 
-    // ★ 智能裁切函數
     async function cropImageTopAndBottom(dataUrl, words) {
       let cropY0 = 0; let cropY1 = 999999; let foundTop = false, foundBottom = false;
       words.forEach(w => {
@@ -1409,12 +1400,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v16', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v17', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v16', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v17', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
