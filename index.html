@@ -152,7 +152,7 @@
           </div>
 
           <div class="flex items-center gap-1.5 shrink-0" id="headerActionBtns">
-            <button onclick="openSmartPasteModal()" class="px-2 py-1.5 rounded-xl bg-amber-300 text-neutral-900 hover:bg-amber-200 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste"></i></button>
+            <button onclick="selectInputZone('paste'); openSmartPasteModal()" class="px-2 py-1.5 rounded-xl bg-amber-300 text-neutral-900 hover:bg-amber-200 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-paste"></i></button>
             <button onclick="toggleReceiptDrawer()" class="px-2.5 py-1.5 rounded-xl bg-white text-panda-600 hover:bg-panda-50 text-xs font-extrabold flex items-center gap-1 shadow-sm transition active:scale-95"><i class="fa-solid fa-images"></i><span>識圖 (<span id="receiptCountBadge">0</span>)</span></button>
           </div>
         </div>
@@ -196,6 +196,14 @@
       <div id="receiptDrawer" class="bg-neutral-900 text-white p-3.5 border-b border-neutral-800 transition-all space-y-3">
         <div class="flex items-center justify-between"><div class="text-xs font-bold flex items-center gap-1.5 text-amber-300"><i class="fa-solid fa-bolt"></i><span>收據識圖與自動匯入工作台</span></div><button onclick="toggleReceiptDrawer()" class="text-neutral-400 hover:text-white px-1"><i class="fa-solid fa-xmark"></i></button></div>
         
+        <div class="flex items-center justify-between bg-neutral-800 rounded-xl p-1 mb-2 border border-neutral-700">
+          <div class="flex items-center gap-1 w-full relative">
+             <button id="engineLocalBtn" onclick="setOcrEngine('local')" class="flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition">🟢 本機引擎</button>
+             <button id="engineAiBtn" onclick="setOcrEngine('ai')" class="flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition">🔵 AI 引擎</button>
+          </div>
+          <button onclick="openApiKeyModal()" class="ml-2 w-8 h-8 rounded-lg bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center transition shrink-0" title="設定 API Key"><i class="fa-solid fa-gear"></i></button>
+        </div>
+
         <div class="grid grid-cols-12 gap-2 items-stretch" id="receiptToolsActionGrid">
           <div class="col-span-8 grid grid-cols-2 gap-1.5 bg-neutral-950 p-1.5 rounded-2xl border border-neutral-700/90 shadow-inner">
             <button type="button" id="zonePasteBtn" onclick="selectInputZone('paste'); openSmartPasteModal()" class="py-2.5 px-2 bg-amber-400 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-amber-200 transition active:scale-95">
@@ -210,10 +218,10 @@
               <input type="file" accept="image/*" multiple class="hidden" onchange="handleMultiReceiptUpload(event)" />
             </label>
           </div>
-          <button type="button" onclick="runLocalOfflineOcr()" id="localOcrBtn" class="col-span-4 py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-2xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95">
-            <i class="fa-solid fa-eye text-sm"></i>
+          <button type="button" onclick="runSmartOcr()" id="smartOcrBtn" class="col-span-4 py-2.5 px-2 theme-bar-gradient hover:opacity-95 text-white rounded-2xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-sm transition active:scale-95">
+            <i class="fa-solid fa-microchip text-sm"></i>
             <span>離線識圖</span>
-            <span class="text-[9px] text-white/85 font-normal">微切片與重掃修正</span>
+            <span class="text-[9px] text-white/85 font-normal">多重驗證修復</span>
           </button>
         </div>
 
@@ -397,6 +405,78 @@
     </div>
   </div>
 
+  <!-- ★ API KEY MODAL -->
+  <div id="apiKeyModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-sky-200 relative overflow-hidden">
+      <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-sky-50 pointer-events-none"></div>
+      <div class="flex items-center justify-between border-b border-sky-100 pb-2.5 relative z-10">
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center"><i class="fa-solid fa-key"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">Gemini API 金鑰</h3><p class="text-[10px] text-neutral-500">啟用高精度 🔵 AI 視覺引擎</p></div></div>
+        <button onclick="closeApiKeyModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3 text-xs relative z-10">
+        <input id="apiKeyValueInput" type="password" placeholder="AIzaSy..." class="w-full px-3.5 py-2.5 text-sm bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-sky-500" />
+        <p class="text-[10px] text-neutral-400">您的金鑰僅加密儲存於本機瀏覽器，絕不會上傳至第三方伺服器。若留空並儲存，將切回 🟢 本機引擎。</p>
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeApiKeyModal()" class="flex-1 py-2 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
+          <button onclick="saveApiKey()" class="flex-1 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold shadow-sm">儲存並啟用</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="smartPasteModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3.5 border border-panda-100">
+      <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center"><i class="fa-solid fa-paste"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">智慧收據文字解析器</h3><p class="text-[10px] text-neutral-500">自動認領餐點及匯入所有費用 (含自動驗算)</p></div></div>
+        <button onclick="closeSmartPasteModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <textarea id="smartPasteTextarea" rows="8" placeholder="請貼上收據文字...&#10;• 全面自動濾除特殊符號&#10;• 支援「訂購於」或頂部提取餐廳名稱&#10;• 內建會計恆等式驗算，自動修復漏讀的小數點" class="w-full p-3 text-xs font-mono bg-neutral-50 border border-panda-200 rounded-2xl focus:outline-none focus:border-panda-600"></textarea>
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeSmartPasteModal()" class="py-2.5 px-4 rounded-xl border border-neutral-200 font-bold text-neutral-600">取消</button>
+          <button onclick="parseSmartTextAndImport(false)" class="flex-1 py-2.5 rounded-xl bg-panda-100 text-panda-700 font-bold">附加餐點</button>
+          <button onclick="parseSmartTextAndImport(true)" class="flex-1 py-2.5 rounded-xl bg-panda-600 hover:bg-panda-700 text-white font-extrabold shadow-sm">覆蓋匯入</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="participantModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl space-y-4 border border-panda-100">
+      <div class="flex items-center justify-between"><h3 class="font-bold text-sm text-neutral-800 flex items-center gap-2"><i class="fa-solid fa-user-plus text-panda-600"></i>新增點餐人</h3><button onclick="closeParticipantModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button></div>
+      <input id="modalParticipantName" type="text" placeholder="輸入同事名稱..." class="w-full px-3.5 py-2.5 text-sm bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" onkeydown="if(event.key==='Enter') confirmAddParticipant()" />
+      <div class="flex gap-2"><button onclick="closeParticipantModal()" class="flex-1 py-2 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-600">取消</button><button onclick="confirmAddParticipant()" class="flex-1 py-2 rounded-xl bg-panda-600 text-white text-xs font-bold shadow-sm">加入</button></div>
+    </div>
+  </div>
+
+  <div id="actionSheetModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3 border-t-4 border-panda-600">
+      <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
+        <div><span class="text-[10px] font-extrabold uppercase tracking-wider text-panda-600">項目設定選單</span><h3 id="actionSheetTitle" class="font-bold text-sm text-neutral-800 mt-0.5">編輯項目</h3></div>
+        <button onclick="closeActionSheet()" class="w-8 h-8 rounded-full bg-panda-50 text-panda-600 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="actionSheetBody" class="space-y-2 text-xs"></div>
+    </div>
+  </div>
+
+  <div id="cloudModal" class="hidden fixed inset-0 bg-neutral-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-panda-100">
+      <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
+        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-xl bg-panda-50 text-panda-600 flex items-center justify-center"><i class="fa-solid fa-cloud"></i></div><div><h3 class="font-extrabold text-sm text-neutral-800">Firebase 雲端同步</h3><p class="text-[10px] text-neutral-400">Project ID: rice-money-back</p></div></div>
+        <button onclick="closeCloudModal()" class="text-neutral-400 hover:text-neutral-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-[11px] font-bold text-neutral-700 block mb-1">雲端同步群組代碼</label>
+          <div class="flex gap-2">
+            <input id="cloudRoomIdInput" type="text" class="flex-1 px-3 py-2 text-xs font-mono font-bold uppercase bg-neutral-50 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" />
+            <button onclick="joinCloudRoom()" class="px-3.5 py-2 rounded-xl bg-panda-600 text-white font-bold text-xs">切換</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 theme-bar-gradient text-white px-4 py-2 rounded-full text-xs font-bold shadow-xl z-50 hidden items-center gap-2 border border-white/20">
     <i class="fa-solid fa-circle-check text-amber-300"></i><span id="toastText">已完成</span>
   </div>
@@ -409,6 +489,7 @@
     const STORAGE_KEY_DB = 'panda_split_records_db_v18';
     const STORAGE_KEY_AUTH = 'panda_split_unlocked_v18';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
+    let currentOcrEngine = 'local'; let geminiApiKey = safeStorageGet('split_rice_gemini_key', '');
 
     function safeStorageGet(key, fallback = null) {
       try { const val = localStorage.getItem(key); if (val !== null) return val; } catch (e) {}
@@ -514,11 +595,13 @@
 
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
-    function sanitizeCleanName(str) { if (!str) return ''; return str.replace(/["'×=_<>!@#%&*:;?]/g, '').trim(); }
+    function sanitizeCleanName(str) { if (!str) return ''; return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim(); }
 
     function initAuthLock() { 
       const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true'; 
       if (unlocked) { unlockAppSuccess(false); } else { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); } 
+      const savedEngine = safeStorageGet('split_rice_ocr_engine');
+      if (savedEngine === 'ai' || savedEngine === 'local') { setOcrEngine(savedEngine, true); }
     }
     
     function pressPinDigit(digit) { 
@@ -588,6 +671,29 @@
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-panda-300 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-panda-200 font-normal';
       }
+    }
+
+    function setOcrEngine(engine, isInit = false) {
+      currentOcrEngine = engine; safeStorageSet('split_rice_ocr_engine', engine);
+      const localBtn = document.getElementById('engineLocalBtn'); const aiBtn = document.getElementById('engineAiBtn'); const actionBtn = document.getElementById('smartOcrBtn');
+      if (engine === 'local') {
+        if (localBtn) localBtn.className = 'flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition';
+        if (aiBtn) aiBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
+        if (actionBtn) actionBtn.innerHTML = `<i class="fa-solid fa-microchip text-sm"></i><span>離線識圖</span><span class="text-[9px] text-white/85 font-normal">多重驗證修復</span>`;
+        if (!isInit) showToast('已切換為 🟢 本機引擎');
+      } else {
+        if (localBtn) localBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
+        if (aiBtn) aiBtn.className = 'flex-1 py-1.5 rounded-lg bg-sky-600 text-white text-[11px] font-bold shadow-sm transition';
+        if (actionBtn) actionBtn.innerHTML = `<i class="fa-solid fa-brain text-sm"></i><span>AI 識圖</span><span class="text-[9px] text-white/85 font-normal">Gemini 高精度</span>`;
+        if (!isInit) showToast('已切換為 🔵 AI 引擎');
+      }
+    }
+
+    function openApiKeyModal() { document.getElementById('apiKeyValueInput').value = geminiApiKey || ''; document.getElementById('apiKeyModal').classList.remove('hidden'); }
+    function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
+    function saveApiKey() {
+      const val = document.getElementById('apiKeyValueInput').value.trim(); geminiApiKey = val; safeStorageSet('split_rice_gemini_key', val); closeApiKeyModal();
+      if (val) { setOcrEngine('ai'); showToast('API Key 已儲存並啟用 🔵 AI 引擎！'); } else { setOcrEngine('local'); showToast('已清空金鑰並切回 🟢 本機引擎'); }
     }
 
     let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
@@ -1045,9 +1151,109 @@
       return dataUrl;
     }
 
+    async function runSmartOcr() {
+      if (appMode === 'debtor') return; 
+      if (currentOcrEngine === 'local') {
+        return await runLocalOfflineOcr();
+      }
+
+      if (!geminiApiKey) {
+        openApiKeyModal();
+        return;
+      }
+
+      const rec = getActiveRecord(); if (!rec) return; 
+      const images = (rec.receipts || []).filter(r => r.dataUrl); 
+      const statusBox = document.getElementById('aiScanStatusBox'); 
+      const statusText = document.getElementById('aiScanStatusText');
+      statusBox.classList.remove('hidden'); 
+      if (images.length === 0) { 
+        statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「上傳截圖」。`; 
+        return; 
+      }
+
+      statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-sky-400"></i>正在呼叫 🔵 AI 視覺引擎進行高精度解析...`;
+
+      try {
+        const parts = images.map(img => {
+          const base64 = img.dataUrl.split(',')[1];
+          const mimeType = img.dataUrl.match(/data:(.*?);/)[1];
+          return { inlineData: { data: base64, mimeType } };
+        });
+        parts.unshift({
+          text: "請分析香港外賣收據。提取：restaurant(字串)、items(陣列，包含name, price(總價數字), qty(數量整數))、deliveryFee(運費)、platformFee(平台費)、packagingFee(包裝費)、directDiscount(折扣，轉為正數)、voucherDiscount(優惠券，轉為正數)、finalTotal(最終實付總計)。若無該項目請回傳 null。餐點名稱請去除無意義的符號。"
+        });
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts }],
+            generationConfig: {
+              temperature: 0.1,
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: "OBJECT",
+                properties: {
+                  restaurant: { type: "STRING" },
+                  items: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, price: { type: "NUMBER" }, qty: { type: "INTEGER" } } } },
+                  deliveryFee: { type: "NUMBER" },
+                  platformFee: { type: "NUMBER" },
+                  packagingFee: { type: "NUMBER" },
+                  directDiscount: { type: "NUMBER" },
+                  voucherDiscount: { type: "NUMBER" },
+                  finalTotal: { type: "NUMBER" }
+                }
+              }
+            }
+          })
+        });
+
+        if (!response.ok) throw new Error(`API Error`);
+        const data = await response.json();
+        const rawJson = data.candidates[0].content.parts[0].text;
+        const parsed = JSON.parse(rawJson);
+
+        const extractedItems = [];
+        (parsed.items || []).forEach(it => {
+          const qty = it.qty && it.qty > 0 ? it.qty : 1;
+          pushItemWithQty(extractedItems, sanitizeCleanName(it.name), it.price || 0, qty, null);
+        });
+
+        const aiResult = {
+          extractedItems,
+          detectedRestaurant: sanitizeCleanName(parsed.restaurant) || null,
+          detectedDelivery: parsed.deliveryFee !== undefined ? parsed.deliveryFee : null,
+          detectedPlatformFee: parsed.platformFee !== undefined ? parsed.platformFee : null,
+          detectedPackagingFee: parsed.packagingFee !== undefined ? parsed.packagingFee : null,
+          detectedDirectDiscount: parsed.directDiscount !== undefined ? parsed.directDiscount : null,
+          detectedVoucher: parsed.voucherDiscount !== undefined ? parsed.voucherDiscount : null,
+          detectedFinalTotal: parsed.finalTotal !== undefined ? parsed.finalTotal : null,
+          detectedSubtotal: null 
+        };
+
+        const metaSummary = applyParsedReceiptToRecord(rec, aiResult, true);
+        saveDatabase(); 
+        renderActiveRecordAll();
+        statusText.innerHTML = `
+          <div class="text-sky-300 space-y-1">
+            <div><i class="fa-solid fa-circle-check mr-1"></i><b>🔵 AI 智能識圖完成！</b></div>
+            <div>• 匯入餐點：<b>${aiResult.extractedItems.length}</b> 項</div>
+            <div>• 自動匯入：<b>${metaSummary.length ? metaSummary.join('、') : '未偵測到額外項目'}</b></div>
+          </div>
+        `;
+        showToast(`AI 識圖成功！匯入 ${aiResult.extractedItems.length} 項餐點`);
+      } catch (err) {
+        statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-300"></i>🔵 AI 連線波動，無縫降級至 🟢 本機引擎...`;
+        setTimeout(() => {
+          runLocalOfflineOcr();
+        }, 800);
+      }
+    }
+
     async function runLocalOfflineOcr() {
       if (appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; const images = (rec.receipts || []).filter(r => r.dataUrl); const statusBox = document.getElementById('aiScanStatusBox'); const statusText = document.getElementById('aiScanStatusText');
-      statusBox.classList.remove('hidden'); if (images.length === 0) { statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「2. 上傳截圖」。`; return; }
+      statusBox.classList.remove('hidden'); if (images.length === 0) { statusText.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-300 mr-1"></i>請先點擊「上傳截圖」。`; return; }
       if (typeof Tesseract === 'undefined') { statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>本機 OCR 引擎載入中，請稍候重試。`; return; }
       try {
         let pass1Lines = []; let pass2Lines = []; let croppedAny = false;
@@ -1106,9 +1312,7 @@
             if (h > MAX_HEIGHT) { w = Math.round(w * MAX_HEIGHT / h); h = MAX_HEIGHT; }
             canvas.width = w; canvas.height = h; 
             const ctx = canvas.getContext('2d'); 
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, w, h);
-            ctx.drawImage(img, 0, 0, w, h); 
+            ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h); 
             const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
             
             const rcpId = 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
@@ -1159,15 +1363,8 @@
       const strip = document.getElementById('receiptGalleryStrip'); const r = rec.receipts || [];
       if (r.length === 0) { strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`; return; }
       strip.innerHTML = r.map((rc, i) => {
-        if (!rc.dataUrl) {
-          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70">
-            <div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-cloud-arrow-down mb-1 text-sm block"></i>圖片已為節省空間而釋放</div>
-          </div>`;
-        }
-        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div>
-          <img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" />
-        </div>`;
+        if (!rc.dataUrl) { return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70"><div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-spinner fa-spin mb-1 text-sm block"></i>正在從資料庫載入...</div></div>`; }
+        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between"><div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div><img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" /></div>`;
       }).join('');
     }
     function renderParticipantChips(rec, calc, isDebtor) {
@@ -1185,12 +1382,12 @@
       c.innerHTML = calc.itemBreakdown.map((ib, idx) => `
         <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-panda-100">
           <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="font-bold text-xs sm:text-sm text-neutral-800">${idx+1}. ${escapeHtml(ib.name)} ${ib.assignedNames.length?`<span class="text-[10px] bg-panda-100 text-panda-700 px-1.5 py-0.5 rounded-full">${ib.assignedNames.join(',')}</span>`:''}</div>
-              <div class="text-[11px] text-neutral-500 mt-0.5">原價 $${ib.originalPrice.toFixed(1)} <span class="text-emerald-600">-$${ib.discountShare.toFixed(1)}</span> <span class="text-amber-700">+$${ib.feeShare.toFixed(1)}</span></div>
-              ${ib.microCrop ? `<div class="mt-1.5"><img src="${ib.microCrop}" class="h-6 object-contain rounded border border-neutral-200 bg-neutral-50 shadow-sm" /></div>` : ''}
+            <div class="flex-1 min-w-0 pr-2">
+              <div class="font-bold text-xs sm:text-sm text-neutral-800 break-words leading-tight">${idx+1}. ${escapeHtml(ib.name)} ${ib.assignedNames.length?`<span class="text-[10px] bg-panda-100 text-panda-700 px-1.5 py-0.5 rounded-full inline-block mt-0.5">${ib.assignedNames.join(',')}</span>`:''}</div>
+              <div class="text-[11px] text-neutral-500 mt-1">原價 $${ib.originalPrice.toFixed(1)} <span class="text-emerald-600">-$${ib.discountShare.toFixed(1)}</span> <span class="text-amber-700">+$${ib.feeShare.toFixed(1)}</span></div>
+              ${ib.microCrop ? `<div class="mt-2"><img src="${ib.microCrop}" class="h-6 object-contain rounded border border-neutral-200 bg-neutral-50 shadow-sm" /></div>` : ''}
             </div>
-            <div class="flex items-start gap-2 pt-0.5">
+            <div class="flex items-start gap-2 pt-0.5 shrink-0">
               <div class="text-right"><div class="text-[10px] text-neutral-400">折實應付</div><div class="font-extrabold text-sm sm:text-base text-panda-600">$${ib.finalPayable.toFixed(1)}</div></div>
               ${isDebtor ? '' : `<button onclick="openItemActionSheet('${ib.id}')" class="w-7 h-7 rounded-xl bg-panda-50 text-panda-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>`}
             </div>
@@ -1225,8 +1422,8 @@
         c.innerHTML = calc.itemBreakdown.map((ib,i) => `
           <div class="bg-white rounded-2xl p-3.5 shadow-xs border border-panda-100">
             <div class="flex justify-between mb-2">
-              <div class="flex gap-2"><span class="w-6 h-6 rounded-lg bg-panda-600 text-white flex items-center justify-center font-bold text-xs">${i+1}</span><div><div class="font-extrabold text-sm">${escapeHtml(ib.name)}</div><div class="text-[10px] text-neutral-400">佔比 ${(ib.ratio*100).toFixed(1)}% ${ib.assignedNames.length?`· ${ib.assignedNames.join(',')}`:''}</div></div></div>
-              <div class="text-right text-panda-600 font-extrabold text-base">$${ib.finalPayable.toFixed(1)}</div>
+              <div class="flex gap-2 min-w-0 pr-2"><span class="w-6 h-6 rounded-lg bg-panda-600 text-white flex items-center justify-center font-bold text-xs shrink-0">${i+1}</span><div class="min-w-0"><div class="font-extrabold text-sm break-words leading-tight">${escapeHtml(ib.name)}</div><div class="text-[10px] text-neutral-400 mt-0.5">佔比 ${(ib.ratio*100).toFixed(1)}% ${ib.assignedNames.length?`· ${ib.assignedNames.join(',')}`:''}</div></div></div>
+              <div class="text-right text-panda-600 font-extrabold text-base shrink-0">$${ib.finalPayable.toFixed(1)}</div>
             </div>
             <div class="grid grid-cols-3 gap-2 text-center text-[11px] mb-2">
               <div class="bg-neutral-50 p-2 rounded-xl">原價<div class="font-bold">$${ib.originalPrice.toFixed(2)}</div></div>
@@ -1254,14 +1451,14 @@
 
       document.getElementById('collectionCardsContainer').innerHTML = calc.itemBreakdown.map((ib,i) => `
         <div class="bg-white p-3 rounded-2xl shadow-xs border flex items-center justify-between ${ib.paid?'border-emerald-300 bg-emerald-50/30':'border-panda-100'}">
-          <div class="flex items-center gap-2.5">
-            <button ${isDebtor ? 'disabled' : `onclick="toggleItemPaid('${ib.id}')"`} class="w-8 h-8 rounded-xl flex items-center justify-center ${ib.paid?'bg-emerald-500 text-white':'bg-panda-50 text-panda-600'}"><i class="fa-solid fa-check"></i></button>
-            <div>
-              <div class="font-bold text-xs sm:text-sm text-neutral-800 ${ib.paid?'line-through text-neutral-400':''}">${i+1}. ${escapeHtml(ib.name)} ${ib.assignedNames.length?`<span class="text-[10px] bg-panda-50 text-panda-700 px-1 rounded">${ib.assignedNames.join(',')}</span>`:''}</div>
-              <div class="text-[11px] text-neutral-500">原價$${ib.originalPrice.toFixed(1)} → 減$${ib.discountShare.toFixed(1)} 加$${ib.feeShare.toFixed(1)}</div>
+          <div class="flex items-center gap-2.5 min-w-0 pr-2">
+            <button ${isDebtor ? 'disabled' : `onclick="toggleItemPaid('${ib.id}')"`} class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${ib.paid?'bg-emerald-500 text-white':'bg-panda-50 text-panda-600'}"><i class="fa-solid fa-check"></i></button>
+            <div class="min-w-0">
+              <div class="font-bold text-xs sm:text-sm text-neutral-800 break-words leading-tight ${ib.paid?'line-through text-neutral-400':''}">${i+1}. ${escapeHtml(ib.name)} ${ib.assignedNames.length?`<span class="text-[10px] bg-panda-50 text-panda-700 px-1 rounded inline-block mt-0.5">${ib.assignedNames.join(',')}</span>`:''}</div>
+              <div class="text-[11px] text-neutral-500 mt-0.5">原價$${ib.originalPrice.toFixed(1)} → 減$${ib.discountShare.toFixed(1)} 加$${ib.feeShare.toFixed(1)}</div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 shrink-0">
             <span class="font-extrabold ${ib.paid?'text-emerald-600':'text-panda-600'}">$${ib.finalPayable.toFixed(1)}</span>
             <button onclick="copySingleItemReminder('${ib.id}')" class="px-2.5 py-1.5 rounded-xl bg-panda-50 text-panda-600 text-xs font-bold"><i class="fa-regular fa-copy"></i></button>
           </div>
@@ -1296,8 +1493,8 @@
     function switchTab(t) { closeNumericKeypad(); activeTab = t; ['items','discounts','breakdown','collect'].forEach(x => { document.getElementById(`tab-${x}`).classList.toggle('hidden', x !== t); const m = document.getElementById(`mobTab-${x}`); if (m) m.className = x === t ? 'flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold' : 'flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 font-medium'; const d = document.getElementById(`deskTab-${x}`); if (d) d.className = x === t ? 'py-2 rounded-xl text-xs font-bold bg-panda-600 text-white' : 'py-2 rounded-xl text-xs font-bold text-panda-800'; }); renderActiveRecordAll(); }
     function updateOrderMetadata() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.title = document.getElementById('orderTitleInput').value.trim(); r.date = document.getElementById('orderDateInput').value; r.restaurant = document.getElementById('orderRestaurantInput').value.trim(); saveDatabase(); renderActiveRecordAll(); }
     function handlePlatformChange(p) { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.platform = p; r.verifiedPromos = [...(PLATFORM_PROMOS[p] || PLATFORM_PROMOS['foodpanda'])]; applyPlatformTheme(p); saveDatabase(); renderActiveRecordAll(); showToast(`已切換為 ${p} 主題配色！`); }
-    function addNewItem() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName'); const p = parseFloat(pInput.value); if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; } const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`; r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false, microCrop: null }); nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`); }
-    function addRapidBatchPrices() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const input = document.getElementById('rapidBatchPricesInput'); const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0); if (nums.length === 0) { showToast('請輸入至少一個金額'); return; } nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false, microCrop: null }); }); input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`); }
+    function addNewItem() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName'); const p = parseFloat(pInput.value); if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; } const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`; r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false }); nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`); }
+    function addRapidBatchPrices() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const input = document.getElementById('rapidBatchPricesInput'); const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0); if (nums.length === 0) { showToast('請輸入至少一個金額'); return; } nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false }); }); input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`); }
     function clearAllItems() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r || r.items.length === 0) return; if (!confirm('確定要清空目前清單中的所有餐點嗎？')) return; r.items = []; saveDatabase(); renderActiveRecordAll(); showToast('已清空餐點清單'); }
     function applyVerifiedPromo(idx) { if (appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; const p = (rec.verifiedPromos || [])[idx]; if (!p) return; rec.discount.mode = p.mode || 'percent_cap'; rec.discount.percentOff = Number(p.percentOff) || 0; rec.discount.capAmount = Number(p.capAmount) || 0; saveDatabase(); renderActiveRecordAll(); showToast(`已套用優惠：${p.title}`); }
     function clearAllParticipants() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.participants = []; r.items.forEach(i => i.assignedTo = []); breakdownViewMode = 'item'; saveDatabase(); renderActiveRecordAll(); showToast('已清空成員'); }
@@ -1342,7 +1539,7 @@
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
-    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, selectInputZone });
+    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -1371,12 +1568,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v17_1', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v18', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v17_1', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v18', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
