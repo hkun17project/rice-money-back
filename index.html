@@ -473,6 +473,10 @@
             <button onclick="joinCloudRoom()" class="px-3.5 py-2 rounded-xl bg-panda-600 text-white font-bold text-xs">切換</button>
           </div>
         </div>
+        <div id="recentCloudRoomsContainer" class="pt-2 border-t border-panda-50 hidden">
+          <span class="text-[10px] text-neutral-500 font-bold mb-1.5 block">最近曾加入的群組：</span>
+          <div id="recentCloudRoomsList" class="flex flex-wrap gap-1.5"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -486,10 +490,12 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v18';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v18';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v19';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v19';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
-    let currentOcrEngine = 'local'; let geminiApiKey = safeStorageGet('split_rice_gemini_key', '');
+
+    let currentOcrEngine = 'local';
+    let geminiApiKey = safeStorageGet('split_rice_gemini_key', '');
 
     function safeStorageGet(key, fallback = null) {
       try { const val = localStorage.getItem(key); if (val !== null) return val; } catch (e) {}
@@ -510,8 +516,12 @@
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k) continue;
-        if (k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) { keysToRemove.push(k); }
-        if (k.startsWith('panda_split_unlocked_v') && k !== STORAGE_KEY_AUTH) { keysToRemove.push(k); }
+        if (k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) {
+          keysToRemove.push(k);
+        }
+        if (k.startsWith('panda_split_unlocked_v') && k !== STORAGE_KEY_AUTH) {
+          keysToRemove.push(k);
+        }
       }
       keysToRemove.forEach(k => safeStorageRemove(k));
     }
@@ -571,7 +581,7 @@
     window._firebaseBridge = { pushState: () => {}, subscribeRoom: () => {} };
     
     function loadDatabase() {
-      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v17_1', 'panda_split_records_db_v17', 'panda_split_records_db_v16', 'panda_split_records_db_v15'];
+      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v18', 'panda_split_records_db_v17_1', 'panda_split_records_db_v17', 'panda_split_records_db_v16', 'panda_split_records_db_v15'];
       for (const k of keys) {
         try { const saved = safeStorageGet(k); if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; } } catch (e) {}
       }
@@ -580,39 +590,74 @@
 
     function saveDatabase() {
       const stateToSave = JSON.parse(JSON.stringify(dbState));
-      stateToSave.records.forEach(r => { if (r.receipts) { r.receipts.forEach(img => { delete img.dataUrl; }); } });
-      try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); } catch (e) { alert('手機瀏覽器儲存空間已滿！'); }
+      stateToSave.records.forEach(r => {
+        if (r.receipts) {
+          r.receipts.forEach(img => {
+            delete img.dataUrl; 
+          });
+        }
+      });
+      try { 
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); 
+      } catch (e) {
+        alert('手機瀏覽器儲存空間已滿！');
+      }
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
     }
     
     async function preloadActiveImages() {
       const rec = getActiveRecord();
       if (rec && rec.receipts) {
-        for (let r of rec.receipts) { if (!r.dataUrl) { r.dataUrl = await ImageDB.get(r.id); } }
+        for (let r of rec.receipts) {
+          if (!r.dataUrl) {
+            r.dataUrl = await ImageDB.get(r.id);
+          }
+        }
         renderReceiptGallery(rec, appMode === 'debtor');
       }
     }
 
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
-    function sanitizeCleanName(str) { if (!str) return ''; return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim(); }
+    
+    function sanitizeCleanName(str) {
+      if (!str) return '';
+      return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim();
+    }
 
     function initAuthLock() { 
       const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true'; 
-      if (unlocked) { unlockAppSuccess(false); } else { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); } 
+      if (unlocked) {
+        unlockAppSuccess(false); 
+      } else { 
+        const ps = document.getElementById('passcodeScreen');
+        if (ps) ps.classList.remove('hidden'); 
+      } 
       const savedEngine = safeStorageGet('split_rice_ocr_engine');
-      if (savedEngine === 'ai' || savedEngine === 'local') { setOcrEngine(savedEngine, true); }
+      if (savedEngine === 'ai' || savedEngine === 'local') {
+        setOcrEngine(savedEngine, true);
+      }
     }
     
     function pressPinDigit(digit) { 
-      const d = String(digit); if (pinBuffer.length >= 6) return; pinBuffer += d; updatePasscodeDots(); 
+      const d = String(digit);
+      if (pinBuffer.length >= 6) return; 
+      pinBuffer += d; 
+      updatePasscodeDots(); 
       if (pinBuffer.length === 6) { 
-        if (pinBuffer === PASSCODE_REQUIRED) { safeStorageSet(STORAGE_KEY_AUTH, 'true'); unlockAppSuccess(true); } 
-        else { 
-          const dotsEl = document.getElementById('passcodeDots'); const hintEl = document.getElementById('passcodeHint');
+        if (pinBuffer === PASSCODE_REQUIRED) { 
+          safeStorageSet(STORAGE_KEY_AUTH, 'true'); 
+          unlockAppSuccess(true); 
+        } else { 
+          const dotsEl = document.getElementById('passcodeDots');
+          const hintEl = document.getElementById('passcodeHint');
           if (dotsEl) dotsEl.classList.add('animate-shake'); 
           if (hintEl) hintEl.textContent = '密碼錯誤，請重新輸入'; 
-          setTimeout(() => { if (dotsEl) dotsEl.classList.remove('animate-shake'); pinBuffer = ''; updatePasscodeDots(); }, 450); 
+          setTimeout(() => { 
+            if (dotsEl) dotsEl.classList.remove('animate-shake'); 
+            pinBuffer = ''; 
+            updatePasscodeDots(); 
+          }, 450); 
         } 
       } 
     }
@@ -622,11 +667,24 @@
     function updatePasscodeDots() { const dots = document.querySelectorAll('#passcodeDots span'); dots.forEach((dot, idx) => { dot.className = idx < pinBuffer.length ? 'w-3.5 h-3.5 rounded-full bg-amber-300 border-2 border-amber-300 scale-110 transition-all' : 'w-3.5 h-3.5 rounded-full border-2 border-white/80 transition-all'; }); }
     function unlockAppSuccess(showWelcome) { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.add('hidden'); showRecordsListView(); if (showWelcome) showToast('驗證成功！'); }
     function lockApp() { 
-      closeNumericKeypad(); safeStorageRemove(STORAGE_KEY_AUTH);
-      for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k); }
-      for (let i = sessionStorage.length - 1; i >= 0; i--) { const k = sessionStorage.key(i); if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k); }
-      pinBuffer = ''; updatePasscodeDots(); const hintEl = document.getElementById('passcodeHint'); if (hintEl) hintEl.textContent = '請輸入 6 位數通行密碼解鎖';
-      document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.add('hidden'); const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); 
+      closeNumericKeypad(); 
+      safeStorageRemove(STORAGE_KEY_AUTH);
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k);
+      }
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k);
+      }
+      pinBuffer = ''; 
+      updatePasscodeDots(); 
+      const hintEl = document.getElementById('passcodeHint');
+      if (hintEl) hintEl.textContent = '請輸入 6 位數通行密碼解鎖';
+      document.getElementById('recordsListView').classList.add('hidden'); 
+      document.getElementById('recordDetailView').classList.add('hidden'); 
+      const ps = document.getElementById('passcodeScreen'); 
+      if (ps) ps.classList.remove('hidden'); 
     }
 
     window.addEventListener('keydown', (e) => {
@@ -653,13 +711,19 @@
     let activeInputZone = 'paste';
     function selectInputZone(zone) {
       activeInputZone = zone;
-      const pasteBtn = document.getElementById('zonePasteBtn'); const pasteIcon = document.getElementById('zonePasteIcon'); const pasteSub = document.getElementById('zonePasteSub');
-      const uploadBtn = document.getElementById('zoneUploadBtn'); const uploadIcon = document.getElementById('zoneUploadIcon'); const uploadSub = document.getElementById('zoneUploadSub');
+      const pasteBtn = document.getElementById('zonePasteBtn');
+      const pasteIcon = document.getElementById('zonePasteIcon');
+      const pasteSub = document.getElementById('zonePasteSub');
+      const uploadBtn = document.getElementById('zoneUploadBtn');
+      const uploadIcon = document.getElementById('zoneUploadIcon');
+      const uploadSub = document.getElementById('zoneUploadSub');
       if (!pasteBtn || !uploadBtn) return;
+
       if (zone === 'paste') {
         pasteBtn.className = 'py-2.5 px-2 bg-amber-400 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-amber-200 transition active:scale-95';
         if (pasteIcon) pasteIcon.className = 'fa-solid fa-paste text-sm text-neutral-900';
         if (pasteSub) pasteSub.className = 'text-[9px] opacity-85 font-normal';
+
         uploadBtn.className = 'py-2.5 px-2 bg-neutral-900/60 hover:bg-neutral-800/80 text-neutral-400 border border-transparent rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 opacity-65 transition active:scale-95';
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-neutral-400 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-neutral-500 font-normal';
@@ -667,6 +731,7 @@
         pasteBtn.className = 'py-2.5 px-2 bg-neutral-900/60 hover:bg-neutral-800/80 text-neutral-400 border border-transparent rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-1 opacity-65 transition active:scale-95';
         if (pasteIcon) pasteIcon.className = 'fa-solid fa-paste text-sm text-neutral-400';
         if (pasteSub) pasteSub.className = 'text-[9px] text-neutral-500 font-normal';
+
         uploadBtn.className = 'py-2.5 px-2 bg-neutral-800 text-white border-2 border-panda-400 rounded-xl text-[11px] font-extrabold cursor-pointer flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-panda-400/40 transition active:scale-95';
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-panda-300 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-panda-200 font-normal';
@@ -674,8 +739,13 @@
     }
 
     function setOcrEngine(engine, isInit = false) {
-      currentOcrEngine = engine; safeStorageSet('split_rice_ocr_engine', engine);
-      const localBtn = document.getElementById('engineLocalBtn'); const aiBtn = document.getElementById('engineAiBtn'); const actionBtn = document.getElementById('smartOcrBtn');
+      currentOcrEngine = engine;
+      safeStorageSet('split_rice_ocr_engine', engine);
+      
+      const localBtn = document.getElementById('engineLocalBtn');
+      const aiBtn = document.getElementById('engineAiBtn');
+      const actionBtn = document.getElementById('smartOcrBtn');
+      
       if (engine === 'local') {
         if (localBtn) localBtn.className = 'flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition';
         if (aiBtn) aiBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
@@ -689,11 +759,27 @@
       }
     }
 
-    function openApiKeyModal() { document.getElementById('apiKeyValueInput').value = geminiApiKey || ''; document.getElementById('apiKeyModal').classList.remove('hidden'); }
-    function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
+    function openApiKeyModal() {
+      document.getElementById('apiKeyValueInput').value = geminiApiKey || '';
+      document.getElementById('apiKeyModal').classList.remove('hidden');
+    }
+    
+    function closeApiKeyModal() {
+      document.getElementById('apiKeyModal').classList.add('hidden');
+    }
+
     function saveApiKey() {
-      const val = document.getElementById('apiKeyValueInput').value.trim(); geminiApiKey = val; safeStorageSet('split_rice_gemini_key', val); closeApiKeyModal();
-      if (val) { setOcrEngine('ai'); showToast('API Key 已儲存並啟用 🔵 AI 引擎！'); } else { setOcrEngine('local'); showToast('已清空金鑰並切回 🟢 本機引擎'); }
+      const val = document.getElementById('apiKeyValueInput').value.trim();
+      geminiApiKey = val;
+      safeStorageSet('split_rice_gemini_key', val);
+      closeApiKeyModal();
+      if (val) {
+        setOcrEngine('ai');
+        showToast('API Key 已儲存並啟用 🔵 AI 引擎！');
+      } else {
+        setOcrEngine('local');
+        showToast('已清空金鑰並切回 🟢 本機引擎');
+      }
     }
 
     let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
@@ -1363,8 +1449,15 @@
       const strip = document.getElementById('receiptGalleryStrip'); const r = rec.receipts || [];
       if (r.length === 0) { strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`; return; }
       strip.innerHTML = r.map((rc, i) => {
-        if (!rc.dataUrl) { return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70"><div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-spinner fa-spin mb-1 text-sm block"></i>正在從資料庫載入...</div></div>`; }
-        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between"><div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div><img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" /></div>`;
+        if (!rc.dataUrl) {
+          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70">
+            <div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-cloud-arrow-down mb-1 text-sm block"></i>圖片已為節省空間而釋放</div>
+          </div>`;
+        }
+        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div>
+          <img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" />
+        </div>`;
       }).join('');
     }
     function renderParticipantChips(rec, calc, isDebtor) {
@@ -1493,8 +1586,8 @@
     function switchTab(t) { closeNumericKeypad(); activeTab = t; ['items','discounts','breakdown','collect'].forEach(x => { document.getElementById(`tab-${x}`).classList.toggle('hidden', x !== t); const m = document.getElementById(`mobTab-${x}`); if (m) m.className = x === t ? 'flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold' : 'flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 font-medium'; const d = document.getElementById(`deskTab-${x}`); if (d) d.className = x === t ? 'py-2 rounded-xl text-xs font-bold bg-panda-600 text-white' : 'py-2 rounded-xl text-xs font-bold text-panda-800'; }); renderActiveRecordAll(); }
     function updateOrderMetadata() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.title = document.getElementById('orderTitleInput').value.trim(); r.date = document.getElementById('orderDateInput').value; r.restaurant = document.getElementById('orderRestaurantInput').value.trim(); saveDatabase(); renderActiveRecordAll(); }
     function handlePlatformChange(p) { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.platform = p; r.verifiedPromos = [...(PLATFORM_PROMOS[p] || PLATFORM_PROMOS['foodpanda'])]; applyPlatformTheme(p); saveDatabase(); renderActiveRecordAll(); showToast(`已切換為 ${p} 主題配色！`); }
-    function addNewItem() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName'); const p = parseFloat(pInput.value); if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; } const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`; r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false }); nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`); }
-    function addRapidBatchPrices() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const input = document.getElementById('rapidBatchPricesInput'); const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0); if (nums.length === 0) { showToast('請輸入至少一個金額'); return; } nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false }); }); input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`); }
+    function addNewItem() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const pInput = document.getElementById('newItemPrice'); const nInput = document.getElementById('newItemName'); const p = parseFloat(pInput.value); if (isNaN(p) || p <= 0) { showToast('請輸入有效的餐點原價'); return; } const n = sanitizeCleanName(nInput.value) || `餐點 #${r.items.length + 1}`; r.items.push({ id: 'i_' + Date.now(), name: n, price: p, assignedTo: [], paid: false, microCrop: null }); nInput.value = ''; pInput.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已加入「${n}」($${p})`); }
+    function addRapidBatchPrices() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; const input = document.getElementById('rapidBatchPricesInput'); const nums = (input.value.match(/[0-9]+(?:\.[0-9]{1,2})?/g) || []).map(Number).filter(n => n > 0); if (nums.length === 0) { showToast('請輸入至少一個金額'); return; } nums.forEach((p, idx) => { r.items.push({ id: 'rb_' + Date.now() + '_' + idx, name: `餐點 #${r.items.length + 1}`, price: p, assignedTo: [], paid: false, microCrop: null }); }); input.value = ''; saveDatabase(); renderActiveRecordAll(); showToast(`已極速加入 ${nums.length} 項餐點！`); }
     function clearAllItems() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r || r.items.length === 0) return; if (!confirm('確定要清空目前清單中的所有餐點嗎？')) return; r.items = []; saveDatabase(); renderActiveRecordAll(); showToast('已清空餐點清單'); }
     function applyVerifiedPromo(idx) { if (appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; const p = (rec.verifiedPromos || [])[idx]; if (!p) return; rec.discount.mode = p.mode || 'percent_cap'; rec.discount.percentOff = Number(p.percentOff) || 0; rec.discount.capAmount = Number(p.capAmount) || 0; saveDatabase(); renderActiveRecordAll(); showToast(`已套用優惠：${p.title}`); }
     function clearAllParticipants() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.participants = []; r.items.forEach(i => i.assignedTo = []); breakdownViewMode = 'item'; saveDatabase(); renderActiveRecordAll(); showToast('已清空成員'); }
@@ -1533,13 +1626,55 @@
     function saveItemEdit(id) { if(appMode === 'debtor') return; const i = getActiveRecord().items.find(x => x.id === id); if (!i) return; const n = sanitizeCleanName(document.getElementById('editItemName').value); const p = parseFloat(document.getElementById('editItemPrice').value); if (n && !isNaN(p) && p >= 0) { i.name = n; i.price = p; closeActionSheet(); saveDatabase(); renderActiveRecordAll(); } }
     function duplicateItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false, microCrop: i.microCrop || null }); saveDatabase(); renderActiveRecordAll(); }
     function deleteItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); r.items = r.items.filter(x => x.id !== id); saveDatabase(); renderActiveRecordAll(); }
-    function openCloudModal() { document.getElementById('cloudRoomIdInput').value = currentRoomId; document.getElementById('cloudModal').classList.remove('hidden'); }
+    
+    // ★ 歷史群組邏輯
+    function getRecentCloudRooms() {
+      let rooms = [];
+      try { rooms = JSON.parse(safeStorageGet('panda_recent_rooms', '[]')); } catch(e) {}
+      if (!rooms.includes(currentRoomId)) {
+        rooms.unshift(currentRoomId);
+        safeStorageSet('panda_recent_rooms', JSON.stringify(rooms));
+      }
+      return rooms;
+    }
+    function renderRecentCloudRooms() {
+      const rooms = getRecentCloudRooms();
+      const container = document.getElementById('recentCloudRoomsContainer');
+      const list = document.getElementById('recentCloudRoomsList');
+      if (rooms.length <= 1) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      const otherRooms = rooms.filter(r => r !== currentRoomId);
+      list.innerHTML = otherRooms.map(r => `
+        <button onclick="selectRecentCloudRoom('${r}')" class="px-2 py-1 rounded-lg bg-neutral-100 hover:bg-panda-50 border border-neutral-200 hover:border-panda-200 text-neutral-600 hover:text-panda-600 text-[10px] font-mono font-bold transition">
+          ${r}
+        </button>
+      `).join('');
+    }
+    function selectRecentCloudRoom(roomId) {
+      document.getElementById('cloudRoomIdInput').value = roomId;
+      joinCloudRoom();
+    }
+    function openCloudModal() { 
+      document.getElementById('cloudRoomIdInput').value = currentRoomId; 
+      renderRecentCloudRooms();
+      document.getElementById('cloudModal').classList.remove('hidden'); 
+    }
     function closeCloudModal() { document.getElementById('cloudModal').classList.add('hidden'); }
-    function joinCloudRoom() { const v = document.getElementById('cloudRoomIdInput').value.trim().toUpperCase(); if (!v) return; currentRoomId = v; safeStorageSet('panda_room_id', currentRoomId); if (window._firebaseBridge) window._firebaseBridge.subscribeRoom(currentRoomId); closeCloudModal(); }
+    function joinCloudRoom() { 
+      const v = document.getElementById('cloudRoomIdInput').value.trim().toUpperCase(); 
+      if (!v || v === currentRoomId) return; 
+      let rooms = getRecentCloudRooms();
+      rooms = [v, ...rooms.filter(r => r !== v)].slice(0, 5);
+      safeStorageSet('panda_recent_rooms', JSON.stringify(rooms));
+      currentRoomId = v; safeStorageSet('panda_room_id', currentRoomId); 
+      if (window._firebaseBridge) window._firebaseBridge.subscribeRoom(currentRoomId); 
+      closeCloudModal(); showToast(`已切換至群組：${v}`); 
+    }
+    
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
-    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone });
+    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone, selectRecentCloudRoom });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -1568,12 +1703,12 @@
         let unsub = null; let timer = null;
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v18', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v19', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v18', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v19', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
