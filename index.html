@@ -490,10 +490,12 @@
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v20';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v20';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v19';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v19';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
-    let currentOcrEngine = 'local'; let geminiApiKey = safeStorageGet('split_rice_gemini_key', '');
+
+    let currentOcrEngine = 'local';
+    let geminiApiKey = safeStorageGet('split_rice_gemini_key', '');
 
     function safeStorageGet(key, fallback = null) {
       try { const val = localStorage.getItem(key); if (val !== null) return val; } catch (e) {}
@@ -514,8 +516,12 @@
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k) continue;
-        if (k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) { keysToRemove.push(k); }
-        if (k.startsWith('panda_split_unlocked_v') && k !== STORAGE_KEY_AUTH) { keysToRemove.push(k); }
+        if (k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) {
+          keysToRemove.push(k);
+        }
+        if (k.startsWith('panda_split_unlocked_v') && k !== STORAGE_KEY_AUTH) {
+          keysToRemove.push(k);
+        }
       }
       keysToRemove.forEach(k => safeStorageRemove(k));
     }
@@ -527,7 +533,9 @@
           const req = indexedDB.open('SplitThatRiceImages', 1);
           req.onupgradeneeded = e => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains('receipts')) { db.createObjectStore('receipts', { keyPath: 'id' }); }
+            if (!db.objectStoreNames.contains('receipts')) {
+              db.createObjectStore('receipts', { keyPath: 'id' });
+            }
           };
           req.onsuccess = e => { this.db = e.target.result; resolve(); };
           req.onerror = e => reject(e);
@@ -573,7 +581,7 @@
     window._firebaseBridge = { pushState: () => {}, subscribeRoom: () => {} };
     
     function loadDatabase() {
-      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v19', 'panda_split_records_db_v18', 'panda_split_records_db_v17_1', 'panda_split_records_db_v17', 'panda_split_records_db_v16', 'panda_split_records_db_v15'];
+      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v18', 'panda_split_records_db_v17_1', 'panda_split_records_db_v17', 'panda_split_records_db_v16', 'panda_split_records_db_v15'];
       for (const k of keys) {
         try { const saved = safeStorageGet(k); if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; } } catch (e) {}
       }
@@ -582,8 +590,18 @@
 
     function saveDatabase() {
       const stateToSave = JSON.parse(JSON.stringify(dbState));
-      stateToSave.records.forEach(r => { if (r.receipts) { r.receipts.forEach(img => { delete img.dataUrl; }); } });
-      try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); } catch (e) { alert('手機瀏覽器儲存空間已滿！'); }
+      stateToSave.records.forEach(r => {
+        if (r.receipts) {
+          r.receipts.forEach(img => {
+            delete img.dataUrl; 
+          });
+        }
+      });
+      try { 
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); 
+      } catch (e) {
+        alert('手機瀏覽器儲存空間已滿！');
+      }
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
     }
     
@@ -601,24 +619,45 @@
 
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
-    function sanitizeCleanName(str) { if (!str) return ''; return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim(); }
+    
+    function sanitizeCleanName(str) {
+      if (!str) return '';
+      return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim();
+    }
 
     function initAuthLock() { 
       const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true'; 
-      if (unlocked) { unlockAppSuccess(false); } else { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); } 
+      if (unlocked) {
+        unlockAppSuccess(false); 
+      } else { 
+        const ps = document.getElementById('passcodeScreen');
+        if (ps) ps.classList.remove('hidden'); 
+      } 
       const savedEngine = safeStorageGet('split_rice_ocr_engine');
-      if (savedEngine === 'ai' || savedEngine === 'local') { setOcrEngine(savedEngine, true); }
+      if (savedEngine === 'ai' || savedEngine === 'local') {
+        setOcrEngine(savedEngine, true);
+      }
     }
     
     function pressPinDigit(digit) { 
-      const d = String(digit); if (pinBuffer.length >= 6) return; pinBuffer += d; updatePasscodeDots(); 
+      const d = String(digit);
+      if (pinBuffer.length >= 6) return; 
+      pinBuffer += d; 
+      updatePasscodeDots(); 
       if (pinBuffer.length === 6) { 
-        if (pinBuffer === PASSCODE_REQUIRED) { safeStorageSet(STORAGE_KEY_AUTH, 'true'); unlockAppSuccess(true); } 
-        else { 
-          const dotsEl = document.getElementById('passcodeDots'); const hintEl = document.getElementById('passcodeHint');
+        if (pinBuffer === PASSCODE_REQUIRED) { 
+          safeStorageSet(STORAGE_KEY_AUTH, 'true'); 
+          unlockAppSuccess(true); 
+        } else { 
+          const dotsEl = document.getElementById('passcodeDots');
+          const hintEl = document.getElementById('passcodeHint');
           if (dotsEl) dotsEl.classList.add('animate-shake'); 
           if (hintEl) hintEl.textContent = '密碼錯誤，請重新輸入'; 
-          setTimeout(() => { if (dotsEl) dotsEl.classList.remove('animate-shake'); pinBuffer = ''; updatePasscodeDots(); }, 450); 
+          setTimeout(() => { 
+            if (dotsEl) dotsEl.classList.remove('animate-shake'); 
+            pinBuffer = ''; 
+            updatePasscodeDots(); 
+          }, 450); 
         } 
       } 
     }
@@ -628,11 +667,24 @@
     function updatePasscodeDots() { const dots = document.querySelectorAll('#passcodeDots span'); dots.forEach((dot, idx) => { dot.className = idx < pinBuffer.length ? 'w-3.5 h-3.5 rounded-full bg-amber-300 border-2 border-amber-300 scale-110 transition-all' : 'w-3.5 h-3.5 rounded-full border-2 border-white/80 transition-all'; }); }
     function unlockAppSuccess(showWelcome) { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.add('hidden'); showRecordsListView(); if (showWelcome) showToast('驗證成功！'); }
     function lockApp() { 
-      closeNumericKeypad(); safeStorageRemove(STORAGE_KEY_AUTH);
-      for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k); }
-      for (let i = sessionStorage.length - 1; i >= 0; i--) { const k = sessionStorage.key(i); if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k); }
-      pinBuffer = ''; updatePasscodeDots(); const hintEl = document.getElementById('passcodeHint'); if (hintEl) hintEl.textContent = '請輸入 6 位數通行密碼解鎖';
-      document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.add('hidden'); const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); 
+      closeNumericKeypad(); 
+      safeStorageRemove(STORAGE_KEY_AUTH);
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k);
+      }
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k);
+      }
+      pinBuffer = ''; 
+      updatePasscodeDots(); 
+      const hintEl = document.getElementById('passcodeHint');
+      if (hintEl) hintEl.textContent = '請輸入 6 位數通行密碼解鎖';
+      document.getElementById('recordsListView').classList.add('hidden'); 
+      document.getElementById('recordDetailView').classList.add('hidden'); 
+      const ps = document.getElementById('passcodeScreen'); 
+      if (ps) ps.classList.remove('hidden'); 
     }
 
     window.addEventListener('keydown', (e) => {
@@ -659,13 +711,19 @@
     let activeInputZone = 'paste';
     function selectInputZone(zone) {
       activeInputZone = zone;
-      const pasteBtn = document.getElementById('zonePasteBtn'); const pasteIcon = document.getElementById('zonePasteIcon'); const pasteSub = document.getElementById('zonePasteSub');
-      const uploadBtn = document.getElementById('zoneUploadBtn'); const uploadIcon = document.getElementById('zoneUploadIcon'); const uploadSub = document.getElementById('zoneUploadSub');
+      const pasteBtn = document.getElementById('zonePasteBtn');
+      const pasteIcon = document.getElementById('zonePasteIcon');
+      const pasteSub = document.getElementById('zonePasteSub');
+      const uploadBtn = document.getElementById('zoneUploadBtn');
+      const uploadIcon = document.getElementById('zoneUploadIcon');
+      const uploadSub = document.getElementById('zoneUploadSub');
       if (!pasteBtn || !uploadBtn) return;
+
       if (zone === 'paste') {
         pasteBtn.className = 'py-2.5 px-2 bg-amber-400 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-amber-200 transition active:scale-95';
         if (pasteIcon) pasteIcon.className = 'fa-solid fa-paste text-sm text-neutral-900';
         if (pasteSub) pasteSub.className = 'text-[9px] opacity-85 font-normal';
+
         uploadBtn.className = 'py-2.5 px-2 bg-neutral-900/60 hover:bg-neutral-800/80 text-neutral-400 border border-transparent rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 opacity-65 transition active:scale-95';
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-neutral-400 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-neutral-500 font-normal';
@@ -673,6 +731,7 @@
         pasteBtn.className = 'py-2.5 px-2 bg-neutral-900/60 hover:bg-neutral-800/80 text-neutral-400 border border-transparent rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-1 opacity-65 transition active:scale-95';
         if (pasteIcon) pasteIcon.className = 'fa-solid fa-paste text-sm text-neutral-400';
         if (pasteSub) pasteSub.className = 'text-[9px] text-neutral-500 font-normal';
+
         uploadBtn.className = 'py-2.5 px-2 bg-neutral-800 text-white border-2 border-panda-400 rounded-xl text-[11px] font-extrabold cursor-pointer flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-panda-400/40 transition active:scale-95';
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-panda-300 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-panda-200 font-normal';
@@ -680,8 +739,13 @@
     }
 
     function setOcrEngine(engine, isInit = false) {
-      currentOcrEngine = engine; safeStorageSet('split_rice_ocr_engine', engine);
-      const localBtn = document.getElementById('engineLocalBtn'); const aiBtn = document.getElementById('engineAiBtn'); const actionBtn = document.getElementById('smartOcrBtn');
+      currentOcrEngine = engine;
+      safeStorageSet('split_rice_ocr_engine', engine);
+      
+      const localBtn = document.getElementById('engineLocalBtn');
+      const aiBtn = document.getElementById('engineAiBtn');
+      const actionBtn = document.getElementById('smartOcrBtn');
+      
       if (engine === 'local') {
         if (localBtn) localBtn.className = 'flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition';
         if (aiBtn) aiBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
@@ -695,11 +759,27 @@
       }
     }
 
-    function openApiKeyModal() { document.getElementById('apiKeyValueInput').value = geminiApiKey || ''; document.getElementById('apiKeyModal').classList.remove('hidden'); }
-    function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
+    function openApiKeyModal() {
+      document.getElementById('apiKeyValueInput').value = geminiApiKey || '';
+      document.getElementById('apiKeyModal').classList.remove('hidden');
+    }
+    
+    function closeApiKeyModal() {
+      document.getElementById('apiKeyModal').classList.add('hidden');
+    }
+
     function saveApiKey() {
-      const val = document.getElementById('apiKeyValueInput').value.trim(); geminiApiKey = val; safeStorageSet('split_rice_gemini_key', val); closeApiKeyModal();
-      if (val) { setOcrEngine('ai'); showToast('API Key 已儲存並啟用 🔵 AI 引擎！'); } else { setOcrEngine('local'); showToast('已清空金鑰並切回 🟢 本機引擎'); }
+      const val = document.getElementById('apiKeyValueInput').value.trim();
+      geminiApiKey = val;
+      safeStorageSet('split_rice_gemini_key', val);
+      closeApiKeyModal();
+      if (val) {
+        setOcrEngine('ai');
+        showToast('API Key 已儲存並啟用 🔵 AI 引擎！');
+      } else {
+        setOcrEngine('local');
+        showToast('已清空金鑰並切回 🟢 本機引擎');
+      }
     }
 
     let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
@@ -775,14 +855,7 @@
       if (appMode === 'debtor') return; 
       const t = dbState.records.find(r => r.id === id); 
       if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; 
-      if (t.receipts) { 
-        t.receipts.forEach(rcp => {
-          ImageDB.remove(rcp.id);
-          if (window._firebaseBridge && window._firebaseBridge.deleteImageFromCloud) {
-            window._firebaseBridge.deleteImageFromCloud(rcp.id);
-          }
-        }); 
-      }
+      if (t.receipts) { t.receipts.forEach(rcp => ImageDB.remove(rcp.id)); }
       dbState.records = dbState.records.filter(r => r.id !== id); 
       if (dbState.activeRecordId === id) dbState.activeRecordId = null; 
       saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); 
@@ -1276,14 +1349,7 @@
           pass1Lines = pass1Lines.concat(reconstructLineObjects(resOrig.data.words, images[i].dataUrl));
 
           const newUrl = await cropImageTopAndBottom(images[i].dataUrl, resOrig.data.words);
-          if (newUrl !== images[i].dataUrl) { 
-            images[i].dataUrl = newUrl; 
-            ImageDB.save(images[i].id, newUrl); 
-            if (window._firebaseBridge && window._firebaseBridge.saveImageToCloud) {
-              window._firebaseBridge.saveImageToCloud(images[i].id, newUrl);
-            }
-            croppedAny = true; 
-          }
+          if (newUrl !== images[i].dataUrl) { images[i].dataUrl = newUrl; ImageDB.save(images[i].id, newUrl); croppedAny = true; }
 
           statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 正在增強對比與重組空間座標 (${i + 1}/${images.length})...`;
           const enhancedDataUrl = await preprocessImageForOcr(images[i].dataUrl); 
@@ -1323,7 +1389,7 @@
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
-          img.onload = async () => {
+          img.onload = () => {
             const canvas = document.createElement('canvas'); 
             let w = img.width; let h = img.height; 
             const MAX_WIDTH = 800;
@@ -1333,21 +1399,18 @@
             canvas.width = w; canvas.height = h; 
             const ctx = canvas.getContext('2d'); 
             ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h); 
-            let dataUrl = canvas.toDataURL('image/jpeg', 0.55);
-            dataUrl = await ensureCloudSafeSize(dataUrl);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
             
             const rcpId = 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
-            await ImageDB.save(rcpId, dataUrl);
-            if (window._firebaseBridge && window._firebaseBridge.saveImageToCloud) {
-              window._firebaseBridge.saveImageToCloud(rcpId, dataUrl);
-            }
-            rec.receipts.push({ id: rcpId, name: file.name, dataUrl: dataUrl, _cloudSynced: true }); 
-            loaded++;
-            if (loaded === files.length) { 
-              saveDatabase(); renderActiveRecordAll(); 
-              selectInputZone('upload');
-              showToast(`已載入並同步 ${files.length} 張截圖！`); 
-            }
+            ImageDB.save(rcpId, dataUrl).then(() => {
+              rec.receipts.push({ id: rcpId, name: file.name, dataUrl: dataUrl }); 
+              loaded++;
+              if (loaded === files.length) { 
+                saveDatabase(); renderActiveRecordAll(); 
+                selectInputZone('upload');
+                showToast(`已載入 ${files.length} 張截圖！可點擊識圖`); 
+              }
+            });
           };
           img.src = e.target.result;
         };
@@ -1356,27 +1419,8 @@
       event.target.value = '';
     }
     
-    async function retryFetchCloudImage(rcpId) {
-      const rec = getActiveRecord();
-      if (!rec || !rec.receipts) return;
-      const target = rec.receipts.find(x => x.id === rcpId);
-      if (target) {
-        target._cloudMissing = false;
-        await preloadActiveImages();
-      }
-    }
-
     function zoomReceiptImage(dataUrl) { document.getElementById('zoomReceiptImg').src = dataUrl; document.getElementById('zoomReceiptBox').classList.remove('hidden'); }
-    function removeReceiptImage(id) { 
-      if (appMode === 'debtor') return; 
-      const rec = getActiveRecord(); if (!rec) return; 
-      ImageDB.remove(id); 
-      if (window._firebaseBridge && window._firebaseBridge.deleteImageFromCloud) {
-        window._firebaseBridge.deleteImageFromCloud(id);
-      }
-      rec.receipts = (rec.receipts || []).filter(r => r.id !== id); 
-      saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); 
-    }
+    function removeReceiptImage(id) { if(appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; ImageDB.remove(id); rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); }
 
     // --- 6. UI RENDER LOGIC ---
     function renderActiveRecordAll() {
@@ -1406,13 +1450,8 @@
       if (r.length === 0) { strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`; return; }
       strip.innerHTML = r.map((rc, i) => {
         if (!rc.dataUrl) {
-          if (rc._cloudMissing) {
-            return `<div onclick="retryFetchCloudImage('${rc.id}')" class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 hover:border-amber-400 rounded-xl p-2 flex flex-col justify-center items-center text-center cursor-pointer transition">
-              <div class="text-[10px] text-amber-300 font-bold"><i class="fa-solid fa-rotate-right mb-1 text-sm block"></i>點擊重新載入雲端圖</div>
-            </div>`;
-          }
-          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-center items-center text-center opacity-85">
-            <div class="text-[10px] text-sky-300 font-bold"><i class="fa-solid fa-cloud-arrow-down fa-fade mb-1 text-sm block"></i>☁️ 正在從雲端同步截圖...</div>
+          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70">
+            <div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-cloud-arrow-down mb-1 text-sm block"></i>圖片已為節省空間而釋放</div>
           </div>`;
         }
         return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
@@ -1588,7 +1627,7 @@
     function duplicateItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false, microCrop: i.microCrop || null }); saveDatabase(); renderActiveRecordAll(); }
     function deleteItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); r.items = r.items.filter(x => x.id !== id); saveDatabase(); renderActiveRecordAll(); }
     
-    // ★ 歷史紀錄群組與一鍵切換
+    // ★ 歷史群組邏輯
     function getRecentCloudRooms() {
       let rooms = [];
       try { rooms = JSON.parse(safeStorageGet('panda_recent_rooms', '[]')); } catch(e) {}
@@ -1611,8 +1650,15 @@
         </button>
       `).join('');
     }
-    function selectRecentCloudRoom(roomId) { document.getElementById('cloudRoomIdInput').value = roomId; joinCloudRoom(); }
-    function openCloudModal() { document.getElementById('cloudRoomIdInput').value = currentRoomId; renderRecentCloudRooms(); document.getElementById('cloudModal').classList.remove('hidden'); }
+    function selectRecentCloudRoom(roomId) {
+      document.getElementById('cloudRoomIdInput').value = roomId;
+      joinCloudRoom();
+    }
+    function openCloudModal() { 
+      document.getElementById('cloudRoomIdInput').value = currentRoomId; 
+      renderRecentCloudRooms();
+      document.getElementById('cloudModal').classList.remove('hidden'); 
+    }
     function closeCloudModal() { document.getElementById('cloudModal').classList.add('hidden'); }
     function joinCloudRoom() { 
       const v = document.getElementById('cloudRoomIdInput').value.trim().toUpperCase(); 
@@ -1628,7 +1674,7 @@
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
-    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone, selectRecentCloudRoom, retryFetchCloudImage });
+    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone, selectRecentCloudRoom });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -1655,102 +1701,34 @@
         const fb = await loadFirebaseSdk(); const app = fb.initializeApp(firebaseConfig); const auth = fb.getAuth(app); const db = fb.getFirestore(app);
         try { await fb.signInAnonymously(auth); } catch (e) {}
         let unsub = null; let timer = null;
-
-        async function saveImageToCloud(imgId, dataUrl) {
-          if (!imgId || !dataUrl) return;
-          try {
-            const safeUrl = await window.ensureCloudSafeSize(dataUrl);
-            await fb.setDoc(fb.doc(db, 'receipt_images_v20', imgId), {
-              id: imgId,
-              roomId: currentRoomId,
-              dataUrl: safeUrl,
-              updatedAt: Date.now()
-            });
-          } catch (e) { console.warn('Cloud image upload failed:', e); }
-        }
-
-        async function fetchImageFromCloud(imgId) {
-          if (!imgId) return null;
-          try {
-            const snap = await fb.getDoc(fb.doc(db, 'receipt_images_v20', imgId));
-            if (snap.exists()) {
-              return snap.data().dataUrl || null;
-            }
-          } catch (e) { console.warn('Cloud image fetch failed:', e); }
-          return null;
-        }
-
-        async function deleteImageFromCloud(imgId) {
-          if (!imgId) return;
-          try {
-            await fb.deleteDoc(fb.doc(db, 'receipt_images_v20', imgId));
-          } catch (e) {}
-        }
-
         function pushState() {
           clearTimeout(timer); timer = setTimeout(async () => {
-            try {
-              const lDb = JSON.parse(JSON.stringify(dbState));
-              lDb.records.forEach(r => {
-                if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name, _cloudMissing: rcp._cloudMissing, _cloudSynced: rcp._cloudSynced }));
-              });
-              
-              // ★ 這裡加上本機時間戳記防護，避免被自己剛剛 Push 出去的舊資料覆蓋
-              lDb.localUpdatedAt = Date.now();
-              dbState.localUpdatedAt = lDb.localUpdatedAt;
-              
-              await fb.setDoc(fb.doc(db, 'orders_v20', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true });
-            } catch (e) {}
+            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v19', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
           }, 400);
         }
-
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v20', rid), (snap) => {
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v19', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
               const data = snap.data();
-              if (data && data.dbPayload) {
-                const cloudTime = data.updatedAt || 0;
-                const localTime = dbState.localUpdatedAt || 0;
-                
-                // ★ 防干擾過濾機制：
-                // 1. 若資料是別人上傳的 (updatedBy !== clientUid)，且雲端時間較新，才允許更新畫面。
-                if (data.updatedBy !== clientUid && cloudTime >= localTime) {
-                  isApplyingRemoteUpdate = true;
-                  const localReceiptsMap = {};
-                  dbState.records.forEach(r => {
-                    localReceiptsMap[r.id] = {};
-                    (r.receipts || []).forEach(rcp => { if (rcp.dataUrl) localReceiptsMap[r.id][rcp.id] = rcp.dataUrl; });
-                  });
-                  dbState = data.dbPayload;
-                  dbState.records.forEach(r => {
-                    if (r.receipts && localReceiptsMap[r.id]) {
-                      r.receipts.forEach(rcp => {
-                        if (localReceiptsMap[r.id][rcp.id]) rcp.dataUrl = localReceiptsMap[r.id][rcp.id];
-                      });
-                    }
-                  });
-                  renderRecordsList();
-                  renderActiveRecordAll();
-                  isApplyingRemoteUpdate = false;
-                  // 收到雲端更新時，自動檢查並下載其他裝置剛上傳的新截圖
-                  if (typeof window.preloadActiveImages === 'function') window.preloadActiveImages();
-                } 
-                // 2. 若資料是本機更新但尚未上傳 (localTime > cloudTime)，自動補推
-                else if (localTime > cloudTime) {
-                  pushState();
-                }
+              if (data && data.dbPayload && data.updatedBy !== clientUid) {
+                isApplyingRemoteUpdate = true;
+                const localReceiptsMap = {};
+                dbState.records.forEach(r => { localReceiptsMap[r.id] = r.receipts || []; });
+                dbState = data.dbPayload;
+                dbState.records.forEach(r => {
+                  if (localReceiptsMap[r.id] && localReceiptsMap[r.id].length > 0) {
+                    r.receipts = localReceiptsMap[r.id];
+                  }
+                });
+                renderRecordsList(); renderActiveRecordAll(); isApplyingRemoteUpdate = false;
               }
             } else pushState();
           }, () => { const t = document.getElementById('listCloudText'); if (t) t.textContent = '本機儲存'; });
         }
-
-        window._firebaseBridge = { pushState, subscribeRoom, saveImageToCloud, fetchImageFromCloud, deleteImageFromCloud };
-        subscribeRoom(currentRoomId);
-        // 初始化連線後，自動檢查目前紀錄是否有待下載的雲端截圖
-        if (typeof window.preloadActiveImages === 'function') window.preloadActiveImages();
+        window._firebaseBridge = { pushState, subscribeRoom }; subscribeRoom(currentRoomId);
       } catch (e) {}
     }
     initCloud();
