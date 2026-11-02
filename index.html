@@ -867,6 +867,7 @@
         const box = document.getElementById('aiScanStatusBox'); if (box) box.classList.add('hidden');
         const txt = document.getElementById('aiScanStatusText'); if (txt) txt.innerHTML = '準備就緒';
     }
+
     function createNewRecord() {
       document.getElementById('zoomReceiptBox').classList.add('hidden'); document.getElementById('zoomReceiptImg').src = ''; resetOcrStatusBox();
       const ts = new Date().toISOString().split('T')[0]; const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
@@ -1522,7 +1523,10 @@
             <div class="text-[10px] text-sky-300 font-bold"><i class="fa-solid fa-cloud-arrow-down fa-fade mb-1 text-sm block"></i>☁️ 正在從雲端同步...</div>
           </div>`;
         }
-        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between"><div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div><img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" /></div>`;
+        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div>
+          <img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" />
+        </div>`;
       }).join('');
     }
     function renderParticipantChips(rec, calc, isDebtor) {
@@ -1615,6 +1619,7 @@
       document.getElementById('clearPaymentBtn').style.display = isDebtor ? 'none' : 'block';
       document.getElementById('markAllPaidBtn').style.display = isDebtor ? 'none' : 'block';
 
+      // 1. 動態更新頂部「墊支負責人收款資料」快捷付款列 (★ 左右對調修正：左邊 FPS，右邊 PayMe)
       const quickBar = document.getElementById('paymentQuickActionsBar');
       if (quickBar) {
         if (!hasAnyPayment) {
@@ -1623,13 +1628,8 @@
         } else {
           quickBar.classList.remove('hidden');
           const btns = [];
-          if (paymeUrl) {
-            btns.push(`
-              <a href="${escapeHtml(paymeUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2 px-3 rounded-xl bg-[#db0011] hover:opacity-95 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i><span>開啟 PayMe 付款</span>
-              </a>
-            `);
-          }
+          
+          // ★ 先放 FPS 按鈕 (左側)
           if (fpsVal) {
             btns.push(`
               <button type="button" onclick="openPaymentModal(null)" class="flex-1 py-2 px-3 rounded-xl bg-panda-600 hover:bg-panda-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
@@ -1643,10 +1643,21 @@
               </button>
             `);
           }
+
+          // ★ 後放 PayMe 按鈕 (右側)
+          if (paymeUrl) {
+            btns.push(`
+              <a href="${escapeHtml(paymeUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2 px-3 rounded-xl bg-[#db0011] hover:opacity-95 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i><span>開啟 PayMe 付款</span>
+              </a>
+            `);
+          }
+
           quickBar.innerHTML = `<div class="flex items-center gap-2">${btns.join('')}</div>`;
         }
       }
 
+      // 2. 渲染下方「應收款項清單」，每項餐點加入獨立「付款」按鈕
       document.getElementById('collectionCardsContainer').innerHTML = calc.itemBreakdown.map((ib,i) => `
         <div class="bg-white p-3 rounded-2xl shadow-xs border flex items-center justify-between ${ib.paid?'border-emerald-300 bg-emerald-50/30':'border-panda-100'}">
           <div class="flex items-center gap-2.5 min-w-0 pr-2">
@@ -1661,11 +1672,12 @@
             <button type="button" onclick="openPaymentModal('${ib.id}')" class="px-2.5 py-1.5 rounded-xl ${ib.paid ? 'bg-neutral-100 text-neutral-500' : 'theme-bar-gradient text-white shadow-xs'} text-xs font-extrabold flex items-center gap-1 active:scale-95 transition">
               <i class="fa-solid fa-credit-card text-[10px]"></i><span>付款</span>
             </button>
-            <button type="button" onclick="copySingleItemReminder('${ib.id}')" class="px-2 py-1.5 rounded-xl bg-panda-50 text-panda-600 text-xs font-bold active:scale-95 transition"><i class="fa-regular fa-copy"></i></button>
+            <button type="button" onclick="copySingleItemReminder('${ib.id}')" title="複製單項催收訊息" class="px-2 py-1.5 rounded-xl bg-panda-50 text-panda-600 text-xs font-bold active:scale-95 transition"><i class="fa-regular fa-copy"></i></button>
           </div>
         </div>
       `).join('');
       
+      // 3. 渲染 WhatsApp 催收文字預覽
       const l = [];
       l.push(`🍱 *【${rec.title}】*`);
       if (rec.restaurant) l.push(`🏪 餐廳：${rec.restaurant}`);
@@ -1998,7 +2010,6 @@
                   
                   try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); } catch (e) {}
                   
-                  // 判斷當前頁面，正確刷新 UI
                   if (typeof window.showRecordsListView === 'function' && document.getElementById('recordsListView') && !document.getElementById('recordsListView').classList.contains('hidden')) {
                     window.renderRecordsList();
                   } else {
