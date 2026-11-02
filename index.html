@@ -348,8 +348,10 @@
           <div class="flex items-center justify-between"><h2 class="text-xs font-bold text-neutral-800 flex items-center gap-1.5"><i class="fa-solid fa-wallet text-panda-600"></i>墊支負責人收款資料</h2><button id="clearPaymentBtn" onclick="clearPaymentInfoFields()" class="text-[11px] text-rose-500 font-bold hover:underline">清空欄目</button></div>
           <div class="grid grid-cols-2 gap-2">
             <div><label class="text-[10px] text-neutral-400 block">FPS 轉數快 / 電話號碼</label><input id="inputPaymentFps" type="text" placeholder="未填寫" oninput="updatePaymentInfo()" class="w-full px-2.5 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" /></div>
-            <div><label class="text-[10px] text-neutral-400 block">PayMe 連結或備註</label><input id="inputPaymentPayme" type="text" placeholder="未填寫" oninput="updatePaymentInfo()" class="w-full px-2.5 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" /></div>
+            <div><label class="text-[10px] text-neutral-400 block">PayMe 連結或備註</label><input id="inputPaymentPayme" type="text" placeholder="未填寫 (可貼連結或ID)" oninput="updatePaymentInfo()" class="w-full px-2.5 py-1.5 text-xs bg-panda-50/40 border border-panda-200 rounded-xl focus:outline-none focus:border-panda-600" /></div>
           </div>
+          <!-- ★ 動態付款快捷列 -->
+          <div id="paymentQuickActionsBar" class="pt-2 border-t border-panda-50 hidden"></div>
         </div>
         <div class="space-y-2">
           <div class="flex items-center justify-between px-1"><span class="text-xs font-bold text-neutral-600">應收款項清單 (點擊標記已收)</span><button id="markAllPaidBtn" onclick="markAllPaid(true)" class="text-[11px] text-panda-600 font-bold hover:underline">全部標記已收</button></div>
@@ -481,17 +483,47 @@
     </div>
   </div>
 
+  <!-- ★ 付款與過數 App 喚起選單 Modal -->
+  <div id="paymentActionModal" class="hidden fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4 border-t-4 border-panda-600">
+      <div class="flex items-center justify-between border-b border-panda-100 pb-2.5">
+        <div class="min-w-0 pr-2">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-panda-600">即時過數付款</span>
+          <h3 id="payModalTitle" class="font-extrabold text-sm text-neutral-800 truncate mt-0.5">餐點付款</h3>
+        </div>
+        <button type="button" onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-panda-50 text-panda-600 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- 應付折實金額醒目提示卡 -->
+      <div class="bg-panda-50/70 border border-panda-200 rounded-2xl p-3.5 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-panda-700 block">此項折實應付金額</span>
+          <div id="payModalAmount" class="text-2xl font-extrabold text-panda-600 mt-0.5">$0.0</div>
+          <span id="payModalFormula" class="text-[10px] text-neutral-500 block mt-0.5"></span>
+        </div>
+        <button type="button" onclick="copyPayModalAmount()" class="px-3 py-1.5 rounded-xl bg-white border border-panda-200 text-panda-700 text-xs font-bold shadow-2xs active:scale-95 transition">
+          <i class="fa-regular fa-copy mr-1"></i>複製銀碼
+        </button>
+      </div>
+
+      <!-- 動態生成的 PayMe 直連與 FPS 付款 App 選項 -->
+      <div id="payModalMethodsContainer" class="space-y-2.5 text-xs"></div>
+    </div>
+  </div>
+
   <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 theme-bar-gradient text-white px-4 py-2 rounded-full text-xs font-bold shadow-xl z-50 hidden items-center gap-2 border border-white/20">
     <i class="fa-solid fa-circle-check text-amber-300"></i><span id="toastText">已完成</span>
   </div>
 
   <!-- ========================================================= -->
-  <!-- CORE APPLICATION LOGIC                                    -->
+  <!-- CORE APPLICATION LOGIC (v21)                              -->
   <!-- ========================================================= -->
   <script>
     const PASSCODE_REQUIRED = '246135';
-    const STORAGE_KEY_DB = 'panda_split_records_db_v19';
-    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v19';
+    const STORAGE_KEY_DB = 'panda_split_records_db_v21';
+    const STORAGE_KEY_AUTH = 'panda_split_unlocked_v21';
     let pinBuffer = ''; let currentFilterPlatform = 'ALL'; let sortNewestFirst = true; let activeTab = 'items'; let breakdownViewMode = 'item'; let appMode = 'creditor';
 
     let currentOcrEngine = 'local';
@@ -511,17 +543,20 @@
       try { sessionStorage.removeItem(key); } catch (e) {}
     }
     
+    // ★ 固化使用者 Client UID，防止同裝置自己的更新引發迴圈
+    let clientUid = safeStorageGet('split_rice_client_uid');
+    if (!clientUid) {
+      clientUid = 'u_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      safeStorageSet('split_rice_client_uid', clientUid);
+    }
+
     function clearLegacyStorage() {
       const keysToRemove = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k) continue;
-        if (k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) {
-          keysToRemove.push(k);
-        }
-        if (k.startsWith('panda_split_unlocked_v') && k !== STORAGE_KEY_AUTH) {
-          keysToRemove.push(k);
-        }
+        if (k.startsWith('panda_split_records_db_v') && k !== STORAGE_KEY_DB) { keysToRemove.push(k); }
+        if (k.startsWith('panda_split_unlocked_v') && k !== STORAGE_KEY_AUTH) { keysToRemove.push(k); }
       }
       keysToRemove.forEach(k => safeStorageRemove(k));
     }
@@ -574,14 +609,14 @@
       'Uber Eats': [ { title: 'Uber One 全單 85折 (上限$50)', badge: 'Uber One', mode: 'percent_cap', percentOff: 15, capAmount: 50 }, { title: '精選餐廳全單 8折 (上限$60)', badge: '限時推廣', mode: 'percent_cap', percentOff: 20, capAmount: 60 } ],
       '其他平台': [ { title: '全單 9折優惠', badge: '通用', mode: 'percent', percentOff: 10, capAmount: 0 } ]
     };
-    const defaultDatabase = { activeRecordId: null, paymentInfo: { fps: '', payme: '' }, records: [] };
+    const defaultDatabase = { activeRecordId: null, paymentInfo: { fps: '', payme: '' }, records: [], localUpdatedAt: 0 };
     let dbState = loadDatabase();
     let currentRoomId = String(safeStorageGet('panda_room_id', 'PANDA-8842')).toUpperCase();
     let isApplyingRemoteUpdate = false;
     window._firebaseBridge = { pushState: () => {}, subscribeRoom: () => {} };
     
     function loadDatabase() {
-      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v18', 'panda_split_records_db_v17_1', 'panda_split_records_db_v17', 'panda_split_records_db_v16', 'panda_split_records_db_v15'];
+      const keys = [STORAGE_KEY_DB, 'panda_split_records_db_v20', 'panda_split_records_db_v19', 'panda_split_records_db_v18', 'panda_split_records_db_v17_1', 'panda_split_records_db_v17', 'panda_split_records_db_v16'];
       for (const k of keys) {
         try { const saved = safeStorageGet(k); if (saved) { const parsed = JSON.parse(saved); if (parsed && Array.isArray(parsed.records)) return parsed; } } catch (e) {}
       }
@@ -589,75 +624,110 @@
     }
 
     function saveDatabase() {
+      dbState.localUpdatedAt = Date.now();
       const stateToSave = JSON.parse(JSON.stringify(dbState));
       stateToSave.records.forEach(r => {
         if (r.receipts) {
-          r.receipts.forEach(img => {
-            delete img.dataUrl; 
-          });
+          r.receipts.forEach(img => { delete img.dataUrl; });
         }
       });
-      try { 
-        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); 
-      } catch (e) {
-        alert('手機瀏覽器儲存空間已滿！');
-      }
+      try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(stateToSave)); } catch (e) { alert('手機瀏覽器儲存空間已滿！'); }
       if (!isApplyingRemoteUpdate && window._firebaseBridge) window._firebaseBridge.pushState();
     }
     
+    function ensureCloudSafeSize(dataUrl) {
+      return new Promise((resolve) => {
+        if (!dataUrl || dataUrl.length < 850000) { resolve(dataUrl); return; }
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale = 0.75;
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.45));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      });
+    }
+    window.ensureCloudSafeSize = ensureCloudSafeSize;
+
+    let isPreloadingImages = false;
     async function preloadActiveImages() {
       const rec = getActiveRecord();
-      if (rec && rec.receipts) {
-        for (let r of rec.receipts) {
-          if (!r.dataUrl) {
-            r.dataUrl = await ImageDB.get(r.id);
+      if (!rec || !rec.receipts || isPreloadingImages) return;
+      isPreloadingImages = true;
+      let updatedAny = false;
+
+      for (let r of rec.receipts) {
+        if (!r.dataUrl) {
+          const localUrl = await ImageDB.get(r.id);
+          if (localUrl) {
+            r.dataUrl = localUrl;
+            r._cloudMissing = false;
+            updatedAny = true;
+          } else if (window._firebaseBridge && window._firebaseBridge.fetchImageFromCloud) {
+            r._loadingCloud = true;
+            renderReceiptGallery(rec, appMode === 'debtor');
+            const cloudUrl = await window._firebaseBridge.fetchImageFromCloud(r.id);
+            r._loadingCloud = false;
+            if (cloudUrl) {
+              r.dataUrl = cloudUrl;
+              r._cloudMissing = false;
+              await ImageDB.save(r.id, cloudUrl);
+              updatedAny = true;
+            } else {
+              r._cloudMissing = true;
+            }
           }
+        } else if (!r._cloudSynced && window._firebaseBridge && window._firebaseBridge.saveImageToCloud) {
+          r._cloudSynced = true;
+          window._firebaseBridge.saveImageToCloud(r.id, r.dataUrl);
         }
-        renderReceiptGallery(rec, appMode === 'debtor');
+      }
+
+      isPreloadingImages = false;
+      const badge = document.getElementById('receiptCountBadge');
+      if (badge) badge.textContent = (rec.receipts || []).length;
+      renderReceiptGallery(rec, appMode === 'debtor');
+      if (updatedAny) renderActiveRecordAll();
+    }
+    window.preloadActiveImages = preloadActiveImages;
+
+    async function retryFetchCloudImage(rcpId) {
+      const rec = getActiveRecord();
+      if (!rec || !rec.receipts) return;
+      const target = rec.receipts.find(x => x.id === rcpId);
+      if (target) {
+        target._cloudMissing = false;
+        await preloadActiveImages();
       }
     }
 
     function getActiveRecord() { return dbState.activeRecordId ? dbState.records.find(r => r.id === dbState.activeRecordId) || null : null; }
     function applyPlatformTheme(platformName) { const validThemes = ['foodpanda', 'Keeta', 'Uber Eats', '其他平台']; const theme = validThemes.includes(platformName) ? platformName : 'foodpanda'; document.body.setAttribute('data-theme', theme); }
-    
-    function sanitizeCleanName(str) {
-      if (!str) return '';
-      return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim();
-    }
+    function sanitizeCleanName(str) { if (!str) return ''; return str.replace(/["'×=_\<>!@#%&*:;\?]/g, '').trim(); }
 
     function initAuthLock() { 
       const unlocked = safeStorageGet(STORAGE_KEY_AUTH) === 'true'; 
-      if (unlocked) {
-        unlockAppSuccess(false); 
-      } else { 
-        const ps = document.getElementById('passcodeScreen');
-        if (ps) ps.classList.remove('hidden'); 
-      } 
+      if (unlocked) { unlockAppSuccess(false); } else { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); } 
       const savedEngine = safeStorageGet('split_rice_ocr_engine');
-      if (savedEngine === 'ai' || savedEngine === 'local') {
-        setOcrEngine(savedEngine, true);
-      }
+      if (savedEngine === 'ai' || savedEngine === 'local') { setOcrEngine(savedEngine, true); }
     }
     
     function pressPinDigit(digit) { 
-      const d = String(digit);
-      if (pinBuffer.length >= 6) return; 
-      pinBuffer += d; 
-      updatePasscodeDots(); 
+      const d = String(digit); if (pinBuffer.length >= 6) return; pinBuffer += d; updatePasscodeDots(); 
       if (pinBuffer.length === 6) { 
-        if (pinBuffer === PASSCODE_REQUIRED) { 
-          safeStorageSet(STORAGE_KEY_AUTH, 'true'); 
-          unlockAppSuccess(true); 
-        } else { 
-          const dotsEl = document.getElementById('passcodeDots');
-          const hintEl = document.getElementById('passcodeHint');
+        if (pinBuffer === PASSCODE_REQUIRED) { safeStorageSet(STORAGE_KEY_AUTH, 'true'); unlockAppSuccess(true); } 
+        else { 
+          const dotsEl = document.getElementById('passcodeDots'); const hintEl = document.getElementById('passcodeHint');
           if (dotsEl) dotsEl.classList.add('animate-shake'); 
           if (hintEl) hintEl.textContent = '密碼錯誤，請重新輸入'; 
-          setTimeout(() => { 
-            if (dotsEl) dotsEl.classList.remove('animate-shake'); 
-            pinBuffer = ''; 
-            updatePasscodeDots(); 
-          }, 450); 
+          setTimeout(() => { if (dotsEl) dotsEl.classList.remove('animate-shake'); pinBuffer = ''; updatePasscodeDots(); }, 450); 
         } 
       } 
     }
@@ -667,24 +737,11 @@
     function updatePasscodeDots() { const dots = document.querySelectorAll('#passcodeDots span'); dots.forEach((dot, idx) => { dot.className = idx < pinBuffer.length ? 'w-3.5 h-3.5 rounded-full bg-amber-300 border-2 border-amber-300 scale-110 transition-all' : 'w-3.5 h-3.5 rounded-full border-2 border-white/80 transition-all'; }); }
     function unlockAppSuccess(showWelcome) { const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.add('hidden'); showRecordsListView(); if (showWelcome) showToast('驗證成功！'); }
     function lockApp() { 
-      closeNumericKeypad(); 
-      safeStorageRemove(STORAGE_KEY_AUTH);
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k);
-      }
-      for (let i = sessionStorage.length - 1; i >= 0; i--) {
-        const k = sessionStorage.key(i);
-        if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k);
-      }
-      pinBuffer = ''; 
-      updatePasscodeDots(); 
-      const hintEl = document.getElementById('passcodeHint');
-      if (hintEl) hintEl.textContent = '請輸入 6 位數通行密碼解鎖';
-      document.getElementById('recordsListView').classList.add('hidden'); 
-      document.getElementById('recordDetailView').classList.add('hidden'); 
-      const ps = document.getElementById('passcodeScreen'); 
-      if (ps) ps.classList.remove('hidden'); 
+      closeNumericKeypad(); safeStorageRemove(STORAGE_KEY_AUTH);
+      for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k); }
+      for (let i = sessionStorage.length - 1; i >= 0; i--) { const k = sessionStorage.key(i); if (k && k.startsWith('panda_split_unlocked')) safeStorageRemove(k); }
+      pinBuffer = ''; updatePasscodeDots(); const hintEl = document.getElementById('passcodeHint'); if (hintEl) hintEl.textContent = '請輸入 6 位數通行密碼解鎖';
+      document.getElementById('recordsListView').classList.add('hidden'); document.getElementById('recordDetailView').classList.add('hidden'); const ps = document.getElementById('passcodeScreen'); if (ps) ps.classList.remove('hidden'); 
     }
 
     window.addEventListener('keydown', (e) => {
@@ -711,19 +768,13 @@
     let activeInputZone = 'paste';
     function selectInputZone(zone) {
       activeInputZone = zone;
-      const pasteBtn = document.getElementById('zonePasteBtn');
-      const pasteIcon = document.getElementById('zonePasteIcon');
-      const pasteSub = document.getElementById('zonePasteSub');
-      const uploadBtn = document.getElementById('zoneUploadBtn');
-      const uploadIcon = document.getElementById('zoneUploadIcon');
-      const uploadSub = document.getElementById('zoneUploadSub');
+      const pasteBtn = document.getElementById('zonePasteBtn'); const pasteIcon = document.getElementById('zonePasteIcon'); const pasteSub = document.getElementById('zonePasteSub');
+      const uploadBtn = document.getElementById('zoneUploadBtn'); const uploadIcon = document.getElementById('zoneUploadIcon'); const uploadSub = document.getElementById('zoneUploadSub');
       if (!pasteBtn || !uploadBtn) return;
-
       if (zone === 'paste') {
         pasteBtn.className = 'py-2.5 px-2 bg-amber-400 text-neutral-900 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-amber-200 transition active:scale-95';
         if (pasteIcon) pasteIcon.className = 'fa-solid fa-paste text-sm text-neutral-900';
         if (pasteSub) pasteSub.className = 'text-[9px] opacity-85 font-normal';
-
         uploadBtn.className = 'py-2.5 px-2 bg-neutral-900/60 hover:bg-neutral-800/80 text-neutral-400 border border-transparent rounded-xl text-[11px] font-bold cursor-pointer flex flex-col items-center justify-center gap-1 opacity-65 transition active:scale-95';
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-neutral-400 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-neutral-500 font-normal';
@@ -731,7 +782,6 @@
         pasteBtn.className = 'py-2.5 px-2 bg-neutral-900/60 hover:bg-neutral-800/80 text-neutral-400 border border-transparent rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-1 opacity-65 transition active:scale-95';
         if (pasteIcon) pasteIcon.className = 'fa-solid fa-paste text-sm text-neutral-400';
         if (pasteSub) pasteSub.className = 'text-[9px] text-neutral-500 font-normal';
-
         uploadBtn.className = 'py-2.5 px-2 bg-neutral-800 text-white border-2 border-panda-400 rounded-xl text-[11px] font-extrabold cursor-pointer flex flex-col items-center justify-center gap-1 shadow-md ring-2 ring-panda-400/40 transition active:scale-95';
         if (uploadIcon) uploadIcon.className = 'fa-solid fa-file-arrow-up text-panda-300 text-sm';
         if (uploadSub) uploadSub.className = 'text-[9px] text-panda-200 font-normal';
@@ -739,13 +789,8 @@
     }
 
     function setOcrEngine(engine, isInit = false) {
-      currentOcrEngine = engine;
-      safeStorageSet('split_rice_ocr_engine', engine);
-      
-      const localBtn = document.getElementById('engineLocalBtn');
-      const aiBtn = document.getElementById('engineAiBtn');
-      const actionBtn = document.getElementById('smartOcrBtn');
-      
+      currentOcrEngine = engine; safeStorageSet('split_rice_ocr_engine', engine);
+      const localBtn = document.getElementById('engineLocalBtn'); const aiBtn = document.getElementById('engineAiBtn'); const actionBtn = document.getElementById('smartOcrBtn');
       if (engine === 'local') {
         if (localBtn) localBtn.className = 'flex-1 py-1.5 rounded-lg bg-neutral-600 text-white text-[11px] font-bold shadow-sm transition';
         if (aiBtn) aiBtn.className = 'flex-1 py-1.5 rounded-lg text-neutral-400 hover:text-white text-[11px] font-bold transition';
@@ -759,27 +804,11 @@
       }
     }
 
-    function openApiKeyModal() {
-      document.getElementById('apiKeyValueInput').value = geminiApiKey || '';
-      document.getElementById('apiKeyModal').classList.remove('hidden');
-    }
-    
-    function closeApiKeyModal() {
-      document.getElementById('apiKeyModal').classList.add('hidden');
-    }
-
+    function openApiKeyModal() { document.getElementById('apiKeyValueInput').value = geminiApiKey || ''; document.getElementById('apiKeyModal').classList.remove('hidden'); }
+    function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
     function saveApiKey() {
-      const val = document.getElementById('apiKeyValueInput').value.trim();
-      geminiApiKey = val;
-      safeStorageSet('split_rice_gemini_key', val);
-      closeApiKeyModal();
-      if (val) {
-        setOcrEngine('ai');
-        showToast('API Key 已儲存並啟用 🔵 AI 引擎！');
-      } else {
-        setOcrEngine('local');
-        showToast('已清空金鑰並切回 🟢 本機引擎');
-      }
+      const val = document.getElementById('apiKeyValueInput').value.trim(); geminiApiKey = val; safeStorageSet('split_rice_gemini_key', val); closeApiKeyModal();
+      if (val) { setOcrEngine('ai'); showToast('API Key 已儲存並啟用 🔵 AI 引擎！'); } else { setOcrEngine('local'); showToast('已清空金鑰並切回 🟢 本機引擎'); }
     }
 
     let keypadState = { targetId: null, isAddItemTrigger: false, allowSpaces: false };
@@ -838,7 +867,6 @@
         const box = document.getElementById('aiScanStatusBox'); if (box) box.classList.add('hidden');
         const txt = document.getElementById('aiScanStatusText'); if (txt) txt.innerHTML = '準備就緒';
     }
-
     function createNewRecord() {
       document.getElementById('zoomReceiptBox').classList.add('hidden'); document.getElementById('zoomReceiptImg').src = ''; resetOcrStatusBox();
       const ts = new Date().toISOString().split('T')[0]; const defaultPlatform = currentFilterPlatform !== 'ALL' ? currentFilterPlatform : 'foodpanda';
@@ -855,7 +883,12 @@
       if (appMode === 'debtor') return; 
       const t = dbState.records.find(r => r.id === id); 
       if (!t || !confirm(`確定要刪除「${t.title}」嗎？`)) return; 
-      if (t.receipts) { t.receipts.forEach(rcp => ImageDB.remove(rcp.id)); }
+      if (t.receipts) { 
+        t.receipts.forEach(rcp => {
+          ImageDB.remove(rcp.id);
+          if (window._firebaseBridge && window._firebaseBridge.deleteImageFromCloud) { window._firebaseBridge.deleteImageFromCloud(rcp.id); }
+        }); 
+      }
       dbState.records = dbState.records.filter(r => r.id !== id); 
       if (dbState.activeRecordId === id) dbState.activeRecordId = null; 
       saveDatabase(); renderRecordsList(); showToast('已刪除紀錄'); 
@@ -1349,7 +1382,14 @@
           pass1Lines = pass1Lines.concat(reconstructLineObjects(resOrig.data.words, images[i].dataUrl));
 
           const newUrl = await cropImageTopAndBottom(images[i].dataUrl, resOrig.data.words);
-          if (newUrl !== images[i].dataUrl) { images[i].dataUrl = newUrl; ImageDB.save(images[i].id, newUrl); croppedAny = true; }
+          if (newUrl !== images[i].dataUrl) { 
+            images[i].dataUrl = newUrl; 
+            ImageDB.save(images[i].id, newUrl); 
+            if (window._firebaseBridge && window._firebaseBridge.saveImageToCloud) {
+              window._firebaseBridge.saveImageToCloud(images[i].id, newUrl);
+            }
+            croppedAny = true; 
+          }
 
           statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-emerald-300"></i>🟢 正在增強對比與重組空間座標 (${i + 1}/${images.length})...`;
           const enhancedDataUrl = await preprocessImageForOcr(images[i].dataUrl); 
@@ -1389,7 +1429,7 @@
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
-          img.onload = () => {
+          img.onload = async () => {
             const canvas = document.createElement('canvas'); 
             let w = img.width; let h = img.height; 
             const MAX_WIDTH = 800;
@@ -1399,18 +1439,21 @@
             canvas.width = w; canvas.height = h; 
             const ctx = canvas.getContext('2d'); 
             ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h); 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+            let dataUrl = canvas.toDataURL('image/jpeg', 0.55);
+            dataUrl = await ensureCloudSafeSize(dataUrl);
             
             const rcpId = 'rcp_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
-            ImageDB.save(rcpId, dataUrl).then(() => {
-              rec.receipts.push({ id: rcpId, name: file.name, dataUrl: dataUrl }); 
-              loaded++;
-              if (loaded === files.length) { 
-                saveDatabase(); renderActiveRecordAll(); 
-                selectInputZone('upload');
-                showToast(`已載入 ${files.length} 張截圖！可點擊識圖`); 
-              }
-            });
+            await ImageDB.save(rcpId, dataUrl);
+            if (window._firebaseBridge && window._firebaseBridge.saveImageToCloud) {
+              window._firebaseBridge.saveImageToCloud(rcpId, dataUrl);
+            }
+            rec.receipts.push({ id: rcpId, name: file.name, dataUrl: dataUrl, _cloudSynced: true }); 
+            loaded++;
+            if (loaded === files.length) { 
+              saveDatabase(); renderActiveRecordAll(); 
+              selectInputZone('upload');
+              showToast(`已載入並同步 ${files.length} 張截圖！`); 
+            }
           };
           img.src = e.target.result;
         };
@@ -1420,7 +1463,27 @@
     }
     
     function zoomReceiptImage(dataUrl) { document.getElementById('zoomReceiptImg').src = dataUrl; document.getElementById('zoomReceiptBox').classList.remove('hidden'); }
-    function removeReceiptImage(id) { if(appMode === 'debtor') return; const rec = getActiveRecord(); if (!rec) return; ImageDB.remove(id); rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); }
+    function removeReceiptImage(id) { 
+      if (appMode === 'debtor') return; 
+      const rec = getActiveRecord(); if (!rec) return; 
+      ImageDB.remove(id); 
+      if (window._firebaseBridge && window._firebaseBridge.deleteImageFromCloud) { window._firebaseBridge.deleteImageFromCloud(id); }
+      rec.receipts = (rec.receipts || []).filter(r => r.id !== id); saveDatabase(); renderActiveRecordAll(); showToast('已移除截圖'); 
+    }
+
+    function resolvePaymeUrl(rawInput) {
+      const val = String(rawInput || '').trim();
+      if (!val) return null;
+      const urlMatch = val.match(/https?:\/\/[^\s]+/i);
+      if (urlMatch) return urlMatch[0];
+      if (/^payme\.hsbc\/[a-zA-Z0-9._-]+/i.test(val)) return 'https://' + val;
+      if (/^[a-zA-Z0-9._-]{3,30}$/.test(val) && !/^\d{8}$/.test(val)) {
+        return 'https://payme.hsbc/' + val;
+      }
+      return null;
+    }
+
+    let currentPayModalAmountVal = '0.0';
 
     // --- 6. UI RENDER LOGIC ---
     function renderActiveRecordAll() {
@@ -1429,7 +1492,7 @@
       document.getElementById('orderDateInput').value = rec.date || ''; document.getElementById('orderDateInput').readOnly = isDebtor;
       document.getElementById('orderPlatformSelect').value = rec.platform || 'foodpanda'; document.getElementById('orderPlatformSelect').disabled = isDebtor;
       document.getElementById('orderRestaurantInput').value = rec.restaurant || ''; document.getElementById('orderRestaurantInput').readOnly = isDebtor;
-      document.getElementById('receiptCountBadge').textContent = (rec.receipts || []).filter(r => r.dataUrl).length; 
+      document.getElementById('receiptCountBadge').textContent = (rec.receipts || []).length; 
       
       document.getElementById('sumOriginal').textContent = `$${calc.totalOriginal.toFixed(1)}`; document.getElementById('sumDiscount').textContent = `-$${calc.totalDiscount.toFixed(1)}`;
       document.getElementById('sumFees').textContent = `+$${calc.totalFees.toFixed(1)}`; document.getElementById('sumFinal').textContent = `$${calc.sumRoundedCollectible.toFixed(1)}`;
@@ -1450,14 +1513,16 @@
       if (r.length === 0) { strip.innerHTML = `<div class="text-[11px] text-neutral-400 py-1 px-1">尚未上傳截圖。</div>`; return; }
       strip.innerHTML = r.map((rc, i) => {
         if (!rc.dataUrl) {
-          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between items-center text-center opacity-70">
-            <div class="text-[10px] text-neutral-400 mb-2 w-full"><i class="fa-solid fa-cloud-arrow-down mb-1 text-sm block"></i>圖片已為節省空間而釋放</div>
+          if (rc._cloudMissing) {
+            return `<div onclick="retryFetchCloudImage('${rc.id}')" class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 hover:border-amber-400 rounded-xl p-2 flex flex-col justify-center items-center text-center cursor-pointer transition">
+              <div class="text-[10px] text-amber-300 font-bold"><i class="fa-solid fa-rotate-right mb-1 text-sm block"></i>點擊重新載入雲端圖</div>
+            </div>`;
+          }
+          return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-center items-center text-center opacity-85">
+            <div class="text-[10px] text-sky-300 font-bold"><i class="fa-solid fa-cloud-arrow-down fa-fade mb-1 text-sm block"></i>☁️ 正在從雲端同步...</div>
           </div>`;
         }
-        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div>
-          <img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" />
-        </div>`;
+        return `<div class="shrink-0 w-36 bg-neutral-800 border border-neutral-700 rounded-xl p-2 flex flex-col justify-between"><div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold text-amber-300 truncate">#${i+1} 點圖放大</span>${isDebtor ? '' : `<button onclick="removeReceiptImage('${rc.id}')" class="text-neutral-400 hover:text-rose-400"><i class="fa-solid fa-trash-can"></i></button>`}</div><img src="${rc.dataUrl}" onclick="zoomReceiptImage('${rc.dataUrl}')" class="h-16 w-full object-cover rounded-lg cursor-zoom-in border border-neutral-600" /></div>`;
       }).join('');
     }
     function renderParticipantChips(rec, calc, isDebtor) {
@@ -1538,9 +1603,49 @@
     }
     function renderCollectTab(rec, calc, isDebtor) {
       if (!rec.paymentInfo) rec.paymentInfo = { fps: '', payme: '' };
-      document.getElementById('inputPaymentFps').value = rec.paymentInfo.fps || ''; document.getElementById('inputPaymentFps').readOnly = isDebtor;
-      document.getElementById('inputPaymentPayme').value = rec.paymentInfo.payme || ''; document.getElementById('inputPaymentPayme').readOnly = isDebtor;
-      document.getElementById('clearPaymentBtn').style.display = isDebtor ? 'none' : 'block'; document.getElementById('markAllPaidBtn').style.display = isDebtor ? 'none' : 'block';
+      const fpsVal = (rec.paymentInfo.fps || '').trim();
+      const paymeVal = (rec.paymentInfo.payme || '').trim();
+      const paymeUrl = resolvePaymeUrl(paymeVal);
+      const hasAnyPayment = Boolean(fpsVal || paymeVal);
+
+      document.getElementById('inputPaymentFps').value = rec.paymentInfo.fps || '';
+      document.getElementById('inputPaymentFps').readOnly = isDebtor;
+      document.getElementById('inputPaymentPayme').value = rec.paymentInfo.payme || '';
+      document.getElementById('inputPaymentPayme').readOnly = isDebtor;
+      document.getElementById('clearPaymentBtn').style.display = isDebtor ? 'none' : 'block';
+      document.getElementById('markAllPaidBtn').style.display = isDebtor ? 'none' : 'block';
+
+      const quickBar = document.getElementById('paymentQuickActionsBar');
+      if (quickBar) {
+        if (!hasAnyPayment) {
+          quickBar.classList.add('hidden');
+          quickBar.innerHTML = '';
+        } else {
+          quickBar.classList.remove('hidden');
+          const btns = [];
+          if (paymeUrl) {
+            btns.push(`
+              <a href="${escapeHtml(paymeUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2 px-3 rounded-xl bg-[#db0011] hover:opacity-95 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i><span>開啟 PayMe 付款</span>
+              </a>
+            `);
+          }
+          if (fpsVal) {
+            btns.push(`
+              <button type="button" onclick="openPaymentModal(null)" class="flex-1 py-2 px-3 rounded-xl bg-panda-600 hover:bg-panda-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
+                <i class="fa-solid fa-mobile-screen-button"></i><span>FPS / 選擇付款 App</span>
+              </button>
+            `);
+          } else if (!paymeUrl && paymeVal) {
+            btns.push(`
+              <button type="button" onclick="openPaymentModal(null)" class="flex-1 py-2 px-3 rounded-xl bg-panda-600 hover:bg-panda-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
+                <i class="fa-solid fa-wallet"></i><span>檢視付款方式</span>
+              </button>
+            `);
+          }
+          quickBar.innerHTML = `<div class="flex items-center gap-2">${btns.join('')}</div>`;
+        }
+      }
 
       document.getElementById('collectionCardsContainer').innerHTML = calc.itemBreakdown.map((ib,i) => `
         <div class="bg-white p-3 rounded-2xl shadow-xs border flex items-center justify-between ${ib.paid?'border-emerald-300 bg-emerald-50/30':'border-panda-100'}">
@@ -1551,9 +1656,12 @@
               <div class="text-[11px] text-neutral-500 mt-0.5">原價$${ib.originalPrice.toFixed(1)} → 減$${ib.discountShare.toFixed(1)} 加$${ib.feeShare.toFixed(1)}</div>
             </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <span class="font-extrabold ${ib.paid?'text-emerald-600':'text-panda-600'}">$${ib.finalPayable.toFixed(1)}</span>
-            <button onclick="copySingleItemReminder('${ib.id}')" class="px-2.5 py-1.5 rounded-xl bg-panda-50 text-panda-600 text-xs font-bold"><i class="fa-regular fa-copy"></i></button>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="font-extrabold text-sm ${ib.paid?'text-emerald-600':'text-panda-600'} mr-0.5">$${ib.finalPayable.toFixed(1)}</span>
+            <button type="button" onclick="openPaymentModal('${ib.id}')" class="px-2.5 py-1.5 rounded-xl ${ib.paid ? 'bg-neutral-100 text-neutral-500' : 'theme-bar-gradient text-white shadow-xs'} text-xs font-extrabold flex items-center gap-1 active:scale-95 transition">
+              <i class="fa-solid fa-credit-card text-[10px]"></i><span>付款</span>
+            </button>
+            <button type="button" onclick="copySingleItemReminder('${ib.id}')" class="px-2 py-1.5 rounded-xl bg-panda-50 text-panda-600 text-xs font-bold active:scale-95 transition"><i class="fa-regular fa-copy"></i></button>
           </div>
         </div>
       `).join('');
@@ -1582,6 +1690,106 @@
       } else { l.push(`(未提供過數資料)`); }
       document.getElementById('whatsappMessageOutput').value = l.join('\n');
     }
+
+    function openPaymentModal(itemId) {
+      const rec = getActiveRecord();
+      if (!rec) return;
+      const calc = calculateRecordBill(rec);
+      const pInfo = rec.paymentInfo || { fps: '', payme: '' };
+      const fpsVal = (pInfo.fps || '').trim();
+      const paymeVal = (pInfo.payme || '').trim();
+      const paymeUrl = resolvePaymeUrl(paymeVal);
+
+      const titleEl = document.getElementById('payModalTitle');
+      const amountEl = document.getElementById('payModalAmount');
+      const formulaEl = document.getElementById('payModalFormula');
+      const container = document.getElementById('payModalMethodsContainer');
+
+      if (itemId) {
+        const ib = calc.itemBreakdown.find(x => x.id === itemId);
+        if (ib) {
+          titleEl.textContent = ib.name + (ib.assignedNames.length ? ` (@${ib.assignedNames.join(',')})` : '');
+          currentPayModalAmountVal = ib.finalPayable.toFixed(1);
+          amountEl.textContent = `$${currentPayModalAmountVal}`;
+          formulaEl.textContent = `原價 $${ib.originalPrice.toFixed(1)} - 折扣 $${ib.discountShare.toFixed(1)} + 費用 $${ib.feeShare.toFixed(1)}`;
+        }
+      } else {
+        titleEl.textContent = rec.title || '全單過數資料';
+        currentPayModalAmountVal = calc.sumRoundedCollectible.toFixed(1);
+        amountEl.textContent = `$${currentPayModalAmountVal}`;
+        formulaEl.textContent = `全單折實總計 (請確認您個人應付的餐點金額)`;
+      }
+
+      const blocks = [];
+      if (paymeUrl) {
+        blocks.push(`
+          <a href="${escapeHtml(paymeUrl)}" target="_blank" rel="noopener noreferrer" onclick="copyPayModalAmountSilent()" class="w-full p-3.5 rounded-2xl bg-[#db0011] hover:opacity-95 text-white flex items-center justify-between shadow-md transition active:scale-98">
+            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+              <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-base font-extrabold shrink-0">P</div>
+              <div class="min-w-0 text-left">
+                <div class="font-extrabold text-xs sm:text-sm">使用 PayMe 立即付款</div>
+                <div class="text-[10px] text-white/80 truncate">${escapeHtml(paymeUrl)}</div>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-white text-[#db0011] font-extrabold text-[11px] shrink-0">開啟 App <i class="fa-solid fa-chevron-right ml-0.5"></i></span>
+          </a>
+        `);
+      } else if (paymeVal) {
+        blocks.push(`
+          <div class="p-3 rounded-2xl bg-neutral-50 border border-neutral-200 flex items-center justify-between">
+            <div class="min-w-0 pr-2">
+              <span class="text-[10px] text-neutral-400 font-bold block">PayMe 備註 / 號碼</span>
+              <span class="font-extrabold text-xs text-neutral-800 break-all">${escapeHtml(paymeVal)}</span>
+            </div>
+            <button type="button" onclick="copyTextWithToast('${escapeHtml(paymeVal)}', '已複製 PayMe 資料！')" class="px-3 py-1.5 rounded-xl bg-panda-50 text-panda-700 font-bold text-xs shrink-0">複製</button>
+          </div>
+        `);
+      }
+
+      if (fpsVal) {
+        blocks.push(`
+          <div class="p-3.5 rounded-2xl bg-neutral-900 text-white space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="min-w-0 pr-2">
+                <span class="text-[10px] text-amber-300 font-bold block"><i class="fa-solid fa-bolt mr-1"></i>FPS 轉數快識別碼 / 電話</span>
+                <span class="font-mono font-extrabold text-sm text-white break-all">${escapeHtml(fpsVal)}</span>
+              </div>
+              <button type="button" onclick="copyFpsAndPrompt('${escapeHtml(fpsVal)}')" class="px-3 py-1.5 rounded-xl bg-amber-400 text-neutral-900 font-extrabold text-xs shrink-0 active:scale-95 transition">
+                <i class="fa-regular fa-copy mr-1"></i>複製號碼
+              </button>
+            </div>
+            <div class="pt-2 border-t border-neutral-800">
+              <span class="text-[10px] text-neutral-400 block mb-1.5">點擊下方按鈕將自動複製 FPS 號碼並嘗試喚起付款 App：</span>
+              <div class="grid grid-cols-3 gap-1.5">
+                <a href="payme://" onclick="copyFpsAndPrompt('${escapeHtml(fpsVal)}')" class="py-2 px-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-center font-bold text-[11px] text-white border border-neutral-700 transition">📲 PayMe</a>
+                <a href="alipayhk://" onclick="copyFpsAndPrompt('${escapeHtml(fpsVal)}')" class="py-2 px-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-center font-bold text-[11px] text-sky-300 border border-neutral-700 transition">💠 AlipayHK</a>
+                <button type="button" onclick="triggerNativeSharePayment('${escapeHtml(fpsVal)}')" class="py-2 px-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-center font-bold text-[11px] text-amber-300 border border-neutral-700 transition"><i class="fa-solid fa-building-columns mr-0.5"></i>銀行 App</button>
+              </div>
+            </div>
+          </div>
+        `);
+      }
+
+      if (blocks.length === 0) {
+        blocks.push(`
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs text-center space-y-1">
+            <i class="fa-solid fa-circle-info text-base text-amber-600 block"></i>
+            <div class="font-bold">墊支負責人尚未填寫 FPS 或 PayMe 連結</div>
+            <div class="text-[11px] text-amber-700">請先在「墊支負責人收款資料」欄位輸入電話或 PayMe 網址，此處按鈕將會即時自動更新。</div>
+          </div>
+        `);
+      }
+
+      container.innerHTML = blocks.join('');
+      document.getElementById('paymentActionModal').classList.remove('hidden');
+    }
+
+    function closePaymentModal() { document.getElementById('paymentActionModal').classList.add('hidden'); }
+    function copyPayModalAmount() { navigator.clipboard.writeText(currentPayModalAmountVal).then(() => { showToast(`已複製應付銀碼：$${currentPayModalAmountVal}`); }); }
+    function copyPayModalAmountSilent() { try { navigator.clipboard.writeText(currentPayModalAmountVal); } catch (e) {} showToast(`已複製應付銀碼 $${currentPayModalAmountVal}，正在開啟 PayMe...`); }
+    function copyTextWithToast(txt, toastMsg) { navigator.clipboard.writeText(txt).then(() => showToast(toastMsg)); }
+    function copyFpsAndPrompt(fpsNum) { navigator.clipboard.writeText(fpsNum).then(() => { showToast(`已複製 FPS (${fpsNum})！過數金額：$${currentPayModalAmountVal}`); }); }
+    function triggerNativeSharePayment(fpsNum) { navigator.clipboard.writeText(fpsNum).then(() => { showToast(`已複製 FPS 號碼 (${fpsNum})！請打開銀行 App 貼上並過數 $${currentPayModalAmountVal}`); }); }
 
     function switchTab(t) { closeNumericKeypad(); activeTab = t; ['items','discounts','breakdown','collect'].forEach(x => { document.getElementById(`tab-${x}`).classList.toggle('hidden', x !== t); const m = document.getElementById(`mobTab-${x}`); if (m) m.className = x === t ? 'flex flex-col items-center justify-center py-1.5 rounded-xl text-panda-600 bg-panda-50 font-bold' : 'flex flex-col items-center justify-center py-1.5 rounded-xl text-neutral-400 font-medium'; const d = document.getElementById(`deskTab-${x}`); if (d) d.className = x === t ? 'py-2 rounded-xl text-xs font-bold bg-panda-600 text-white' : 'py-2 rounded-xl text-xs font-bold text-panda-800'; }); renderActiveRecordAll(); }
     function updateOrderMetadata() { if (appMode === 'debtor') return; const r = getActiveRecord(); if (!r) return; r.title = document.getElementById('orderTitleInput').value.trim(); r.date = document.getElementById('orderDateInput').value; r.restaurant = document.getElementById('orderRestaurantInput').value.trim(); saveDatabase(); renderActiveRecordAll(); }
@@ -1627,7 +1835,6 @@
     function duplicateItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); const i = r.items.find(x => x.id === id); if (!i) return; r.items.push({ id: 'i_' + Date.now(), name: i.name, price: i.price, assignedTo: [...(i.assignedTo || [])], paid: false, microCrop: i.microCrop || null }); saveDatabase(); renderActiveRecordAll(); }
     function deleteItem(id) { if(appMode === 'debtor') return; const r = getActiveRecord(); r.items = r.items.filter(x => x.id !== id); saveDatabase(); renderActiveRecordAll(); }
     
-    // ★ 歷史群組邏輯
     function getRecentCloudRooms() {
       let rooms = [];
       try { rooms = JSON.parse(safeStorageGet('panda_recent_rooms', '[]')); } catch(e) {}
@@ -1673,8 +1880,8 @@
     
     function showToast(msg) { const b = document.getElementById('toastBanner'); document.getElementById('toastText').textContent = msg; b.classList.remove('hidden'); b.classList.add('flex'); clearTimeout(window._toastTimer); window._toastTimer = setTimeout(() => { b.classList.add('hidden'); b.classList.remove('flex'); }, 2600); }
     function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
-
-    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone, selectRecentCloudRoom });
+    
+    Object.assign(window, { pressPinDigit, backspacePinDigit, clearPinDigits, lockApp, setAppMode, openNumericKeypad, closeNumericKeypad, keypadPress, keypadBackspace, keypadClear, keypadConfirmAction, showRecordsListView, backToRecordsList, setPlatformFilter, toggleSortOrder, clearRecordSearch, createNewRecord, deleteRecord, openRecordDetail, openSmartPasteModal, closeSmartPasteModal, parseSmartTextAndImport, runSmartOcr, runLocalOfflineOcr, openSmartPasteWithText, handleMultiReceiptUpload, zoomReceiptImage, removeReceiptImage, switchTab, updateOrderMetadata, handlePlatformChange, addNewItem, addRapidBatchPrices, clearAllItems, applyVerifiedPromo, clearAllParticipants, removeParticipant, toggleItemAssignee, setDiscountMode, updateDiscountParams, updateFeeParams, setFeeSplitMode, setRoundingMode, setBreakdownViewMode, toggleItemPaid, markAllPaid, updatePaymentInfo, clearPaymentInfoFields, copyShareMessage, copySingleItemReminder, openAddParticipantModal, closeParticipantModal, confirmAddParticipant, toggleReceiptDrawer, openItemActionSheet, closeActionSheet, saveItemEdit, duplicateItem, deleteItem, openCloudModal, closeCloudModal, joinCloudRoom, setOcrEngine, openApiKeyModal, closeApiKeyModal, saveApiKey, selectInputZone, selectRecentCloudRoom, openPaymentModal, closePaymentModal, copyPayModalAmount, copyPayModalAmountSilent, copyTextWithToast, copyFpsAndPrompt, triggerNativeSharePayment });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -1690,7 +1897,12 @@
   <!-- FIREBASE CLOUD SYNC -->
   <script type="module">
     const firebaseConfig = { apiKey: "AIzaSyD4fH7khR8coPGOc7e8tFXyKR6UHb-k3aI", authDomain: "rice-money-back.firebaseapp.com", projectId: "rice-money-back", storageBucket: "rice-money-back.firebasestorage.app", messagingSenderId: "879838987019", appId: "1:879838987019:web:cea2e429400b703c50580e" };
-    let clientUid = 'u_' + Math.random().toString(36).substring(2, 9);
+    let clientUid = localStorage.getItem('split_rice_client_uid');
+    if (!clientUid) {
+      clientUid = 'u_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      try { localStorage.setItem('split_rice_client_uid', clientUid); } catch (e) {}
+    }
+    
     async function loadFirebaseSdk() {
       const v = '11.1.0';
       const [app, auth, fs] = await Promise.all([ import(`https://www.gstatic.com/firebasejs/${v}/firebase-app.js`), import(`https://www.gstatic.com/firebasejs/${v}/firebase-auth.js`), import(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore.js`) ]);
@@ -1701,34 +1913,113 @@
         const fb = await loadFirebaseSdk(); const app = fb.initializeApp(firebaseConfig); const auth = fb.getAuth(app); const db = fb.getFirestore(app);
         try { await fb.signInAnonymously(auth); } catch (e) {}
         let unsub = null; let timer = null;
+        let hasInitialSync = false;
+
+        async function saveImageToCloud(imgId, dataUrl) {
+          if (!imgId || !dataUrl) return;
+          try {
+            const safeUrl = await window.ensureCloudSafeSize(dataUrl);
+            await fb.setDoc(fb.doc(db, 'receipt_images_v21', imgId), {
+              id: imgId,
+              roomId: currentRoomId,
+              dataUrl: safeUrl,
+              updatedAt: Date.now()
+            });
+          } catch (e) {}
+        }
+
+        async function fetchImageFromCloud(imgId) {
+          if (!imgId) return null;
+          try {
+            const snap = await fb.getDoc(fb.doc(db, 'receipt_images_v21', imgId));
+            if (snap.exists()) {
+              return snap.data().dataUrl || null;
+            }
+          } catch (e) {}
+          return null;
+        }
+
+        async function deleteImageFromCloud(imgId) {
+          if (!imgId) return;
+          try {
+            await fb.deleteDoc(fb.doc(db, 'receipt_images_v21', imgId));
+          } catch (e) {}
+        }
+
         function pushState() {
+          if (!hasInitialSync) return;
           clearTimeout(timer); timer = setTimeout(async () => {
-            try { const lDb = JSON.parse(JSON.stringify(dbState)); lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); await fb.setDoc(fb.doc(db, 'orders_v19', currentRoomId), { dbPayload: lDb, updatedAt: Date.now(), updatedBy: clientUid }, { merge: true }); } catch (e) {}
+            try { 
+              const lDb = JSON.parse(JSON.stringify(dbState)); 
+              lDb.records.forEach(r => { if (r.receipts) r.receipts = r.receipts.map(rcp => ({ id: rcp.id, name: rcp.name })); }); 
+              await fb.setDoc(fb.doc(db, 'orders_v21', currentRoomId), { 
+                dbPayload: lDb, 
+                updatedAt: lDb.localUpdatedAt || Date.now(), 
+                updatedBy: clientUid 
+              }, { merge: true }); 
+            } catch (e) {}
           }, 400);
         }
+
         function subscribeRoom(rid) {
           if (unsub) unsub();
-          unsub = fb.onSnapshot(fb.doc(db, 'orders_v19', rid), (snap) => {
+          hasInitialSync = false;
+          unsub = fb.onSnapshot(fb.doc(db, 'orders_v21', rid), (snap) => {
             const dot = document.getElementById('listCloudDot'); const txt = document.getElementById('listCloudText');
             if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; if (txt) txt.textContent = `同步 (#${rid})`;
             if (snap.exists()) {
               const data = snap.data();
-              if (data && data.dbPayload && data.updatedBy !== clientUid) {
-                isApplyingRemoteUpdate = true;
-                const localReceiptsMap = {};
-                dbState.records.forEach(r => { localReceiptsMap[r.id] = r.receipts || []; });
-                dbState = data.dbPayload;
-                dbState.records.forEach(r => {
-                  if (localReceiptsMap[r.id] && localReceiptsMap[r.id].length > 0) {
-                    r.receipts = localReceiptsMap[r.id];
+              hasInitialSync = true;
+              
+              if (data && data.dbPayload) {
+                const remoteTime = data.updatedAt || 0;
+                const localTime = dbState.localUpdatedAt || 0;
+                const isForeignUpdate = data.updatedBy !== clientUid;
+                const isInitialEmptyLoad = dbState.records.length === 0 && (data.dbPayload.records || []).length > 0;
+
+                // ★ Timestamp Resolution：防止 Race Condition 互相洗白
+                if (isInitialEmptyLoad || (isForeignUpdate && remoteTime >= localTime)) {
+                  isApplyingRemoteUpdate = true;
+                  const localReceiptsMap = {};
+                  dbState.records.forEach(r => {
+                    localReceiptsMap[r.id] = {};
+                    (r.receipts || []).forEach(rcp => { if (rcp.dataUrl) localReceiptsMap[r.id][rcp.id] = rcp.dataUrl; });
+                  });
+                  
+                  dbState = data.dbPayload;
+                  
+                  dbState.records.forEach(r => {
+                    if (r.receipts && localReceiptsMap[r.id]) {
+                      r.receipts.forEach(rcp => {
+                        if (localReceiptsMap[r.id][rcp.id]) rcp.dataUrl = localReceiptsMap[r.id][rcp.id];
+                      });
+                    }
+                  });
+                  
+                  try { localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(dbState)); } catch (e) {}
+                  
+                  // 判斷當前頁面，正確刷新 UI
+                  if (typeof window.showRecordsListView === 'function' && document.getElementById('recordsListView') && !document.getElementById('recordsListView').classList.contains('hidden')) {
+                    window.renderRecordsList();
+                  } else {
+                    if (typeof window.renderRecordsList === 'function') window.renderRecordsList();
                   }
-                });
-                renderRecordsList(); renderActiveRecordAll(); isApplyingRemoteUpdate = false;
+                  if (typeof window.renderActiveRecordAll === 'function') window.renderActiveRecordAll();
+                  
+                  isApplyingRemoteUpdate = false;
+                  if (typeof window.preloadActiveImages === 'function') window.preloadActiveImages();
+                }
               }
-            } else pushState();
+            } else {
+              hasInitialSync = true;
+              if (dbState.records.length > 0) pushState();
+            }
           }, () => { const t = document.getElementById('listCloudText'); if (t) t.textContent = '本機儲存'; });
         }
-        window._firebaseBridge = { pushState, subscribeRoom }; subscribeRoom(currentRoomId);
+
+        window._firebaseBridge = { pushState, subscribeRoom, saveImageToCloud, fetchImageFromCloud, deleteImageFromCloud };
+        subscribeRoom(currentRoomId);
+        if (typeof window.preloadActiveImages === 'function') window.preloadActiveImages();
       } catch (e) {}
     }
     initCloud();
